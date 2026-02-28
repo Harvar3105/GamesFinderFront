@@ -1,7 +1,7 @@
 import { config, Config } from "../config";
 import { HttpClient } from "./httpClient";
 
-class BackendFetcher extends HttpClient {
+class GamesAndOffersFetcher extends HttpClient {
   private readonly config: Config;
 
   constructor(config: Config) {
@@ -67,4 +67,4 @@ class BackendFetcher extends HttpClient {
   }
 }
 
-export const backendFetcher = new BackendFetcher(config);
+export const backendFetcher = new GamesAndOffersFetcher(config);
