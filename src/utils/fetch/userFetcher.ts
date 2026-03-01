@@ -4,7 +4,7 @@ import { User } from "domain/entities/User";
 
 export interface UserFetcherResponse {
   user: User;
-  jwt: string;
+  accessToken: string;
   refreshToken: string;
 }
 
@@ -19,7 +19,15 @@ class UserFetcher extends HttpClient {
     this.config = config;
   }
 
-  public register(username: string, email: string, password: string) {
+  public register({
+    username,
+    email,
+    password,
+  }: {
+    username: string;
+    email: string;
+    password: string;
+  }) {
     return this.post<UserFetcherResponse>(this.config.userRegisterEndpoint, {
       username: username,
       email: email,
@@ -27,7 +35,15 @@ class UserFetcher extends HttpClient {
     });
   }
 
-  public login(password: string, username?: string, email?: string) {
+  public login({
+    username,
+    email,
+    password,
+  }: {
+    password: string;
+    username?: string;
+    email?: string;
+  }) {
     return this.post<UserFetcherResponse>(this.config.userLoginEndpoint, {
       username: username,
       email: email,

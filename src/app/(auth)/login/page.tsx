@@ -5,7 +5,8 @@ import { AnimationType } from "@/components/animations/animationTypes";
 import { useToken } from "@/components/providers/TokenProvider";
 import { useUser } from "@/components/providers/UserProvider";
 import { useState } from "react";
-import { userFetcher } from "utils/fetch/userFetcher";
+import { bffUserFetcher } from "utils/fetch/bff/bffUserFetcher";
+import { HttpError } from "utils/fetch/httpError";
 
 export default function LoginPage() {
   const { setUser } = useUser();
@@ -24,15 +25,24 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const result = await userFetcher.login(form.usernameOrEmail, form.password);
-    if (!result) {
+    let result;
+    if (form.usernameOrEmail.includes("@")) {
+      result = await bffUserFetcher.login({ email: form.usernameOrEmail, password: form.password });
+    } else {
+      result = await bffUserFetcher.login({
+        username: form.usernameOrEmail,
+        password: form.password,
+      });
+    }
+    console.log(result);
+    console.log(result instanceof HttpError);
+    if (result instanceof HttpError) {
       setError("Login failed");
       return;
     }
 
     setUser(result.user);
-    updateJwt(result.jwt);
+    updateJwt(result.accessToken);
     updateRt(result.refreshToken);
     setError("");
   };

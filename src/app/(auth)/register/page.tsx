@@ -5,7 +5,8 @@ import { AnimationType } from "@/components/animations/animationTypes";
 import { useToken } from "@/components/providers/TokenProvider";
 import { useUser } from "@/components/providers/UserProvider";
 import { useState } from "react";
-import { userFetcher } from "utils/fetch/userFetcher";
+import { bffUserFetcher } from "utils/fetch/bff/bffUserFetcher";
+import { HttpError } from "utils/fetch/httpError";
 
 export default function RegisterPage() {
   const { setUser } = useUser();
@@ -31,14 +32,19 @@ export default function RegisterPage() {
       return;
     }
 
-    const result = await userFetcher.register(form.username, form.email, form.password);
-    if (!result) {
-      setError("Registration failed");
+    const result = await bffUserFetcher.register({
+      username: form.username,
+      email: form.email,
+      password: form.password,
+    });
+    console.log(result instanceof HttpError);
+    if (result instanceof HttpError) {
+      setError("Login failed");
       return;
     }
 
     setUser(result.user);
-    updateJwt(result.jwt);
+    updateJwt(result.accessToken);
     updateRt(result.refreshToken);
 
     setError("");
