@@ -25,7 +25,7 @@ export default function RegisterPage() {
       return;
     }
     setError("");
-    console.log("Регистрация:", form);
+    console.log("Register:", form);
     // TODO: Api call
   };
 
@@ -107,13 +107,6 @@ export default function RegisterPage() {
             >
               Register
             </button>
-
-            {/* <Link
-              href="/login"
-              className="w-full bg-blue-600 text-xl text-white py-2 rounded hover:bg-blue-700 transition cursor-default"
-            >
-              Login
-            </Link> */}
           </form>
         </div>
       </div>

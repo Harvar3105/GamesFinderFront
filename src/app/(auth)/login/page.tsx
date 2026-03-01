@@ -1,7 +1,79 @@
+"use client";
+
+import { LottieFactory } from "@/components/animations/animationFactory";
+import { AnimationType } from "@/components/animations/animationTypes";
+import { useState } from "react";
+
 export default function LoginPage() {
+  const [form, setForm] = useState({
+    usernameOrEmail: "",
+    password: "",
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    console.log("Login:", form);
+    // TODO: Api call
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-2xl font-bold">Login Page</h1>
+      <div className="relative max-w-md w-full bg-cyan-50 dark:bg-white p-8 rounded-lg shadow-lg overflow-hidden">
+        <div className="z-0 absolute inset-0 opacity-35 pointer-events-none top-1/12">
+          <LottieFactory animationType={AnimationType.Auth} width="100%" height="100%" />
+        </div>
+        <div className="z-1 relative backdrop-blur-[1.5px] text-1xl font-medium">
+          <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Create an Account</h1>
+
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="usernameOrEmail" className="block mb-1">
+                Username or Email
+              </label>
+              <input
+                id="usernameOrEmail"
+                type="text"
+                name="username"
+                value={form.usernameOrEmail}
+                onChange={handleChange}
+                className="w-full border border-gray-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                className="w-full border border-gray-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-xl text-white py-2 rounded hover:bg-blue-700 transition"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
