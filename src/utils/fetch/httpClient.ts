@@ -32,25 +32,25 @@ export class HttpClient {
     return response.json() as Promise<T>;
   }
 
-  public get<T>(path: string) {
+  protected get<T>(path: string) {
     return this.request<T>(path, { method: "GET" });
   }
 
-  public post<T>(path: string, body?: unknown) {
+  protected post<T>(path: string, body?: unknown) {
     return this.request<T>(path, {
       method: "POST",
       body: JSON.stringify(body),
     });
   }
 
-  public put<T>(path: string, body?: unknown) {
+  protected put<T>(path: string, body?: unknown) {
     return this.request<T>(path, {
       method: "PUT",
       body: JSON.stringify(body),
     });
   }
 
-  public delete<T>(path: string) {
+  protected delete<T>(path: string) {
     return this.request<T>(path, { method: "DELETE" });
   }
 }

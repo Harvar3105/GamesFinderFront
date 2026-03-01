@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useUser } from "../providers/UserProvider";
-import ThemeSwitcher from "../theme/ThemeSwitcher";
+import ThemeSwitcher from "../providers/theme/ThemeSwitcher";
 
 export default function Navigation() {
   const { user, setUser } = useUser();

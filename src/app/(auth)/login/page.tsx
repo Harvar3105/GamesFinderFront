@@ -2,9 +2,15 @@
 
 import { LottieFactory } from "@/components/animations/animationFactory";
 import { AnimationType } from "@/components/animations/animationTypes";
+import { useToken } from "@/components/providers/TokenProvider";
+import { useUser } from "@/components/providers/UserProvider";
 import { useState } from "react";
+import { userFetcher } from "utils/fetch/userFetcher";
 
 export default function LoginPage() {
+  const { setUser } = useUser();
+  const { updateJwt, updateRt } = useToken();
+
   const [form, setForm] = useState({
     usernameOrEmail: "",
     password: "",
@@ -16,17 +22,25 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = await userFetcher.login(form.usernameOrEmail, form.password);
+    if (!result) {
+      setError("Login failed");
+      return;
+    }
+
+    setUser(result.user);
+    updateJwt(result.jwt);
+    updateRt(result.refreshToken);
     setError("");
-    console.log("Login:", form);
-    // TODO: Api call
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="relative max-w-md w-full bg-cyan-50 dark:bg-white p-8 rounded-lg shadow-lg overflow-hidden">
-        <div className="z-0 absolute inset-0 opacity-35 pointer-events-none top-1/12">
+        <div className="z-0 absolute inset-0 opacity-35 pointer-events-none top-6/14">
           <LottieFactory animationType={AnimationType.Auth} width="100%" height="100%" />
         </div>
         <div className="z-1 relative backdrop-blur-[1.5px] text-1xl font-medium">
@@ -42,7 +56,7 @@ export default function LoginPage() {
               <input
                 id="usernameOrEmail"
                 type="text"
-                name="username"
+                name="usernameOrEmail"
                 value={form.usernameOrEmail}
                 onChange={handleChange}
                 className="w-full border border-gray-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -73,6 +87,7 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
+        <div className="h-70"></div>
       </div>
     </div>
   );

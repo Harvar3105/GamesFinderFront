@@ -2,9 +2,15 @@
 
 import { LottieFactory } from "@/components/animations/animationFactory";
 import { AnimationType } from "@/components/animations/animationTypes";
+import { useToken } from "@/components/providers/TokenProvider";
+import { useUser } from "@/components/providers/UserProvider";
 import { useState } from "react";
+import { userFetcher } from "utils/fetch/userFetcher";
 
 export default function RegisterPage() {
+  const { setUser } = useUser();
+  const { updateJwt, updateRt } = useToken();
+
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -18,21 +24,30 @@ export default function RegisterPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
+    const result = await userFetcher.register(form.username, form.email, form.password);
+    if (!result) {
+      setError("Registration failed");
+      return;
+    }
+
+    setUser(result.user);
+    updateJwt(result.jwt);
+    updateRt(result.refreshToken);
+
     setError("");
-    console.log("Register:", form);
-    // TODO: Api call
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="relative max-w-md w-full bg-cyan-50 dark:bg-white p-8 rounded-lg shadow-lg overflow-hidden">
-        <div className="z-0 absolute inset-0 opacity-35 pointer-events-none top-4/12">
+        <div className="z-0 absolute inset-0 opacity-35 pointer-events-none top-11/20">
           <LottieFactory animationType={AnimationType.Auth} width="100%" height="100%" />
         </div>
         <div className="z-1 relative backdrop-blur-[1.5px] text-1xl font-medium">
@@ -109,6 +124,7 @@ export default function RegisterPage() {
             </button>
           </form>
         </div>
+        <div className="h-70"></div>
       </div>
     </div>
   );
