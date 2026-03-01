@@ -28,15 +28,24 @@ export default function Navigation() {
             </svg>
           </Link>
         </li>
-        <li>
-          {user ? (
+        {user ? (
+          <li>
             <span>Hi, {user.username}</span>
-          ) : (
-            <Link href="/register" className="text-blue-600 hover:underline">
-              Register
-            </Link>
-          )}
-        </li>
+          </li>
+        ) : (
+          <>
+            <li>
+              <Link href="/register" className="text-blue-600 hover:underline">
+                Register
+              </Link>
+            </li>
+            <li>
+              <Link href="/login" className="text-blue-600 hover:underline">
+                Login
+              </Link>
+            </li>
+          </>
+        )}
       </ul>
       <div className="flex items-center justify-around gap-5">
         <ThemeSwitcher />
