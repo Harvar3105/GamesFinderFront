@@ -32,25 +32,27 @@ export class HttpClient {
     return response.json() as Promise<T>;
   }
 
-  protected get<T>(path: string) {
-    return this.request<T>(path, { method: "GET" });
+  protected get<T>(path: string, init?: RequestInit) {
+    return this.request<T>(path, { ...init, method: "GET" });
   }
 
-  protected post<T>(path: string, body?: unknown) {
+  protected post<T>(path: string, body?: unknown, init?: RequestInit) {
     return this.request<T>(path, {
+      ...init,
       method: "POST",
       body: JSON.stringify(body),
     });
   }
 
-  protected put<T>(path: string, body?: unknown) {
+  protected put<T>(path: string, body?: unknown, init?: RequestInit) {
     return this.request<T>(path, {
+      ...init,
       method: "PUT",
       body: JSON.stringify(body),
     });
   }
 
-  protected delete<T>(path: string) {
-    return this.request<T>(path, { method: "DELETE" });
+  protected delete<T>(path: string, init?: RequestInit) {
+    return this.request<T>(path, { ...init, method: "DELETE" });
   }
 }

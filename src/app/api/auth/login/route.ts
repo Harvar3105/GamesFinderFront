@@ -21,7 +21,20 @@ export async function POST(request: NextRequest) {
       email: email,
       password: password,
     });
-    return NextResponse.json(response);
+
+    const nextResponse = NextResponse.json({
+      user: response.user,
+      accessToken: response.accessToken,
+    });
+
+    nextResponse.cookies.set("refreshToken", response.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 Days
+      path: "/",
+    });
+    return nextResponse;
   } catch (error) {
     if (error instanceof HttpError) {
       return NextResponse.json(

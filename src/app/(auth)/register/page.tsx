@@ -4,13 +4,14 @@ import { LottieFactory } from "@/components/animations/animationFactory";
 import { AnimationType } from "@/components/animations/animationTypes";
 import { useToken } from "@/components/providers/TokenProvider";
 import { useUser } from "@/components/providers/UserProvider";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import { bffUserFetcher } from "utils/fetch/bff/bffUserFetcher";
 import { HttpError } from "utils/fetch/httpError";
 
 export default function RegisterPage() {
   const { setUser } = useUser();
-  const { updateJwt, updateRt } = useToken();
+  const { updateJwt } = useToken();
 
   const [form, setForm] = useState({
     username: "",
@@ -37,7 +38,7 @@ export default function RegisterPage() {
       email: form.email,
       password: form.password,
     });
-    console.log(result instanceof HttpError);
+
     if (result instanceof HttpError) {
       setError("Login failed");
       return;
@@ -45,9 +46,8 @@ export default function RegisterPage() {
 
     setUser(result.user);
     updateJwt(result.accessToken);
-    updateRt(result.refreshToken);
-
     setError("");
+    redirect("/");
   };
 
   return (

@@ -12,27 +12,27 @@ class GamesAndOffersFetcher extends HttpClient {
     this.config = config;
   }
 
-  public checkGameExists(steamId: number, getGame = false) {
+  public checkGameExists(steamId: number, getGame = false, init?: RequestInit) {
     let params = `steamId=${steamId}`;
     if (getGame) {
       params += `&getGame=true`;
     }
-    return this.get(`${this.config.checkGameEndpoint}?${params}`);
+    return this.get(`${this.config.checkGameEndpoint}?${params}`, init);
   }
 
-  public checkSteamOfferExists(steamId: number) {
-    return this.get(`${this.config.checkSteamOfferEndpoint}?steamId=${steamId}`);
+  public checkSteamOfferExists(steamId: number, init?: RequestInit) {
+    return this.get(`${this.config.checkSteamOfferEndpoint}?steamId=${steamId}`, init);
   }
 
-  public checkInstantGamingOfferExists(vendorId: string) {
-    return this.get(`${this.config.checkInstantGamingOfferEndpoint}?steamId=${vendorId}`);
+  public checkInstantGamingOfferExists(vendorId: string, init?: RequestInit) {
+    return this.get(`${this.config.checkInstantGamingOfferEndpoint}?steamId=${vendorId}`, init);
   }
 
-  public getGameIdBySteamId(steamId: number) {
-    return this.get(`${this.config.getGammeIdEndpoint}?steamId=${steamId}`);
+  public getGameIdBySteamId(steamId: number, init?: RequestInit) {
+    return this.get(`${this.config.getGammeIdEndpoint}?steamId=${steamId}`, init);
   }
 
-  public getInstantGamingOfferId(gameId?: string, vendorId?: string) {
+  public getInstantGamingOfferId(gameId?: string, vendorId?: string, init?: RequestInit) {
     if (!gameId && !vendorId)
       throw new Error("⚠️At least one of gameId or vendorId must be provided");
 
@@ -46,10 +46,10 @@ class GamesAndOffersFetcher extends HttpClient {
       }
       params += `vendorId=${vendorId}`;
     }
-    return this.get(`${this.config.getInstantGamingOfferIdEndpoint}?${params}`);
+    return this.get(`${this.config.getInstantGamingOfferIdEndpoint}?${params}`, init);
   }
 
-  public getSteamOfferId(gameId?: string, steamId?: number) {
+  public getSteamOfferId(gameId?: string, steamId?: number, init?: RequestInit) {
     if (!gameId && !steamId)
       throw new Error("⚠️At least one of gameId or steamId must be provided");
 
@@ -63,7 +63,7 @@ class GamesAndOffersFetcher extends HttpClient {
       }
       params += `steamId=${steamId}`;
     }
-    return this.get(`${this.config.getSteamOfferIdEndpoint}?${params}`);
+    return this.get(`${this.config.getSteamOfferIdEndpoint}?${params}`, init);
   }
 }
 

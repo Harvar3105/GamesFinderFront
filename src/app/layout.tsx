@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import "./globals.css";
 import Navigation from "@/components/layouts/Navigation";
 import UserProvider from "@/components/providers/UserProvider";
@@ -7,6 +7,7 @@ import Footer from "@/components/layouts/Footer";
 import ThemeProvider from "@/components/providers/theme/ThemeProvider";
 import { ETheme } from "domain/enums/ETheme";
 import TokenProvider from "@/components/providers/TokenProvider";
+import { AuthInitializer } from "@/components/providers/AuthInitializer";
 
 export const metadata: Metadata = {
   title: "Games Finder",
@@ -21,14 +22,14 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const initialTheme = cookieStore.get("theme")?.value === ETheme.DARK ? ETheme.DARK : ETheme.LIGHT;
   const jwt = cookieStore.get("jwt")?.value || null;
-  const rt = cookieStore.get("rt")?.value || null;
 
   return (
     <html lang="en" data-theme={initialTheme}>
       <body className="flex flex-col min-h-screen">
         <ThemeProvider initialTheme={initialTheme}>
-          <TokenProvider initialJwt={jwt} initialRt={rt}>
+          <TokenProvider initialJwt={jwt}>
             <UserProvider serverUser={null}>
+              <AuthInitializer />
               <header>
                 <Navigation />
               </header>

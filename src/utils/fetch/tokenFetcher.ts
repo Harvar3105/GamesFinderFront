@@ -24,6 +24,13 @@ class TokenFetcher extends HttpClient {
       token,
     });
   }
+
+  public refresh(refreshToken: string) {
+    return this.post<{ accessToken: string; refreshToken?: string; user?: any }>(
+      this.config.tokenRefreshEndpoint,
+      { refreshToken },
+    );
+  }
 }
 
 export const tokenFetcher = new TokenFetcher(config);
