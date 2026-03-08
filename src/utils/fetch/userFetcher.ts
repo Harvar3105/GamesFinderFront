@@ -39,15 +39,21 @@ class UserFetcher extends HttpClient {
     username,
     email,
     password,
+    accessToken,
+    refreshTokenHash,
   }: {
     password: string;
     username?: string;
     email?: string;
+    accessToken?: string;
+    refreshTokenHash?: string;
   }) {
     return this.post<UserFetcherResponse>(this.config.userLoginEndpoint, {
       username: username,
       email: email,
       password: password,
+      accessToken: accessToken,
+      refreshTokenHash: refreshTokenHash,
     });
   }
 }

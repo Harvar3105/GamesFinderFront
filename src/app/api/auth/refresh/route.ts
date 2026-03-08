@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { HttpError } from "utils/fetch/httpError";
 import { config } from "utils/config";
 
 export async function POST(request: NextRequest) {
@@ -9,18 +8,17 @@ export async function POST(request: NextRequest) {
     if (!refreshToken) {
       return NextResponse.json({ error: "No refresh token" }, { status: 401 });
     }
-
+    console.log(refreshToken);
     const response = await fetch(config.identityUrl + config.tokenRefreshEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        refreshToken: refreshToken,
+        refreshTokenHash: refreshToken,
       }),
     });
-    console.log(response);
-    console.log(config.identityUrl + config.tokenRefreshEndpoint);
+
     if (!response.ok) {
       return NextResponse.json({ error: "Failed to refresh token" }, { status: response.status });
     }

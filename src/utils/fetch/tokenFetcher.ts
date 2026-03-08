@@ -1,5 +1,6 @@
 import { Config, config } from "utils/config";
 import { HttpClient } from "./httpClient";
+import { User } from "domain/entities/User";
 
 class TokenFetcher extends HttpClient {
   private readonly config: Config;
@@ -26,7 +27,7 @@ class TokenFetcher extends HttpClient {
   }
 
   public refresh(refreshToken: string) {
-    return this.post<{ accessToken: string; refreshToken?: string; user?: any }>(
+    return this.post<{ accessToken: string; refreshToken?: string }>(
       this.config.tokenRefreshEndpoint,
       { refreshToken },
     );

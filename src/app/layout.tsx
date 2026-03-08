@@ -7,7 +7,7 @@ import Footer from "@/components/layouts/Footer";
 import ThemeProvider from "@/components/providers/theme/ThemeProvider";
 import { ETheme } from "domain/enums/ETheme";
 import TokenProvider from "@/components/providers/TokenProvider";
-import { AuthInitializer } from "@/components/providers/AuthInitializer";
+import { AuthInitializer } from "utils/fetch/bff/AuthInitializer";
 
 export const metadata: Metadata = {
   title: "Games Finder",
