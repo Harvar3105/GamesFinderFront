@@ -1,3 +1,4 @@
+import { ECurrency } from "domain/enums/ECurrency";
 import { config, Config } from "../config";
 import { HttpClient } from "./httpClient";
 
@@ -64,6 +65,13 @@ class GamesAndOffersFetcher extends HttpClient {
       params += `steamId=${steamId}`;
     }
     return this.get(`${this.config.getSteamOfferIdEndpoint}?${params}`, init);
+  }
+
+  public getGamesPaged(page: number, pageSize: number, currency?: ECurrency) {
+    if (page <= 0 || pageSize <= 0) return;
+    return this.get(
+      `${currency ? this.config.getGamesWithCurrencyPaged : this.config.getGamesPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
+    );
   }
 }
 

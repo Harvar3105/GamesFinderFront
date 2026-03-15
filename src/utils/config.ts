@@ -13,6 +13,9 @@ export class Config {
   public readonly getInstantGamingOfferIdEndpoint: string;
   public readonly getSteamOfferIdEndpoint: string;
 
+  public readonly getGamesPaged: string;
+  public readonly getGamesWithCurrencyPaged: string;
+
   constructor() {
     this.identityUrl = process.env.NEXT_IDENTITY_URL!;
     this.userRegisterEndpoint = process.env.NEXT_USER_REGISTER!;
@@ -27,6 +30,9 @@ export class Config {
     this.getGammeIdEndpoint = process.env.NEXT_BACKEND_GET_GAME_ID!;
     this.getInstantGamingOfferIdEndpoint = process.env.NEXT_BACKEND_GET_IG_OFFER_ID!;
     this.getSteamOfferIdEndpoint = process.env.NEXT_BACKEND_GET_STEAM_OFFER_ID!;
+
+    this.getGamesPaged = process.env.NEXT_BACKEND_GET_GAMES_PAGED!;
+    this.getGamesWithCurrencyPaged = process.env.NEXT_BACKEND_GET_GAMES_WITH_CURRENCY_PAGED!;
   }
 }
 
