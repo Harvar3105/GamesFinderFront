@@ -1,6 +1,6 @@
-import { ECurrency } from "domain/enums/ECurrency";
-import Entity from "./entity";
-import GameOffer from "./gameOffer";
+import { ECurrency } from "@/domain/enums/ECurrency";
+import Entity from "./Entity";
+import GameOffer from "./GameOffer";
 
 export default class Game extends Entity {
   public name: string;
@@ -8,7 +8,7 @@ export default class Game extends Entity {
   public steamId?: number;
   public inPackages: number[] = [];
   public isDLC: boolean;
-  public Description?: string;
+  public description?: string;
   public headerImage?: string;
   public offers: GameOffer[] = [];
   public isReleased: boolean;
@@ -24,7 +24,7 @@ export default class Game extends Entity {
     isReleased: boolean,
     steamUrl?: string,
     steamId?: number,
-    Description?: string,
+    description?: string,
     headerImage?: string,
     initialPrice?: number,
     initialCurrency?: ECurrency,
@@ -36,7 +36,7 @@ export default class Game extends Entity {
     this.isReleased = isReleased;
     this.steamUrl = steamUrl;
     this.steamId = steamId;
-    this.Description = Description;
+    this.description = description;
     this.headerImage = headerImage;
     this.initialPrice = initialPrice;
     this.initialCurrency = initialCurrency;

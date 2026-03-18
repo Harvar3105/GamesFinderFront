@@ -1,6 +1,6 @@
-import { ECurrency } from "domain/enums/ECurrency";
-import { EVendor } from "domain/enums/EVendor";
-import Entity from "./entity";
+import { ECurrency } from "@/domain/enums/ECurrency";
+import { EVendor } from "@/domain/enums/EVendor";
+import Entity from "./Entity";
 
 export default class GameOffer extends Entity {
   public gameId: string;

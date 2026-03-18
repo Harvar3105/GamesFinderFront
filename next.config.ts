@@ -1,8 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "shared.akamai.steamstatic.com",
+        pathname: "/store_item_assets/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.steamstatic.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

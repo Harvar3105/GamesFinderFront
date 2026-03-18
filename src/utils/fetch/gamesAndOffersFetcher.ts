@@ -1,6 +1,7 @@
 import { ECurrency } from "domain/enums/ECurrency";
 import { config, Config } from "../config";
 import { HttpClient } from "./httpClient";
+import Game from "@/domain/entities/Game";
 
 class GamesAndOffersFetcher extends HttpClient {
   private readonly config: Config;
@@ -13,27 +14,30 @@ class GamesAndOffersFetcher extends HttpClient {
     this.config = config;
   }
 
-  public checkGameExists(steamId: number, getGame = false, init?: RequestInit) {
+  public async checkGameExists(steamId: number, getGame = false, init?: RequestInit) {
     let params = `steamId=${steamId}`;
     if (getGame) {
       params += `&getGame=true`;
     }
-    return this.get(`${this.config.checkGameEndpoint}?${params}`, init);
+    return await this.get(`${this.config.checkGameEndpoint}?${params}`, init);
   }
 
-  public checkSteamOfferExists(steamId: number, init?: RequestInit) {
-    return this.get(`${this.config.checkSteamOfferEndpoint}?steamId=${steamId}`, init);
+  public async checkSteamOfferExists(steamId: number, init?: RequestInit) {
+    return await this.get(`${this.config.checkSteamOfferEndpoint}?steamId=${steamId}`, init);
   }
 
-  public checkInstantGamingOfferExists(vendorId: string, init?: RequestInit) {
-    return this.get(`${this.config.checkInstantGamingOfferEndpoint}?steamId=${vendorId}`, init);
+  public async checkInstantGamingOfferExists(vendorId: string, init?: RequestInit) {
+    return await this.get(
+      `${this.config.checkInstantGamingOfferEndpoint}?steamId=${vendorId}`,
+      init,
+    );
   }
 
-  public getGameIdBySteamId(steamId: number, init?: RequestInit) {
-    return this.get(`${this.config.getGammeIdEndpoint}?steamId=${steamId}`, init);
+  public async getGameIdBySteamId(steamId: number, init?: RequestInit) {
+    return await this.get(`${this.config.getGammeIdEndpoint}?steamId=${steamId}`, init);
   }
 
-  public getInstantGamingOfferId(gameId?: string, vendorId?: string, init?: RequestInit) {
+  public async getInstantGamingOfferId(gameId?: string, vendorId?: string, init?: RequestInit) {
     if (!gameId && !vendorId)
       throw new Error("⚠️At least one of gameId or vendorId must be provided");
 
@@ -47,10 +51,10 @@ class GamesAndOffersFetcher extends HttpClient {
       }
       params += `vendorId=${vendorId}`;
     }
-    return this.get(`${this.config.getInstantGamingOfferIdEndpoint}?${params}`, init);
+    return await this.get(`${this.config.getInstantGamingOfferIdEndpoint}?${params}`, init);
   }
 
-  public getSteamOfferId(gameId?: string, steamId?: number, init?: RequestInit) {
+  public async getSteamOfferId(gameId?: string, steamId?: number, init?: RequestInit) {
     if (!gameId && !steamId)
       throw new Error("⚠️At least one of gameId or steamId must be provided");
 
@@ -64,14 +68,19 @@ class GamesAndOffersFetcher extends HttpClient {
       }
       params += `steamId=${steamId}`;
     }
-    return this.get(`${this.config.getSteamOfferIdEndpoint}?${params}`, init);
+    return await this.get(`${this.config.getSteamOfferIdEndpoint}?${params}`, init);
   }
 
-  public getGamesPaged(page: number, pageSize: number, currency?: ECurrency) {
-    if (page <= 0 || pageSize <= 0) return;
-    return this.get(
+  public async getGamesPaged(
+    page: number,
+    pageSize: number,
+    currency?: ECurrency,
+  ): Promise<Game[] | null> {
+    if (page <= 0 || pageSize <= 0) return null;
+    const response = await this.get<{ games: Game[] }>(
       `${currency ? this.config.getGamesWithCurrencyPaged : this.config.getGamesPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
     );
+    return response.games ?? null;
   }
 }
 
