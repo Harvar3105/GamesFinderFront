@@ -5,7 +5,7 @@ import { useUser } from "../providers/UserProvider";
 import ThemeSwitcher from "../providers/theme/ThemeSwitcher";
 
 export default function Navigation() {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const liStyle = "rounded bg-amber-300 dark:bg-[#33353b] p-2";
   return (
     <nav className="navbar flex items-center justify-between gap-5 px-5 py-3 border-b bg-white dark:bg-[#1a1a1e] border-b-gray-300 dark:border-b-gray-600">

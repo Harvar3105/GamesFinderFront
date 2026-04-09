@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { HttpError } from "utils/fetch/httpError";
 import handleHttpError from "utils/fetch/httpErrorHandle";
 import { userFetcher } from "utils/fetch/userFetcher";
 

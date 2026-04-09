@@ -62,7 +62,17 @@ export default function GamesFiltersWidget({ onFiltersChange }: GamesFiltersWidg
     }
 
     return filtersObject;
-  }, [searchQuery, searchByName, searchByDescription, searchByVendorId, steamAvailable, instantGamingAvailable, minPrice, maxPrice, sortOption]);
+  }, [
+    searchQuery,
+    searchByName,
+    searchByDescription,
+    searchByVendorId,
+    steamAvailable,
+    instantGamingAvailable,
+    minPrice,
+    maxPrice,
+    sortOption,
+  ]);
 
   // Notify parent of changes
   React.useEffect(() => {

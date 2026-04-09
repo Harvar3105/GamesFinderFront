@@ -50,7 +50,7 @@ export function AuthInitializer() {
     };
 
     initAuth();
-  }, []);
+  });
 
   return null;
 }
