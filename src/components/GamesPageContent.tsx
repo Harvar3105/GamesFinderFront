@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import GamesTable from "@/components/GamesTable";
-import Game from "@/domain/entities/Game";
+import Game from "@/domain/entities/game";
 import { bffGamesFetcher } from "@/utils/fetch/bff/bffGamesFetcher";
 
 interface GamesPageContentProps {

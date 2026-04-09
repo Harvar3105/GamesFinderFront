@@ -2,8 +2,8 @@
 
 import React, { useMemo } from "react";
 import Image from "next/image";
-import Game from "@/domain/entities/Game";
-import GameOffer from "@/domain/entities/GameOffer";
+import Game from "@/domain/entities/game";
+import GameOffer from "@/domain/entities/gameOffer";
 import { EVendor } from "@/domain/enums/EVendor";
 import TablePageSwitcher from "@/components/widgets/TablePageSwitcher";
 
