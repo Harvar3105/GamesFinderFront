@@ -75,13 +75,25 @@ class GamesAndOffersFetcher extends HttpClient {
     page: number,
     pageSize: number,
     currency?: ECurrency,
-  ): Promise<Game[] | null> {
+  ): Promise<GamesFetchData | null> {
     if (page <= 0 || pageSize <= 0) return null;
-    const response = await this.get<{ games: Game[] }>(
-      `${currency ? this.config.getGamesWithCurrencyPaged : this.config.getGamesPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
+    const response = await this.get<GamesFetchData>(
+      //TODO: Resolve todo at backend first.
+      // `${currency ? this.config.getGamesWithCurrencyPaged : this.config.getGamesPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
+      `${this.config.getGamesWithCurrencyPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
     );
-    return response.games ?? null;
+    // console.log(
+    //   "At server! Game with offer:",
+    //   response?.games.find((g) => g.offers?.length > 0) ?? "Not found",
+    // );
+    // console.log(response?.games);
+    return response ?? { games: [], totalGamesCount: 0 };
   }
 }
+
+export type GamesFetchData = {
+  games: Game[];
+  totalGamesCount: number;
+};
 
 export const backendFetcher = new GamesAndOffersFetcher(config);

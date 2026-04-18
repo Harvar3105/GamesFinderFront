@@ -1,20 +1,20 @@
 import GamesPageContent from "@/components/GamesPageContent";
 import Game from "@/domain/entities/Game";
-import { backendFetcher } from "@/utils/fetch/gamesAndOffersFetcher";
+import { backendFetcher, GamesFetchData } from "@/utils/fetch/gamesAndOffersFetcher";
 
 // Server component for SEO and initial data fetching
 export default async function GamesPage() {
-  let initialGames: Game[] = [];
+  let initialData: GamesFetchData = { games: [], totalGamesCount: 0 };
   let error: string | null = null;
 
   try {
-    initialGames = (await backendFetcher.getGamesPaged(1, 25)) ?? [];
+    initialData = (await backendFetcher.getGamesPaged(1, 25)) ?? { games: [], totalGamesCount: 0 };
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load games";
     console.error("Server Games fetcher error:", err);
   }
 
-  if (error && initialGames.length === 0) {
+  if (error && initialData.games.length === 0) {
     return (
       <div className="min-h-screen py-8 md:py-12">
         <h1 className="px-8 md:px-8 mb-8 md:mb-8 text-4xl md:text-2xl font-bold text-gray-900 dark:text-white">
@@ -32,7 +32,10 @@ export default async function GamesPage() {
       <h1 className="px-8 md:px-8 mb-8 md:mb-8 text-4xl md:text-2xl font-bold text-gray-900 dark:text-white">
         Games List
       </h1>
-      <GamesPageContent initialGames={initialGames} />
+      <GamesPageContent
+        initialGames={initialData.games}
+        initialCount={initialData.totalGamesCount}
+      />
     </div>
   );
 }

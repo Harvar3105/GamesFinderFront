@@ -2,6 +2,7 @@ import { ECurrency } from "@/domain/enums/ECurrency";
 import { HttpClient } from "../httpClient";
 import { HttpError } from "../httpError";
 import Game from "@/domain/entities/Game";
+import { GamesFetchData } from "../gamesAndOffersFetcher";
 
 class BffGamesFetcher extends HttpClient {
   constructor() {
@@ -14,18 +15,18 @@ class BffGamesFetcher extends HttpClient {
     page: number,
     pageSize: number,
     currency?: ECurrency,
-  ): Promise<Game[]> {
+  ): Promise<GamesFetchData> {
     try {
-      const result = await this.post<Game[]>("/api/games", {
+      const result = await this.post<GamesFetchData>("/api/games", {
         page: page,
         pageSize: pageSize,
         currency: currency,
       });
-      return Array.isArray(result) ? result : [];
+      return Array.isArray(result.games) ? result : { games: [], totalGamesCount: 0 };
     } catch (error) {
       if (error instanceof HttpError) {
         console.error("HTTP Error:", error);
-        return [];
+        return { games: [], totalGamesCount: 0 };
       }
       throw error;
     }

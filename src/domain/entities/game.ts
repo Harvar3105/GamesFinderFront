@@ -4,7 +4,7 @@ import GameOffer from "./GameOffer";
 
 export default class Game extends Entity {
   public name: string;
-  public steamUrl?: string;
+  public steamURL?: string;
   public steamId?: number;
   public inPackages: number[] = [];
   public isDLC: boolean;
@@ -28,18 +28,18 @@ export default class Game extends Entity {
     headerImage?: string,
     initialPrice?: number,
     initialCurrency?: ECurrency,
-    initialOffers?: GameOffer[],
+    offers?: GameOffer[],
   ) {
     super(id, createdAt, updatedAt);
     this.name = name;
     this.isDLC = isDLC;
     this.isReleased = isReleased;
-    this.steamUrl = steamUrl;
+    this.steamURL = steamUrl;
     this.steamId = steamId;
     this.description = description;
     this.headerImage = headerImage;
     this.initialPrice = initialPrice;
     this.initialCurrency = initialCurrency;
-    if (initialOffers) this.offers = initialOffers;
+    this.offers = offers ?? [];
   }
 }

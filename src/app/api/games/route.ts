@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
     const { page, pageSize, currency } = await request.json();
 
     const result = await backendFetcher.getGamesPaged(page, pageSize, currency);
+
     return NextResponse.json(result);
   } catch (error) {
     return handleHttpError(error);

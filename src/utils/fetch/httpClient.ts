@@ -33,7 +33,9 @@ export class HttpClient {
   }
 
   protected async get<T>(path: string, init?: RequestInit) {
-    return await this.request<T>(path, { ...init, method: "GET" });
+    const result = await this.request<T>(path, { ...init, method: "GET" });
+    console.log(`GET ${path} result:`, result);
+    return result;
   }
 
   protected async post<T>(path: string, body?: unknown, init?: RequestInit): Promise<T> {
