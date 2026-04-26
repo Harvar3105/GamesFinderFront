@@ -10,15 +10,8 @@ export interface AvailabilityFilter {
   instantGaming?: boolean;
 }
 
-export interface SearchParams {
-  query?: string;
-  searchByName?: boolean;
-  searchByDescription?: boolean;
-  searchByVendorId?: boolean;
-}
-
 export interface GamesFiltersObject {
-  search?: SearchParams;
+  query?: string;
   filters?: {
     availability?: AvailabilityFilter;
     priceRange?: PriceRange;

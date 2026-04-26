@@ -1,8 +1,7 @@
-import { ECurrency } from "@/domain/enums/ECurrency";
 import { HttpClient } from "../httpClient";
 import { HttpError } from "../httpError";
-import Game from "@/domain/entities/Game";
 import { GamesFetchData } from "../gamesAndOffersFetcher";
+import { GetGamesPagedParams } from "../contracts/gnoContracts";
 
 class BffGamesFetcher extends HttpClient {
   constructor() {
@@ -11,17 +10,9 @@ class BffGamesFetcher extends HttpClient {
     });
   }
 
-  public async getGamesPaged(
-    page: number,
-    pageSize: number,
-    currency?: ECurrency,
-  ): Promise<GamesFetchData> {
+  public async getGamesPaged(params: GetGamesPagedParams): Promise<GamesFetchData> {
     try {
-      const result = await this.post<GamesFetchData>("/api/games", {
-        page: page,
-        pageSize: pageSize,
-        currency: currency,
-      });
+      const result = await this.post<GamesFetchData>("/api/games", params);
       return Array.isArray(result.games) ? result : { games: [], totalGamesCount: 0 };
     } catch (error) {
       if (error instanceof HttpError) {

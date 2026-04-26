@@ -1,12 +1,13 @@
+import { GetGamesPagedParams } from "@/utils/fetch/contracts/gnoContracts";
 import { NextRequest, NextResponse } from "next/server";
 import { backendFetcher } from "utils/fetch/gamesAndOffersFetcher";
 import handleHttpError from "utils/fetch/httpErrorHandle";
 
 export async function POST(request: NextRequest) {
   try {
-    const { page, pageSize, currency } = await request.json();
+    const params: GetGamesPagedParams = await request.json();
 
-    const result = await backendFetcher.getGamesPaged(page, pageSize, currency);
+    const result = await backendFetcher.getGamesPaged(params);
 
     return NextResponse.json(result);
   } catch (error) {

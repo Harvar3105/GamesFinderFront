@@ -1,5 +1,4 @@
 import GamesPageContent from "@/components/GamesPageContent";
-import Game from "@/domain/entities/Game";
 import { backendFetcher, GamesFetchData } from "@/utils/fetch/gamesAndOffersFetcher";
 
 // Server component for SEO and initial data fetching
@@ -8,7 +7,10 @@ export default async function GamesPage() {
   let error: string | null = null;
 
   try {
-    initialData = (await backendFetcher.getGamesPaged(1, 25)) ?? { games: [], totalGamesCount: 0 };
+    initialData = (await backendFetcher.getGamesPaged({ page: 1, pageSize: 25 })) ?? {
+      games: [],
+      totalGamesCount: 0,
+    };
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load games";
     console.error("Server Games fetcher error:", err);

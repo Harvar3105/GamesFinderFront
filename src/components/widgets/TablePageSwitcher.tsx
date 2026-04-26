@@ -69,7 +69,7 @@ export default function TablePageSwitcher({
         disabled={currentPage === 1}
         aria-label="Previous page"
       >
-        ← Предыдущая
+        ← Previous
       </button>
 
       <div className="flex gap-2 items-center">
@@ -112,7 +112,7 @@ export default function TablePageSwitcher({
       </button>
 
       <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-        Page {currentPage} из {totalPages}
+        Page {currentPage} of {totalPages}
       </div>
     </div>
   );

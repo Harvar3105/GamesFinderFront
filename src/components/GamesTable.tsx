@@ -59,7 +59,7 @@ export default function GamesTable({ pageGames }: GamesTableProps) {
                     href={game.steamURL || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block transition-transform hover:scale-105"
+                    className="inline-block transition-transform hover:scale-160"
                     title={`Open ${game.name} on Steam`}
                   >
                     <Image

@@ -1,7 +1,8 @@
-import { ECurrency } from "domain/enums/ECurrency";
 import { config, Config } from "../config";
 import { HttpClient } from "./httpClient";
 import Game from "@/domain/entities/Game";
+import { GetGamesPagedParams } from "./contracts/gnoContracts";
+import { toQueryString } from "../toQueryString";
 
 class GamesAndOffersFetcher extends HttpClient {
   private readonly config: Config;
@@ -71,22 +72,11 @@ class GamesAndOffersFetcher extends HttpClient {
     return await this.get(`${this.config.getSteamOfferIdEndpoint}?${params}`, init);
   }
 
-  public async getGamesPaged(
-    page: number,
-    pageSize: number,
-    currency?: ECurrency,
-  ): Promise<GamesFetchData | null> {
-    if (page <= 0 || pageSize <= 0) return null;
+  public async getGamesPaged(params: GetGamesPagedParams): Promise<GamesFetchData | null> {
+    const flattered = toQueryString(params);
     const response = await this.get<GamesFetchData>(
-      //TODO: Resolve todo at backend first.
-      // `${currency ? this.config.getGamesWithCurrencyPaged : this.config.getGamesPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
-      `${this.config.getGamesWithCurrencyPaged}?page=${page}&pageSize=${pageSize}${currency ? "&currency=" + currency : ""}`,
+      `${this.config.getGamesWithCurrencyPaged}?${flattered.toString()}`,
     );
-    // console.log(
-    //   "At server! Game with offer:",
-    //   response?.games.find((g) => g.offers?.length > 0) ?? "Not found",
-    // );
-    // console.log(response?.games);
     return response ?? { games: [], totalGamesCount: 0 };
   }
 }

@@ -3,52 +3,45 @@
 import React, { useState, useCallback } from "react";
 import { GamesFiltersObject } from "@/domain/types/GamesFilters";
 import { ESortOption } from "@/domain/enums/ESortOption";
+import { EVendor } from "@/domain/enums/EVendor";
 
 interface GamesFiltersWidgetProps {
-  onFiltersChange: (filters: GamesFiltersObject) => void;
+  onFiltersSubmit: (filters: GamesFiltersObject) => void;
 }
 
-export default function GamesFiltersWidget({ onFiltersChange }: GamesFiltersWidgetProps) {
-  // Search state
+export default function GamesFiltersWidget({ onFiltersSubmit }: GamesFiltersWidgetProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchByName, setSearchByName] = useState(true);
-  const [searchByDescription, setSearchByDescription] = useState(false);
-  const [searchByVendorId, setSearchByVendorId] = useState(false);
-
-  // Filter state
-  const [steamAvailable, setSteamAvailable] = useState(false);
-  const [instantGamingAvailable, setInstantGamingAvailable] = useState(false);
+  const [vendorFilters, setVendorFilters] = useState<Record<EVendor, boolean>>({
+    [EVendor.Steam]: false,
+    [EVendor.InstantGaming]: false,
+    [EVendor.G2A]: false,
+  });
   const [minPrice, setMinPrice] = useState<number | "">("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
-
-  // Sort state
   const [sortOption, setSortOption] = useState<ESortOption>(ESortOption.None);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const buildFiltersObject = useCallback(() => {
     const filtersObject: GamesFiltersObject = {};
 
-    // Build search params
-    if (searchQuery || searchByName || searchByDescription || searchByVendorId) {
-      filtersObject.search = {
-        query: searchQuery || undefined,
-        searchByName: searchByName || undefined,
-        searchByDescription: searchByDescription || undefined,
-        searchByVendorId: searchByVendorId || undefined,
-      };
+    if (searchQuery) {
+      filtersObject.query = searchQuery;
     }
 
-    // Build filters
-    if (steamAvailable || instantGamingAvailable || minPrice !== "" || maxPrice !== "") {
+    const hasVendorFilters = Object.values(vendorFilters).some((v) => v);
+    const hasPriceFilter = minPrice !== "" || maxPrice !== "";
+
+    if (hasVendorFilters || hasPriceFilter) {
       filtersObject.filters = {};
 
-      if (steamAvailable || instantGamingAvailable) {
+      if (hasVendorFilters) {
         filtersObject.filters.availability = {
-          steam: steamAvailable || undefined,
-          instantGaming: instantGamingAvailable || undefined,
+          steam: vendorFilters[EVendor.Steam] || undefined,
+          instantGaming: vendorFilters[EVendor.InstantGaming] || undefined,
         };
       }
 
-      if (minPrice !== "" || maxPrice !== "") {
+      if (hasPriceFilter) {
         filtersObject.filters.priceRange = {
           min: minPrice !== "" ? Number(minPrice) : undefined,
           max: maxPrice !== "" ? Number(maxPrice) : undefined,
@@ -56,31 +49,32 @@ export default function GamesFiltersWidget({ onFiltersChange }: GamesFiltersWidg
       }
     }
 
-    // Add sort
     if (sortOption !== ESortOption.None) {
       filtersObject.sort = sortOption;
     }
 
     return filtersObject;
-  }, [
-    searchQuery,
-    searchByName,
-    searchByDescription,
-    searchByVendorId,
-    steamAvailable,
-    instantGamingAvailable,
-    minPrice,
-    maxPrice,
-    sortOption,
-  ]);
-
-  // Notify parent of changes
-  React.useEffect(() => {
-    onFiltersChange(buildFiltersObject());
-  }, [buildFiltersObject, onFiltersChange]);
+  }, [searchQuery, vendorFilters, minPrice, maxPrice, sortOption]);
 
   const handleSearchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleSearch = () => {
+    onFiltersSubmit(buildFiltersObject());
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const handleVendorChange = (vendor: EVendor) => {
+    setVendorFilters((prev) => ({
+      ...prev,
+      [vendor]: !prev[vendor],
+    }));
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -89,152 +83,119 @@ export default function GamesFiltersWidget({ onFiltersChange }: GamesFiltersWidg
 
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSearchByName(true);
-    setSearchByDescription(false);
-    setSearchByVendorId(false);
-    setSteamAvailable(false);
-    setInstantGamingAvailable(false);
+    setVendorFilters({
+      [EVendor.Steam]: false,
+      [EVendor.InstantGaming]: false,
+      [EVendor.G2A]: false,
+    });
     setMinPrice("");
     setMaxPrice("");
     setSortOption(ESortOption.None);
   };
 
+  const hasActiveFilters =
+    searchQuery ||
+    Object.values(vendorFilters).some((v) => v) ||
+    minPrice !== "" ||
+    maxPrice !== "" ||
+    sortOption !== ESortOption.None;
+
   return (
-    <div className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Search and filter</h2>
+    <div className="w-full bg-white dark:bg-gray-900 rounded-lg p-4 space-y-3 border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Search games..."
+          value={searchQuery}
+          onChange={handleSearchQueryChange}
+          onKeyDown={handleSearchKeyPress}
+          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        />
+        <button
+          onClick={handleSearch}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
+        >
+          Search
+        </button>
+      </div>
 
-      <div className="space-y-6">
-        {/* Search Section */}
-        <div className="space-y-3">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Search</h3>
+      <select
+        title="sorting"
+        value={sortOption}
+        onChange={handleSortChange}
+        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+      >
+        <option value={ESortOption.None}>Sort by...</option>
+        <option value={ESortOption.AscendingPrice}>Price ↑</option>
+        <option value={ESortOption.DescendingPrice}>Price ↓</option>
+      </select>
 
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Enter search request..."
-              value={searchQuery}
-              onChange={handleSearchQueryChange}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+        <button
+          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium text-gray-900 dark:text-white"
+        >
+          <span>
+            More filters {hasActiveFilters && <span className="ml-2 text-blue-600">●</span>}
+          </span>
+          <span className={`transition-transform ${isFiltersOpen ? "rotate-180" : ""}`}>▼</span>
+        </button>
 
-          <div className="flex flex-wrap gap-4 text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={searchByName}
-                onChange={(e) => setSearchByName(e.target.checked)}
-                className="w-4 h-4 accent-blue-600 cursor-pointer"
-              />
-              <span className="text-gray-700 dark:text-gray-300">By name</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={searchByDescription}
-                onChange={(e) => setSearchByDescription(e.target.checked)}
-                className="w-4 h-4 accent-blue-600 cursor-pointer"
-              />
-              <span className="text-gray-700 dark:text-gray-300">By description</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={searchByVendorId}
-                onChange={(e) => setSearchByVendorId(e.target.checked)}
-                className="w-4 h-4 accent-blue-600 cursor-pointer"
-              />
-              <span className="text-gray-700 dark:text-gray-300">By venodrs id</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Filters Section */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Filtering</h3>
-
-          {/* Availability Filter */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Available</p>
-            <div className="flex flex-wrap gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={steamAvailable}
-                  onChange={(e) => setSteamAvailable(e.target.checked)}
-                  className="w-4 h-4 accent-blue-600 cursor-pointer"
-                />
-                <span className="text-gray-700 dark:text-gray-300 text-sm">In Steam</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={instantGamingAvailable}
-                  onChange={(e) => setInstantGamingAvailable(e.target.checked)}
-                  className="w-4 h-4 accent-blue-600 cursor-pointer"
-                />
-                <span className="text-gray-700 dark:text-gray-300 text-sm">In IG</span>
-              </label>
+        {isFiltersOpen && (
+          <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3 border border-gray-200 dark:border-gray-700">
+            <div>
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Available at:
+              </p>
+              <div className="space-y-2">
+                {Object.values(EVendor).map((vendor) => (
+                  <label key={vendor} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="checkbox"
+                      checked={vendorFilters[vendor]}
+                      onChange={() => handleVendorChange(vendor)}
+                      className="w-4 h-4 accent-blue-600 cursor-pointer"
+                    />
+                    <span className="text-gray-700 dark:text-gray-300">{vendor}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Price Range Filter */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price range</p>
-            <div className="flex gap-4 items-center">
-              <div className="flex-1">
+            <div className="border-t border-gray-300 dark:border-gray-600 pt-3">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Price range:
+              </p>
+              <div className="flex gap-2 items-center">
                 <input
                   type="number"
                   placeholder="Min"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
-              <span className="text-gray-500 dark:text-gray-400">—</span>
-              <div className="flex-1">
+                <span className="text-gray-500 dark:text-gray-400 text-xs">—</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Sort Section */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-3">Sorting</h3>
-
-          <select
-            value={sortOption}
-            onChange={handleSortChange}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value={ESortOption.None}>No sort</option>
-            <option value={ESortOption.SteamPriceAsc}>Steam: price asc</option>
-            <option value={ESortOption.SteamPriceDesc}>Steam: price desc</option>
-            <option value={ESortOption.InstantGamingPriceAsc}>InstantGaming: price asc</option>
-            <option value={ESortOption.InstantGamingPriceDesc}>InstantGaming: price desc</option>
-          </select>
-        </div>
-
-        {/* Reset Button */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <button
-            onClick={handleResetFilters}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
-          >
-            Clear filters
-          </button>
-        </div>
+        )}
       </div>
+
+      {hasActiveFilters && (
+        <button
+          onClick={handleResetFilters}
+          className="w-full px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          Clear filters
+        </button>
+      )}
     </div>
   );
 }
