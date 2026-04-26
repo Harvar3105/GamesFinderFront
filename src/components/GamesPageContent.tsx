@@ -45,6 +45,8 @@ export default function GamesPageContent({ initialGames, initialCount }: GamesPa
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to apply filters");
       console.error("Filters submit error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
