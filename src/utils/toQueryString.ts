@@ -4,11 +4,12 @@ export function toQueryString(obj: object, prefix = ""): URLSearchParams {
   Object.entries(obj).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
 
+    const fullKey = prefix ? `${prefix}.${key}` : key;
 
     if (typeof value === "object" && !Array.isArray(value)) {
-      toQueryString(value, key).forEach((v, k) => params.append(k, v));
+      toQueryString(value, fullKey).forEach((v, k) => params.append(k, v));
     } else {
-      params.append(key, String(value));
+      params.append(fullKey, String(value));
     }
   });
 

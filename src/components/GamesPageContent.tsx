@@ -93,7 +93,10 @@ export default function GamesPageContent({ initialGames, initialCount }: GamesPa
 
       {!loading && (
         <>
-          <GamesFiltersWidget onFiltersSubmit={handleFiltersSubmit} />
+          <GamesFiltersWidget
+            currentFilters={activeFilters}
+            onFiltersSubmit={handleFiltersSubmit}
+          />
           <GamesTable pageGames={games} />
           <TablePageSwitcher
             currentPage={currentPage}

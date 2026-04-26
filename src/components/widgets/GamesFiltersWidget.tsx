@@ -7,18 +7,35 @@ import { EVendor } from "@/domain/enums/EVendor";
 
 interface GamesFiltersWidgetProps {
   onFiltersSubmit: (filters: GamesFiltersObject) => void;
+  currentFilters?: GamesFiltersObject;
 }
 
-export default function GamesFiltersWidget({ onFiltersSubmit }: GamesFiltersWidgetProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [vendorFilters, setVendorFilters] = useState<Record<EVendor, boolean>>({
-    [EVendor.Steam]: false,
-    [EVendor.InstantGaming]: false,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getInitialVendorFilters = (availability?: any): Record<EVendor, boolean> => {
+  return {
+    [EVendor.Steam]: availability?.steam ?? false,
+    [EVendor.InstantGaming]: availability?.instantGaming ?? false,
     [EVendor.G2A]: false,
-  });
-  const [minPrice, setMinPrice] = useState<number | "">("");
-  const [maxPrice, setMaxPrice] = useState<number | "">("");
-  const [sortOption, setSortOption] = useState<ESortOption>(ESortOption.None);
+  };
+};
+
+export default function GamesFiltersWidget({
+  onFiltersSubmit,
+  currentFilters,
+}: GamesFiltersWidgetProps) {
+  const [searchQuery, setSearchQuery] = useState(currentFilters?.query || "");
+  const [vendorFilters, setVendorFilters] = useState<Record<EVendor, boolean>>(
+    getInitialVendorFilters(currentFilters?.filters?.availability),
+  );
+  const [minPrice, setMinPrice] = useState<number | "">(
+    currentFilters?.filters?.priceRange?.min ?? "",
+  );
+  const [maxPrice, setMaxPrice] = useState<number | "">(
+    currentFilters?.filters?.priceRange?.max ?? "",
+  );
+  const [sortOption, setSortOption] = useState<ESortOption>(
+    currentFilters?.sort ?? ESortOption.None,
+  );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const buildFiltersObject = useCallback(() => {

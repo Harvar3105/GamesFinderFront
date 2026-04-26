@@ -8,6 +8,7 @@ export interface PriceRange {
 export interface AvailabilityFilter {
   steam?: boolean;
   instantGaming?: boolean;
+  g2a?: boolean;
 }
 
 export interface GamesFiltersObject {
