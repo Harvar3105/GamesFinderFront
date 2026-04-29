@@ -1,6 +1,6 @@
 import { config, Config } from "../config";
 import { HttpClient } from "./httpClient";
-import Game from "@/domain/entities/Game";
+import Game from "@/domain/entities/game";
 import { GetGamesPagedParams } from "./contracts/gnoContracts";
 import { toQueryString } from "../toQueryString";
 

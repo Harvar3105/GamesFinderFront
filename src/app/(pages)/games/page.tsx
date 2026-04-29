@@ -1,4 +1,4 @@
-import GamesPageContent from "@/components/GamesPageContent";
+import GamesPageContent from "@/app/(pages)/games/gamesPageContent";
 import { backendFetcher, GamesFetchData } from "@/utils/fetch/gamesAndOffersFetcher";
 
 // Server component for SEO and initial data fetching

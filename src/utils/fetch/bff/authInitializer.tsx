@@ -1,7 +1,7 @@
 "use client";
 
-import { useToken } from "@/components/providers/TokenProvider";
-import { useUser } from "@/components/providers/UserProvider";
+import { useToken } from "@/components/providers/tokenProvider";
+import { useUser } from "@/components/providers/userProvider";
 import { useEffect, useRef } from "react";
 
 export function AuthInitializer() {

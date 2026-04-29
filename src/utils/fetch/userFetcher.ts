@@ -1,6 +1,6 @@
 import { Config, config } from "utils/config";
 import { HttpClient } from "./httpClient";
-import { User } from "domain/entities/User";
+import { User } from "@/domain/entities/user";
 
 export interface UserFetcherResponse {
   user: User;

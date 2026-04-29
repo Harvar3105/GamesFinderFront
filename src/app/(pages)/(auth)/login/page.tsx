@@ -2,8 +2,8 @@
 
 import { LottieFactory } from "@/components/animations/animationFactory";
 import { AnimationType } from "@/components/animations/animationTypes";
-import { useToken } from "@/components/providers/TokenProvider";
-import { useUser } from "@/components/providers/UserProvider";
+import { useToken } from "@/components/providers/tokenProvider";
+import { useUser } from "@/components/providers/userProvider";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import { bffUserFetcher } from "utils/fetch/bff/bffUserFetcher";

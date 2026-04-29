@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { GamesFiltersObject } from "@/domain/types/GamesFilters";
-import { ESortOption } from "@/domain/enums/ESortOption";
-import { EVendor } from "@/domain/enums/EVendor";
+import { GamesFiltersObject } from "@/domain/types/gamesFilters";
+import { ESortOption } from "@/domain/enums/eSortOption";
+import { EVendor } from "@/domain/enums/eVendor";
 
 interface GamesFiltersWidgetProps {
   onFiltersSubmit: (filters: GamesFiltersObject) => void;

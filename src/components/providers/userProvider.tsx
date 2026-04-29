@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "domain/entities/User";
+import { User } from "@/domain/entities/user";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface UserContextValue {

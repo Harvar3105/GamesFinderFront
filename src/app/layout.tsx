@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
-import Navigation from "@/components/layouts/Navigation";
-import UserProvider from "@/components/providers/UserProvider";
-import Footer from "@/components/layouts/Footer";
-import ThemeProvider from "@/components/providers/theme/ThemeProvider";
-import { ETheme } from "domain/enums/ETheme";
-import TokenProvider from "@/components/providers/TokenProvider";
-import { AuthInitializer } from "utils/fetch/bff/AuthInitializer";
+import Navigation from "@/components/layouts/navigation";
+import UserProvider from "@/components/providers/userProvider";
+import Footer from "@/components/layouts/footer";
+import ThemeProvider from "@/components/providers/theme/themeProvider";
+import { ETheme } from "@/domain/enums/eTheme";
+import TokenProvider from "@/components/providers/tokenProvider";
+import { AuthInitializer } from "@/utils/fetch/bff/authInitializer";
 
 export const metadata: Metadata = {
   title: "Games Finder",

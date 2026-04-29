@@ -1,4 +1,4 @@
-import { ESortOption } from "@/domain/enums/ESortOption";
+import { ESortOption } from "@/domain/enums/eSortOption";
 
 export interface PriceRange {
   min?: number;

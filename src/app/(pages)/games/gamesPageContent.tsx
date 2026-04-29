@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import GamesTable from "@/components/GamesTable";
+import GamesTable from "@/app/(pages)/games/gamesTable";
 import { bffGamesFetcher } from "@/utils/fetch/bff/bffGamesFetcher";
-import Game from "@/domain/entities/Game";
-import GamesFiltersWidget from "./widgets/GamesFiltersWidget";
-import TablePageSwitcher from "./widgets/TablePageSwitcher";
+import GamesFiltersWidget from "./gamesFiltersWidget";
+import TablePageSwitcher from "../../../components/widgets/tablePageSwitcher";
 import { GamesFetchData } from "@/utils/fetch/gamesAndOffersFetcher";
-import { GamesFiltersObject } from "@/domain/types/GamesFilters";
+import { GamesFiltersObject } from "@/domain/types/gamesFilters";
+import Game from "@/domain/entities/game";
 
 interface GamesPageContentProps {
   initialGames: Game[];

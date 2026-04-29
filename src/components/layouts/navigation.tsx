@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useUser } from "../providers/UserProvider";
-import ThemeSwitcher from "../providers/theme/ThemeSwitcher";
+import { useUser } from "../providers/userProvider";
+import ThemeSwitcher from "../providers/theme/themeSwitcher";
 
 export default function Navigation() {
   const { user } = useUser();

@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { EVendor } from "@/domain/enums/EVendor";
-import Game from "@/domain/entities/Game";
-import GameOffer from "@/domain/entities/GameOffer";
+import { EVendor } from "@/domain/enums/eVendor";
+import Game from "@/domain/entities/game";
+import GameOffer from "@/domain/entities/gameOffer";
 
 interface GamesTableProps {
   pageGames: Game[];

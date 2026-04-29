@@ -1,5 +1,5 @@
-import { ECurrency } from "@/domain/enums/ECurrency";
-import { GamesFiltersObject } from "@/domain/types/GamesFilters";
+import { ECurrency } from "@/domain/enums/eCurrency";
+import { GamesFiltersObject } from "@/domain/types/gamesFilters";
 
 export interface GetGamesPagedParams {
   page: number;
