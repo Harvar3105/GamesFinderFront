@@ -10,14 +10,73 @@ interface GamesTableProps {
 }
 
 export default function GamesTable({ pageGames }: GamesTableProps) {
-  const getOfferPrice = (game: Game, vendor: EVendor): string => {
-    const offer = game.offers?.find((o: GameOffer) => o.vendor === vendor);
-    if (!offer || !offer.available) return "N/A";
-    return offer.amount ? `${offer.amount}` : "N/A";
+  const getVendorOffers = (game: Game, vendor: EVendor): GameOffer[] => {
+    return (game.offers ?? []).filter(
+      (offer: GameOffer) => offer.vendor === vendor && offer.available,
+    );
   };
 
-  console.log("Game with offer:", pageGames.find((g) => g.offers?.length > 0) ?? "Not found");
-  console.log("Game example:", pageGames[0] ?? "No games");
+  const formatOfferPrice = (offer: GameOffer): string => {
+    if (offer.amount === undefined || offer.amount === null) return "N/A";
+    return offer.currency ? `${offer.amount} ${offer.currency}` : `${offer.amount}`;
+  };
+
+  const getOfferPrice = (game: Game, vendor: EVendor): string => {
+    const offers = getVendorOffers(game, vendor);
+    if (offers.length === 0) return "N/A";
+
+    const pricedOffers = offers.filter(
+      (offer) => offer.amount !== undefined && offer.amount !== null,
+    );
+    if (pricedOffers.length === 0) return "N/A";
+
+    const lowestOffer = pricedOffers.reduce((currentLowest, offer) =>
+      (offer.amount ?? Number.POSITIVE_INFINITY) <
+      (currentLowest.amount ?? Number.POSITIVE_INFINITY)
+        ? offer
+        : currentLowest,
+    );
+
+    return formatOfferPrice(lowestOffer);
+  };
+
+  const renderVendorOffersCell = (game: Game, vendor: EVendor) => {
+    const offers = getVendorOffers(game, vendor);
+
+    if (offers.length === 0) {
+      return <span>N/A</span>;
+    }
+
+    return (
+      <details className="group inline-block min-w-[160px] text-left">
+        <summary className="list-none cursor-pointer text-right font-medium text-blue-600 transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+          <span>{getOfferPrice(game, vendor)}</span>
+          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">({offers.length})</span>
+        </summary>
+        <div className="mt-2 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+          <ul className="space-y-2 text-sm">
+            {offers.map((offer) => (
+              <li key={offer.id} className="flex items-start justify-between gap-3">
+                <a
+                  href={offer.vendorsUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-0 truncate text-blue-600 hover:underline dark:text-blue-400"
+                  title={offer.vendorsGameId}
+                >
+                  {/* //TODO: Update DB data via latest backend version. Then update game_offer.ts entity and use offer name here */}
+                  {offer.vendorsUrl || "Offer"}
+                </a>
+                <span className="whitespace-nowrap text-gray-700 dark:text-gray-200">
+                  {formatOfferPrice(offer)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    );
+  };
 
   return (
     <div className="w-full overflow-x-auto p-4" data-table-root>
@@ -100,13 +159,13 @@ export default function GamesTable({ pageGames }: GamesTableProps) {
                   : "N/A"}
               </td>
               <td className="text-gray-600 dark:text-gray-300 p-4 text-right font-medium whitespace-nowrap">
-                {getOfferPrice(game, EVendor.Steam)}
+                {renderVendorOffersCell(game, EVendor.Steam)}
               </td>
               <td className="text-gray-600 dark:text-gray-300 p-4 text-right font-medium whitespace-nowrap">
-                {getOfferPrice(game, EVendor.InstantGaming)}
+                {renderVendorOffersCell(game, EVendor.InstantGaming)}
               </td>
               <td className="text-gray-600 dark:text-gray-300 p-4 text-right font-medium whitespace-nowrap">
-                {getOfferPrice(game, EVendor.G2A)}
+                {renderVendorOffersCell(game, EVendor.G2A)}
               </td>
             </tr>
           ))}
