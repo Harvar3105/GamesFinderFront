@@ -65,7 +65,7 @@ export default function GamesTable({ pageGames }: GamesTableProps) {
                   title={offer.vendorsGameId}
                 >
                   {/* //TODO: Update DB data via latest backend version. Then update game_offer.ts entity and use offer name here */}
-                  {offer.vendorsUrl || "Offer"}
+                  {offer.offerName || "Offer"}
                 </a>
                 <span className="whitespace-nowrap text-gray-700 dark:text-gray-200">
                   {formatOfferPrice(offer)}

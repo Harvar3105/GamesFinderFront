@@ -4,6 +4,7 @@ import Entity from "./entity";
 
 export default class GameOffer extends Entity {
   public gameId: string;
+  public offerName: string;
   public vendorsGameId: string;
   public vendor: EVendor;
   public vendorsUrl: string;
@@ -13,6 +14,7 @@ export default class GameOffer extends Entity {
 
   constructor(
     id: string,
+    offerName: string,
     createdAt: Date,
     updatedAt: Date,
     gameId: string,
@@ -25,6 +27,7 @@ export default class GameOffer extends Entity {
   ) {
     super(id, createdAt, updatedAt);
     this.gameId = gameId;
+    this.offerName = offerName;
     this.vendorsGameId = vendorsGameId;
     this.vendor = vendor;
     this.vendorsUrl = vendorsUrl;

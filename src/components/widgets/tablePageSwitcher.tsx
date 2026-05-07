@@ -6,12 +6,14 @@ interface TablePageSwitcherProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  pagerSize: number;
 }
 
 export default function TablePageSwitcher({
   currentPage,
   totalPages,
   onPageChange,
+  pagerSize,
 }: TablePageSwitcherProps) {
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -112,7 +114,7 @@ export default function TablePageSwitcher({
       </button>
 
       <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-        Page {currentPage} of {totalPages}
+        Page {currentPage} of {totalPages} with {pagerSize} items per page
       </div>
     </div>
   );

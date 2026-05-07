@@ -102,6 +102,7 @@ export default function GamesPageContent({ initialGames, initialCount }: GamesPa
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
+            pagerSize={ITEMS_PER_PAGE}
           />
         </>
       )}
