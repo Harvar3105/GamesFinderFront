@@ -4,6 +4,7 @@ import "./globals.css";
 import Navigation from "@/components/layouts/navigation";
 import UserProvider from "@/components/providers/userProvider";
 import Footer from "@/components/layouts/footer";
+import PopupProvider from "@/components/providers/popupProvider";
 import ThemeProvider from "@/components/providers/theme/themeProvider";
 import { ETheme } from "@/domain/enums/eTheme";
 import TokenProvider from "@/components/providers/tokenProvider";
@@ -29,14 +30,16 @@ export default async function RootLayout({
         <ThemeProvider initialTheme={initialTheme}>
           <TokenProvider initialJwt={jwt}>
             <UserProvider serverUser={null}>
-              <AuthInitializer />
-              <header>
-                <Navigation />
-              </header>
-              <main className="grow">{children}</main>
-              <footer>
-                <Footer />
-              </footer>
+              <PopupProvider>
+                <AuthInitializer />
+                <header>
+                  <Navigation />
+                </header>
+                <main className="grow">{children}</main>
+                <footer>
+                  <Footer />
+                </footer>
+              </PopupProvider>
             </UserProvider>
           </TokenProvider>
         </ThemeProvider>
