@@ -1,3 +1,5 @@
+import "server-only";
+
 export class Config {
   public readonly identityUri: string;
   public readonly userRegisterEndpoint: string;
@@ -16,6 +18,11 @@ export class Config {
   public readonly getGamesPaged: string;
   public readonly getGamesWithCurrencyPaged: string;
 
+  public readonly redisHost: string;
+  public readonly redisPort: number;
+  public readonly redisPassword: string;
+  public readonly redisDB: number;
+
   constructor() {
     this.identityUri = process.env.IDENTITY_URI!;
     this.userRegisterEndpoint = process.env.USER_REGISTRATION!;
@@ -33,6 +40,11 @@ export class Config {
 
     this.getGamesPaged = process.env.BACKEND_GET_GAMES_PAGED!;
     this.getGamesWithCurrencyPaged = process.env.BACKEND_GET_GAMES_WITH_CURRENCY_PAGED!;
+
+    this.redisHost = process.env.REDIS_HOST!;
+    this.redisPort = Number.parseInt(process.env.REDIS_PORT!);
+    this.redisPassword = process.env.REDIS_PASSWORD!;
+    this.redisDB = Number.parseInt(process.env.REDIS_DATABASE!);
   }
 }
 

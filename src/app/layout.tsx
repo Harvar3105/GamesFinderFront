@@ -9,6 +9,7 @@ import { ETheme } from "@/domain/entities/enums/ETheme";
 import CRTProvider from "@/components/providers/crt/crtProvider";
 import AnimationsProvider from "@/components/providers/animations/animationsProvider";
 import DesignElement from "@/components/providers/designElement";
+import QueryProvider from "@/components/providers/queryProvider";
 
 export const metadata: Metadata = {
   title: "Games Finder",
@@ -31,19 +32,21 @@ export default async function RootLayout({
         <ThemeProvider initialTheme={initialTheme}>
           <CRTProvider initialState={true}>
             <AnimationsProvider initialState={true}>
-              <UserProvider clientUser={null}>
-                <header className="z-99">
-                  <Header />
-                </header>
-                <DesignElement>
-                  <main className="min-h-screen flex flex-col relative selection:bg-primary/30 selection:text-primary">
-                    <div className="grow">{children}</div>
-                  </main>
-                </DesignElement>
-                <footer className="z-99">
-                  <Footer />
-                </footer>
-              </UserProvider>
+              <QueryProvider>
+                <UserProvider clientUser={null}>
+                  <header className="z-99">
+                    <Header />
+                  </header>
+                  <DesignElement>
+                    <main className="min-h-screen flex flex-col relative selection:bg-primary/30 selection:text-primary">
+                      <div className="grow">{children}</div>
+                    </main>
+                  </DesignElement>
+                  <footer className="z-99">
+                    <Footer />
+                  </footer>
+                </UserProvider>
+              </QueryProvider>
             </AnimationsProvider>
           </CRTProvider>
         </ThemeProvider>

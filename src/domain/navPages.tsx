@@ -1,5 +1,5 @@
 export const NavPages = {
-  home: "/home",
+  home: "/",
   games: "/games",
   game: "/game",
   profile: "/profile",
