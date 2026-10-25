@@ -2,7 +2,7 @@ import PageContainer from "@/components/layouts/pageContainer";
 import { ButtonLink, Icon, Panel, SectionHeading } from "@/components/ui";
 import GuestOnly from "@/components/widgets/guestOnly";
 import ProductCard, { type ProductCardData } from "@/components/widgets/productCard";
-import { NavPages } from "@/domain/navPages";
+import { NavPages } from "@/config/navPages";
 
 const STEPS = [
   {

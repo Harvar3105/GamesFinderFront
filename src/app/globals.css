@@ -37,6 +37,8 @@
   --element: #353148;
   --primary: #8c60f3;
   --text: #000000;
+  --error: #e50000;
+  --error-bg: #ef6666;
 
   --shadow-color: rgba(53, 49, 72, 0.3);
 
@@ -52,6 +54,8 @@
   --element: #261f32;
   --primary: #594ba0;
   --text: #fbfafb;
+  --error: #e50000;
+  --error-bg: #ef6666;
 
   --shadow-color: rgba(38, 31, 50, 0.6);
 
@@ -231,6 +235,8 @@
   --color-element: var(--element);
   --color-primary: var(--primary);
   --color-text: var(--text);
+  --color-error: var(--error);
+  --color-error-bg: var(--error-bg);
   --color-component-hover: var(--component-hover);
   --color-row-hover: var(--row-hover);
 

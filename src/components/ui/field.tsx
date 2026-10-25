@@ -2,12 +2,24 @@ import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
 
 const controlBase =
-  "w-full min-h-11 rounded-sm border border-transparent bg-component px-related-md font-sans text-base text-text";
+  "w-full min-h-11 rounded-sm border bg-component px-related-md font-sans text-base text-text";
 
-type InputProps = InputHTMLAttributes<HTMLInputElement>;
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  invalid?: boolean;
+}
 
-export function Input({ className, ...rest }: InputProps) {
-  return <input className={mergeClassNames(controlBase, className)} {...rest} />;
+export function Input({ invalid, className, ...rest }: InputProps) {
+  return (
+    <input
+      aria-invalid={invalid || undefined}
+      className={mergeClassNames(
+        controlBase,
+        invalid ? "border-error" : "border-transparent",
+        className,
+      )}
+      {...rest}
+    />
+  );
 }
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
@@ -17,7 +29,7 @@ export function Select({ className, ...rest }: SelectProps) {
     <select
       className={mergeClassNames(
         controlBase,
-        "appearance-auto transition-colors duration-150 hover:bg-component-hover",
+        "border-transparent appearance-auto transition-colors duration-150 hover:bg-component-hover",
         className,
       )}
       {...rest}
@@ -31,6 +43,9 @@ interface FieldProps {
   labelId?: string;
   hint?: ReactNode;
   hintId?: string;
+  /** Shown under the control. Wire `errorId` to the control's `aria-describedby`. */
+  error?: ReactNode;
+  errorId?: string;
   className?: string;
   children: ReactNode;
 }
@@ -41,6 +56,8 @@ export default function Field({
   labelId,
   hint,
   hintId,
+  error,
+  errorId,
   className,
   children,
 }: FieldProps) {
@@ -59,6 +76,11 @@ export default function Field({
       {hint && (
         <span id={hintId} className="typo-small">
           {hint}
+        </span>
+      )}
+      {error && (
+        <span id={errorId} className="font-sans text-sm/[1.5] font-semibold text-error">
+          {error}
         </span>
       )}
     </div>

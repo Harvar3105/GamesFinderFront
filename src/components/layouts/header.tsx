@@ -7,7 +7,7 @@ import ThemeSwitcher from "@/components/providers/theme/themeSwitcher";
 import { useUser } from "@/components/providers/userProvider";
 import { NavLink } from "@/components/ui";
 import LoginWidget from "@/components/widgets/loginWidget";
-import { NavPages } from "@/domain/navPages";
+import { NavPages } from "@/config/navPages";
 
 function isActive(pathname: string, href: string): boolean {
   if (href === NavPages.home) return pathname === href;

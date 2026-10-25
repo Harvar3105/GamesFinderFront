@@ -1,3 +1,4 @@
+export { default as Alert } from "./alert";
 export { default as Avatar, DEFAULT_AVATAR } from "./avatar";
 export { default as Badge } from "./badge";
 export { default as Button, ButtonLink, buttonClass, type ButtonVariant } from "./button";

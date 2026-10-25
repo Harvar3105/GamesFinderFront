@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { isAdmin } from "@/components/helpers/userRoles";
 import { useUser } from "@/components/providers/userProvider";
 import { Avatar, Badge, Button, ButtonLink } from "@/components/ui";
-import { NavPages } from "@/domain/navPages";
+import { NavPages } from "@/config/navPages";
 import BFFFetch from "@/lib/client/fetch/bffFetch";
 
 export default function LoginWidget() {

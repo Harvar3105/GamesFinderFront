@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
 import { Chip, Thumb, panelClass } from "@/components/ui";
-import { NavPages } from "@/domain/navPages";
+import { NavPages } from "@/config/navPages";
 
 // TODO: Check the fields against the backend product contract.
 export interface ProductCardData {

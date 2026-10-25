@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { FormHTMLAttributes, HTMLAttributes } from "react";
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
 
 export type PanelPadding = "none" | "related" | "attention";
@@ -13,7 +13,8 @@ export function panelClass(padding: PanelPadding = "related", className?: string
   return mergeClassNames("rounded-md bg-container shadow-container", paddings[padding], className);
 }
 
-interface PanelProps extends HTMLAttributes<HTMLElement> {
+interface PanelProps
+  extends HTMLAttributes<HTMLElement>, Pick<FormHTMLAttributes<HTMLFormElement>, "noValidate"> {
   as?: "div" | "section" | "article" | "nav" | "aside" | "form";
   padding?: PanelPadding;
 }

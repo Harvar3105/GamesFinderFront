@@ -13,7 +13,7 @@ Frontend of GamesFinder, a service that collects digital product (game) offers f
 | `src/` | source code (described below) |
 | `public/` | static files served as is: `favicon.ico`, `pfp.jpg` (default avatar) |
 | `next.config.ts` | Next.js config: React Compiler, allowed image domains (Steam CDN) |
-| `tsconfig.json` | TypeScript, aliases `@/app/*`, `@/assets/*`, `@/components/*`, `@/domain/*`, `@/lib/*` |
+| `tsconfig.json` | TypeScript, aliases `@/app/*`, `@/assets/*`, `@/components/*`, `@/config/*`, `@/domain/*`, `@/lib/*` |
 | `postcss.config.mjs` | Tailwind v4 via `@tailwindcss/postcss` |
 | `eslint.config.mjs`, `prettier.config.js` | linting and formatting |
 | `.env.local`, `.env.prod` | environment variables: Identity, backend and Redis addresses (not in git) |
@@ -29,6 +29,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `fonts.ts` | — | fonts via `next/font/google`: Fira Sans, Doto, Google Sans Code |
 | `globals.css` | — | design tokens (theme colors, spacing per window class, radii, shadow, text styles), their Tailwind mapping (`@theme`), `typo-*` utilities, base styles |
 | `page.tsx` | `/` | home page |
+| `(auth)/layout.tsx` | — | centers the sign-in / sign-up panel |
 | `(auth)/login/page.tsx` | `/login` | sign in |
 | `(auth)/registration/page.tsx` | `/registration` | sign up |
 | `api/(auth)/login/route.ts` | `POST /api/login` | BFF: sign in via Identity, create a Redis session, set the cookie |
@@ -47,11 +48,11 @@ Empty for now. The logo in the new design is text set in Doto.
 
 | folder | contents |
 | --- | --- |
-| `ui/` | base design-system components, imported from `@/components/ui`: `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass`, `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox`, `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `Thumb`, `Table` / `TableHeader` / `TableCell` |
-| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatTimeAgo` (`format.ts`) |
+| `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass`, `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `Thumb`, `Table` / `TableHeader` / `TableCell` |
+| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatTimeAgo` (`format.ts`), `isValidEmail` / `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
-| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `productCard.tsx` (product card for grids), `guestOnly.tsx` (renders children only for signed-out visitors) |
+| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `productCard.tsx` (product card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
 
@@ -64,7 +65,13 @@ Types shared by the client and the server. No side effects.
 | `contracts/in/` | what the browser sends to the BFF (`LoginPayload`, `RegistrationPayload`) |
 | `contracts/out/` | what the BFF sends to and receives from external services (`LoginRequest`, `IdentityAuthModel`, `SessionTokens`) |
 | `entities/` | entities: `Entity` (base: id, dates), `User`, `UserData`, `UserDTO`; `enums/ETheme` (`light` / `dark`) |
+
+## `src/config` — app-wide constants
+
+| path | purpose |
+| --- | --- |
 | `navPages.tsx` | page URLs: `/`, `/catalog`, `/catalog/[id]` (`NavPages.product(id)`), `/account`, `/admin`, `/login`, `/registration` |
+| `externalLinks.ts` | external links: `GITHUB_URL`, `CONTACT_EMAIL_HREF` |
 
 ## `src/lib` — helpers and the server side of the BFF
 
@@ -84,7 +91,7 @@ Tailwind's default colors, radii, shadows, fonts and breakpoints are disabled: o
 
 | what | utilities |
 | --- | --- |
-| colors | `bg-background`, `bg-container`, `bg-component`, `bg-element`, `bg-primary`, `text-text`, `bg-component-hover`, `bg-row-hover` |
+| colors | `bg-background`, `bg-container`, `bg-component`, `bg-element`, `bg-primary`, `text-text`, `text-error` / `border-error`, `bg-error-bg`, `bg-component-hover`, `bg-row-hover` |
 | spacing | `*-related-xs/sm/md/lg`, `*-attention-sm/md/lg`, `*-edge-x`, `*-edge-y` (values depend on the window width) |
 | radii | `rounded-sm` 8px, `rounded-md` 12px, `rounded-full` |
 | shadow | `shadow-container` |
@@ -105,6 +112,6 @@ Browser (page / component)
 
 ## Rules for the current task (redesign)
 
-- Rewritten: `src/app` (pages, `layout.tsx`, `globals.css`), `src/components`, `src/assets`, and `src/domain/navPages.tsx`.
-- Not touched: `src/app/api`, the rest of `src/domain`, `src/lib`.
+- Rewritten: `src/app` (pages, `layout.tsx`, `globals.css`), `src/components`, `src/assets`, `src/config`.
+- Not touched: `src/app/api`, `src/domain`, `src/lib`.
 - Placeholders are marked with `FIX:` comments; types that must be checked against the backend are marked with `TODO:`.

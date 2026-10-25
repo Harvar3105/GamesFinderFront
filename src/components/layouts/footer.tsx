@@ -1,9 +1,5 @@
+import { CONTACT_EMAIL_HREF, GITHUB_URL } from "@/config/externalLinks";
 import { ButtonLink, Icon } from "@/components/ui";
-
-// TODO: Replace with the real repository URL.
-const GITHUB_URL = "https://github.com/";
-// TODO: Replace with the real contact email.
-const CONTACT_EMAIL = "mailto:";
 
 export default function Footer() {
   return (
@@ -14,7 +10,7 @@ export default function Footer() {
           <Icon name="code_xml" />
           GitHub
         </ButtonLink>
-        <ButtonLink href={CONTACT_EMAIL} variant="secondary">
+        <ButtonLink href={CONTACT_EMAIL_HREF} variant="secondary">
           <Icon name="mail" />
           Contact us
         </ButtonLink>
