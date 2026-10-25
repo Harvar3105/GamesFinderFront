@@ -21,14 +21,13 @@ export default function Header() {
             href={NavPages.home}
             className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
           >
-            <div className="relative w-60 h-15 rounded-lg overflow-hidden border border-primary/40 p-0.5 bg-surface-container-high transition-transform group-hover:scale-105 group-hover:border-primary">
+            <div className="relative w-60 h-15 rounded-lg overflow-hidden border border-primary/40 p-0.5 bg-surface-container-high">
               <Image
                 src={Logo}
                 alt="Games Finder Logo"
                 className="w-full h-full object-cover rounded"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </Link>
 
