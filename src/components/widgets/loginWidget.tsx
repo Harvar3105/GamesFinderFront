@@ -42,7 +42,7 @@ export default function LoginWidget() {
 
   return (
     <>
-      <ButtonLink href={NavPages.account} variant="ghost" className="px-related-sm">
+      <ButtonLink href={NavPages.account} variant="ghost" size="compact">
         <Avatar user={user} />
         {user.username}
       </ButtonLink>

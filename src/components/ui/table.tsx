@@ -16,7 +16,7 @@ export default function Table({
   ...rest
 }: TableProps) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" data-scroll-box>
       <table
         className={mergeClassNames(
           "w-full border-collapse",
@@ -33,16 +33,23 @@ export default function Table({
   );
 }
 
+interface TableHeaderProps extends ThHTMLAttributes<HTMLTableCellElement> {
+  align?: "left" | "right";
+}
+
 export function TableHeader({
+  align = "left",
   className,
   scope = "col",
   ...rest
-}: ThHTMLAttributes<HTMLTableCellElement>) {
+}: TableHeaderProps) {
   return (
     <th
       scope={scope}
       className={mergeClassNames(
-        "whitespace-nowrap bg-component p-related-md text-left typo-label first:rounded-tl-sm last:rounded-tr-sm",
+        "whitespace-nowrap bg-component p-related-md typo-label",
+        align === "right" ? "text-right" : "text-left",
+        "first:rounded-tl-sm last:rounded-tr-sm",
         className,
       )}
       {...rest}

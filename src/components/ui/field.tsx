@@ -1,19 +1,42 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
 
-const controlBase =
-  "w-full min-h-11 rounded-sm border bg-component px-related-md font-sans text-base text-text";
+export type ControlSize = "md" | "sm";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+const controlBase = "rounded-sm border bg-component px-related-md text-text";
+
+const controlSizes: Record<ControlSize, string> = {
+  md: "min-h-11 text-base",
+  sm: "min-h-9 text-sm",
+};
+
+interface ControlProps {
+  controlSize?: ControlSize;
+  fullWidth?: boolean;
+  /** Code font, for prices and IDs. */
+  mono?: boolean;
+}
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement>, ControlProps {
   invalid?: boolean;
 }
 
-export function Input({ invalid, className, ...rest }: InputProps) {
+export function Input({
+  invalid,
+  controlSize = "md",
+  fullWidth = true,
+  mono = false,
+  className,
+  ...rest
+}: InputProps) {
   return (
     <input
       aria-invalid={invalid || undefined}
       className={mergeClassNames(
         controlBase,
+        controlSizes[controlSize],
+        fullWidth ? "w-full" : "w-auto",
+        mono ? "font-code" : "font-sans",
         invalid ? "border-error" : "border-transparent",
         className,
       )}
@@ -22,13 +45,22 @@ export function Input({ invalid, className, ...rest }: InputProps) {
   );
 }
 
-type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement>, ControlProps {}
 
-export function Select({ className, ...rest }: SelectProps) {
+export function Select({
+  controlSize = "md",
+  fullWidth = true,
+  mono = false,
+  className,
+  ...rest
+}: SelectProps) {
   return (
     <select
       className={mergeClassNames(
         controlBase,
+        controlSizes[controlSize],
+        fullWidth ? "w-full" : "w-auto",
+        mono ? "font-code" : "font-sans",
         "border-transparent appearance-auto transition-colors duration-150 hover:bg-component-hover",
         className,
       )}
