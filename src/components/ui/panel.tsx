@@ -1,13 +1,17 @@
 import type { HTMLAttributes } from "react";
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
 
-type PanelPadding = "none" | "related" | "attention";
+export type PanelPadding = "none" | "related" | "attention";
 
 const paddings: Record<PanelPadding, string> = {
   none: "p-0 overflow-hidden",
   related: "p-related-lg",
   attention: "p-attention-sm",
 };
+
+export function panelClass(padding: PanelPadding = "related", className?: string): string {
+  return mergeClassNames("rounded-md bg-container shadow-container", paddings[padding], className);
+}
 
 interface PanelProps extends HTMLAttributes<HTMLElement> {
   as?: "div" | "section" | "article" | "nav" | "aside" | "form";
@@ -20,14 +24,5 @@ export default function Panel({
   className,
   ...rest
 }: PanelProps) {
-  return (
-    <Tag
-      className={mergeClassNames(
-        "rounded-md bg-container shadow-container",
-        paddings[padding],
-        className,
-      )}
-      {...rest}
-    />
-  );
+  return <Tag className={panelClass(padding, className)} {...rest} />;
 }

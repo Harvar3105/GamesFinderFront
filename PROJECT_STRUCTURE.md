@@ -47,11 +47,11 @@ Empty for now. The logo in the new design is text set in Doto.
 
 | folder | contents |
 | --- | --- |
-| `ui/` | base design-system components, imported from `@/components/ui`: `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel`, `Field` / `Input` / `Select` / `Checkbox`, `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `Thumb`, `Table` / `TableHeader` / `TableCell` |
-| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`) |
-| `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact) |
+| `ui/` | base design-system components, imported from `@/components/ui`: `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass`, `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox`, `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `Thumb`, `Table` / `TableHeader` / `TableCell` |
+| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatTimeAgo` (`format.ts`) |
+| `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
-| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out) |
+| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `productCard.tsx` (product card for grids), `guestOnly.tsx` (renders children only for signed-out visitors) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
 

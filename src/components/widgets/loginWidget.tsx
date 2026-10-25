@@ -9,7 +9,7 @@ import { NavPages } from "@/domain/navPages";
 import BFFFetch from "@/lib/client/fetch/bffFetch";
 
 export default function LoginWidget() {
-  const { user, logout } = useUser();
+  const { user, isLoggedIn, logout } = useUser();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -22,7 +22,8 @@ export default function LoginWidget() {
     // TODO: On error show a notification. Notification widgets are not implemented yet.
   });
 
-  if (!user) {
+  // `!user` narrows the type for the code below; isLoggedIn() is the source of truth.
+  if (!isLoggedIn() || !user) {
     return (
       <>
         {pathname !== NavPages.login && (

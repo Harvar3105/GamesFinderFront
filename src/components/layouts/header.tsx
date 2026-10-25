@@ -16,12 +16,12 @@ function isActive(pathname: string, href: string): boolean {
 
 export default function Header() {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { user, isLoggedIn } = useUser();
 
   const links = [
     { href: NavPages.home, label: "Home" },
     { href: NavPages.catalog, label: "Catalog" },
-    ...(user ? [{ href: NavPages.account, label: "Account" }] : []),
+    ...(isLoggedIn() ? [{ href: NavPages.account, label: "Account" }] : []),
     ...(isAdmin(user) ? [{ href: NavPages.admin, label: "Administration" }] : []),
   ];
 
