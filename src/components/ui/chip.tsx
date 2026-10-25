@@ -1,11 +1,17 @@
 import type { ButtonHTMLAttributes, HTMLAttributes } from "react";
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
 
-export default function Chip({ className, ...rest }: HTMLAttributes<HTMLSpanElement>) {
+interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Code font, for IDs. */
+  mono?: boolean;
+}
+
+export default function Chip({ mono = false, className, ...rest }: ChipProps) {
   return (
     <span
       className={mergeClassNames(
-        "inline-flex items-center whitespace-nowrap rounded-full bg-component px-related-sm py-related-xs font-sans text-sm leading-[1.2]",
+        "inline-flex items-center whitespace-nowrap rounded-full bg-component px-related-sm py-related-xs text-sm leading-[1.2]",
+        mono ? "font-code" : "font-sans",
         className,
       )}
       {...rest}
