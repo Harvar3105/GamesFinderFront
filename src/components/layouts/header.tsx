@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import ThemeSwitcher from "../providers/theme/themeSwitcher";
-import Image from "next/image";
 import { NavPages } from "@/domain/navPages";
 import { usePathname } from "next/navigation";
-import Logo from "@/assets/logo.png";
 import LoginWidget from "../widgets/loginWidget";
 
 export default function Header() {
@@ -21,14 +19,7 @@ export default function Header() {
             href={NavPages.home}
             className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
           >
-            <div className="relative w-60 h-15 rounded-lg overflow-hidden border border-primary/40 p-0.5 bg-surface-container-high">
-              <Image
-                src={Logo}
-                alt="Games Finder Logo"
-                className="w-full h-full object-cover rounded"
-                referrerPolicy="no-referrer"
-              />
-            </div>
+            <span className="typo-logo">GamesFinder</span>
           </Link>
 
           {/* Desktop Navigation Links */}

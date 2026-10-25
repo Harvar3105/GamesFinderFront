@@ -1,7 +1,5 @@
 "use client";
 
-import AnimationsSwitcher from "../providers/animations/animationsSwitcher";
-import CRTSwitcher from "../providers/crt/crtSwitcher";
 
 export default function Footer() {
   return (
@@ -35,8 +33,6 @@ export default function Footer() {
 
         {/* Right: Cyber Controls Toggles & Telemetry */}
         <div className="flex items-center gap-4">
-          <AnimationsSwitcher />
-          <CRTSwitcher />
           <div className="hidden lg:flex items-center gap-1.5 text-[10px] font-label-sm text-tertiary bg-tertiary/5 px-2 py-0.5 border border-tertiary/20 rounded">
             <span>PING:</span>
             <span className="font-mono">12ms</span>

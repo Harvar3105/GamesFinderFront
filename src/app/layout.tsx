@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
+import { fontVariables } from "./fonts";
 import Header from "@/components/layouts/header";
-import UserProvider from "@/components/providers/userProvider";
 import Footer from "@/components/layouts/footer";
 import ThemeProvider from "@/components/providers/theme/themeProvider";
-import { ETheme } from "@/domain/entities/enums/ETheme";
-import CRTProvider from "@/components/providers/crt/crtProvider";
-import AnimationsProvider from "@/components/providers/animations/animationsProvider";
-import DesignElement from "@/components/providers/designElement";
 import QueryProvider from "@/components/providers/queryProvider";
+import UserProvider from "@/components/providers/userProvider";
+import { ETheme } from "@/domain/entities/enums/ETheme";
 
 export const metadata: Metadata = {
   title: "Games Finder",
@@ -21,34 +19,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  //TODO: Cookie request must be presented before actual cookie use.
   const cookieStore = await cookies();
   const initialTheme = cookieStore.get("theme")?.value === ETheme.DARK ? ETheme.DARK : ETheme.LIGHT;
   //TODO: Store session cookie.
 
   return (
-    <html lang="en" data-theme={initialTheme}>
-      <body className="flex flex-col min-h-screen">
+    <html lang="en" data-theme={initialTheme} className={fontVariables}>
+      <body className="flex min-h-screen flex-col">
         <ThemeProvider initialTheme={initialTheme}>
-          <CRTProvider initialState={true}>
-            <AnimationsProvider initialState={true}>
-              <QueryProvider>
-                <UserProvider clientUser={null}>
-                  <header className="z-99">
-                    <Header />
-                  </header>
-                  <DesignElement>
-                    <main className="min-h-screen flex flex-col relative selection:bg-primary/30 selection:text-primary">
-                      <div className="grow">{children}</div>
-                    </main>
-                  </DesignElement>
-                  <footer className="z-99">
-                    <Footer />
-                  </footer>
-                </UserProvider>
-              </QueryProvider>
-            </AnimationsProvider>
-          </CRTProvider>
+          <QueryProvider>
+            <UserProvider clientUser={null}>
+              <Header />
+              <main className="flex w-full flex-1 flex-col">{children}</main>
+              <Footer />
+            </UserProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

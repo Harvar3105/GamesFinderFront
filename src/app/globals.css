@@ -1,316 +1,353 @@
 @import "tailwindcss";
 
+/*
+ * GamesFinder design system (artifact «GamesFinderDesign»).
+ *
+ * 1. Raw tokens: plain CSS variables. Colors and shadows switch with [data-theme],
+ *    spacing switches with the window class (compact … xlarge).
+ * 2. @theme: maps raw tokens to Tailwind utilities and removes Tailwind's default
+ *    colors, radii, shadows and breakpoints, so only design tokens can be used.
+ * 3. @utility: text styles (typo-*), built on the --text-* font shorthands.
+ * 4. Base styles: page background, text, focus ring.
+ *
+ * Usage examples:
+ *   bg-container  text-text  bg-component  bg-primary
+ *   p-related-md  gap-attention-sm  px-edge-x
+ *   rounded-sm (8px)  rounded-md (12px)  rounded-full
+ *   shadow-container
+ *   font-sans  font-doto  font-code
+ *   typo-h1  typo-h2  typo-label  typo-small …
+ *   medium:  expanded:  large:  xlarge:  (window classes)
+ *   dark:  light:  (themes)
+ */
+
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
+/* ---------------------------------------------------------------- */
+/* 1. Raw tokens                                                     */
+/* ---------------------------------------------------------------- */
+
+/* Colors. No attribute means the light theme. */
+:root,
 [data-theme="light"] {
-  --color-secondary-fixed: #acedff;
-  --color-on-secondary: #ffffff;
-  --color-inverse-primary: #ddb7ff;
-  --color-on-primary: #ffffff;
-  --color-surface: #fdf7ff;
-  --color-tertiary-fixed-dim: #4ae176;
-  --color-primary-fixed: #f0dbff;
-  --color-surface-dim: #ded7e6;
-  --color-surface-container-high: #ede6f4;
-  --color-on-secondary-fixed: #001f26;
-  --color-on-background: #1d192b;
-  --color-surface-container-highest: #e7e0ef;
-  --color-on-surface-variant: #4a454e;
-  --color-tertiary-fixed: #6bff8f;
-  --color-on-tertiary-container: #002109;
-  --color-on-error-container: #410002;
-  --color-on-tertiary-fixed: #002109;
-  --color-background: #fdf7ff;
-  --color-surface-bright: #fdf7ff;
-  --color-tertiary: #006e26;
-  --color-secondary: #006877;
-  --color-on-error: #ffffff;
-  --color-on-primary-fixed-variant: #6900b3;
-  --color-error: #ba1a1a;
-  --color-surface-container: #f2ebfa;
-  --color-on-secondary-container: #001f26;
-  --color-primary: #842bd2;
-  --color-outline: #7c757f;
-  --color-on-secondary-fixed-variant: #004e5c;
-  --color-error-container: #ffdad6;
-  --color-on-tertiary: #ffffff;
-  --color-on-tertiary-fixed-variant: #005321;
-  --color-primary-container: #f0dbff;
-  --color-secondary-fixed-dim: #4cd7f6;
-  --color-primary-fixed-dim: #ddb7ff;
-  --color-secondary-container: #acedff;
-  --color-on-primary-container: #2c0051;
-  --color-inverse-surface: #322e40;
-  --color-surface-container-low: #f8f1ff;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-tint: #842bd2;
-  --color-tertiary-container: #6bff8f;
-  --color-inverse-on-surface: #f5effe;
-  --color-surface-variant: #e9dfeb;
-  --color-outline-variant: #cdc3ce;
-  --color-on-primary-fixed: #2c0051;
-  --color-on-surface: #1d192b;
+  --background: #e4e0ec;
+  --container: #f8f6fc;
+  --component: #cccad2;
+  --element: #353148;
+  --primary: #8c60f3;
+  --text: #000000;
 
-  --color-crt-center: rgb(240, 230, 255);
-  --color-crt-mid: rgb(245, 240, 255);
-  --color-crt-outer: rgb(250, 245, 255);
-  --color-crt-edge: rgb(255, 255, 255);
+  --shadow-color: rgba(53, 49, 72, 0.3);
 
-  --background: var(--color-background);
-  --foreground: var(--color-on-surface);
+  /* Derived states (README «Компоненты и состояния»). */
+  --component-hover: color-mix(in srgb, var(--component) 88%, black);
+  --row-hover: color-mix(in srgb, var(--container) 94%, black);
 }
 
 [data-theme="dark"] {
-  --color-secondary-fixed: #acedff;
-  --color-on-secondary: #003640;
-  --color-inverse-primary: #842bd2;
-  --color-on-primary: #490080;
-  --color-surface: #151122;
-  --color-tertiary-fixed-dim: #4ae176;
-  --color-primary-fixed: #f0dbff;
-  --color-surface-dim: #151122;
-  --color-surface-container-high: #2c273a;
-  --color-on-secondary-fixed: #001f26;
-  --color-on-background: #e7dff8;
-  --color-surface-container-highest: #373245;
-  --color-on-surface-variant: #cfc2d6;
-  --color-tertiary-fixed: #6bff8f;
-  --color-on-tertiary-container: #003111;
-  --color-on-error-container: #ffdad6;
-  --color-on-tertiary-fixed: #002109;
-  --color-background: #151122;
-  --color-surface-bright: #3b364a;
-  --color-tertiary: #4ae176;
-  --color-secondary: #4cd7f6;
-  --color-on-error: #690005;
-  --color-on-primary-fixed-variant: #6900b3;
-  --color-error: #ffb4ab;
-  --color-surface-container: #211d2f;
-  --color-on-secondary-container: #00424e;
-  --color-primary: #ddb7ff;
-  --color-outline: #988d9f;
-  --color-on-secondary-fixed-variant: #004e5c;
-  --color-error-container: #93000a;
-  --color-on-tertiary: #003915;
-  --color-on-tertiary-fixed-variant: #005321;
-  --color-primary-container: #b76dff;
-  --color-secondary-fixed-dim: #4cd7f6;
-  --color-primary-fixed-dim: #ddb7ff;
-  --color-secondary-container: #03b5d3;
-  --color-on-primary-container: #400071;
-  --color-inverse-surface: #e7dff8;
-  --color-surface-container-low: #1d192b;
-  --color-surface-container-lowest: #100c1d;
-  --color-surface-tint: #ddb7ff;
-  --color-tertiary-container: #00a74b;
-  --color-inverse-on-surface: #322e40;
-  --color-surface-variant: #373245;
-  --color-outline-variant: #4d4354;
-  --color-on-primary-fixed: #2c0051;
-  --color-on-surface: #e7dff8;
+  --background: #625d73;
+  --container: #41394f;
+  --component: #86819e;
+  --element: #261f32;
+  --primary: #594ba0;
+  --text: #fbfafb;
 
-  --color-crt-center: rgb(28, 9, 62);
-  --color-crt-mid: rgb(18, 7, 36);
-  --color-crt-outer: rgb(8, 3, 16);
-  --color-crt-edge: rgb(2, 1, 5);
+  --shadow-color: rgba(38, 31, 50, 0.6);
 
-  --background: var(--color-background);
-  --foreground: var(--color-on-surface);
+  --component-hover: color-mix(in srgb, var(--component) 88%, black);
+  --row-hover: color-mix(in srgb, var(--container) 90%, white);
+}
+
+/* Spacing per window class. Components use only the unsuffixed variables. */
+:root {
+  --related-xs-compact: 4px;
+  --related-xs-medium: 4px;
+  --related-xs-expanded: 4px;
+  --related-xs-large: 4px;
+  --related-xs-xlarge: 4px;
+  --related-sm-compact: 8px;
+  --related-sm-medium: 8px;
+  --related-sm-expanded: 8px;
+  --related-sm-large: 12px;
+  --related-sm-xlarge: 12px;
+  --related-md-compact: 12px;
+  --related-md-medium: 12px;
+  --related-md-expanded: 16px;
+  --related-md-large: 16px;
+  --related-md-xlarge: 20px;
+  --related-lg-compact: 16px;
+  --related-lg-medium: 16px;
+  --related-lg-expanded: 24px;
+  --related-lg-large: 24px;
+  --related-lg-xlarge: 24px;
+  --attention-sm-compact: 24px;
+  --attention-sm-medium: 24px;
+  --attention-sm-expanded: 32px;
+  --attention-sm-large: 40px;
+  --attention-sm-xlarge: 40px;
+  --attention-md-compact: 32px;
+  --attention-md-medium: 40px;
+  --attention-md-expanded: 48px;
+  --attention-md-large: 64px;
+  --attention-md-xlarge: 64px;
+  --attention-lg-compact: 48px;
+  --attention-lg-medium: 64px;
+  --attention-lg-expanded: 80px;
+  --attention-lg-large: 96px;
+  --attention-lg-xlarge: 120px;
+  --edge-x-compact: 16px;
+  --edge-x-medium: 24px;
+  --edge-x-expanded: 32px;
+  --edge-x-large: 64px;
+  --edge-x-xlarge: 96px;
+  --edge-y-compact: 16px;
+  --edge-y-medium: 24px;
+  --edge-y-expanded: 32px;
+  --edge-y-large: 48px;
+  --edge-y-xlarge: 64px;
+
+  --related-xs: var(--related-xs-compact);
+  --related-sm: var(--related-sm-compact);
+  --related-md: var(--related-md-compact);
+  --related-lg: var(--related-lg-compact);
+  --attention-sm: var(--attention-sm-compact);
+  --attention-md: var(--attention-md-compact);
+  --attention-lg: var(--attention-lg-compact);
+  --edge-x: var(--edge-x-compact);
+  --edge-y: var(--edge-y-compact);
+}
+
+/* Breakpoints are literals: CSS variables cannot be used in media queries (bp-* tokens). */
+@media (min-width: 600px) {
+  :root {
+    --related-xs: var(--related-xs-medium);
+    --related-sm: var(--related-sm-medium);
+    --related-md: var(--related-md-medium);
+    --related-lg: var(--related-lg-medium);
+    --attention-sm: var(--attention-sm-medium);
+    --attention-md: var(--attention-md-medium);
+    --attention-lg: var(--attention-lg-medium);
+    --edge-x: var(--edge-x-medium);
+    --edge-y: var(--edge-y-medium);
+  }
+}
+
+@media (min-width: 840px) {
+  :root {
+    --related-xs: var(--related-xs-expanded);
+    --related-sm: var(--related-sm-expanded);
+    --related-md: var(--related-md-expanded);
+    --related-lg: var(--related-lg-expanded);
+    --attention-sm: var(--attention-sm-expanded);
+    --attention-md: var(--attention-md-expanded);
+    --attention-lg: var(--attention-lg-expanded);
+    --edge-x: var(--edge-x-expanded);
+    --edge-y: var(--edge-y-expanded);
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --related-xs: var(--related-xs-large);
+    --related-sm: var(--related-sm-large);
+    --related-md: var(--related-md-large);
+    --related-lg: var(--related-lg-large);
+    --attention-sm: var(--attention-sm-large);
+    --attention-md: var(--attention-md-large);
+    --attention-lg: var(--attention-lg-large);
+    --edge-x: var(--edge-x-large);
+    --edge-y: var(--edge-y-large);
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --related-xs: var(--related-xs-xlarge);
+    --related-sm: var(--related-sm-xlarge);
+    --related-md: var(--related-md-xlarge);
+    --related-lg: var(--related-lg-xlarge);
+    --attention-sm: var(--attention-sm-xlarge);
+    --attention-md: var(--attention-md-xlarge);
+    --attention-lg: var(--attention-lg-xlarge);
+    --edge-x: var(--edge-x-xlarge);
+    --edge-y: var(--edge-y-xlarge);
+  }
+}
+
+/* Text styles as `font` shorthands. Families come from next/font (src/app/fonts.ts). */
+:root {
+  --family-fira-sans: var(--ff-fira-sans), sans-serif;
+  --family-doto: var(--ff-doto), sans-serif;
+  --family-google-sans-code: var(--ff-google-sans-code), monospace;
+
+  --text-main-text: 430 16px/1.5 var(--family-fira-sans);
+  --text-styled-header: 430 16px/1.5 var(--family-doto);
+  --text-code: 430 16px/1.5 var(--family-google-sans-code);
+  --text-logo: 700 28px/1 var(--family-doto);
+  --text-logo-footer: 700 20px/1 var(--family-doto);
+  --text-display: 700 clamp(36px, 4.4vw, 64px) / 1.05 var(--family-doto);
+  --text-heading-1: 700 40px/1.1 var(--family-doto);
+  --text-heading-1-compact: 700 32px/1.1 var(--family-doto);
+  --text-heading-2: 600 24px/1.3 var(--family-fira-sans);
+  --text-heading-2-compact: 600 20px/1.3 var(--family-fira-sans);
+  --text-button: 600 16px/1 var(--family-fira-sans);
+  --text-label: 600 14px/1.5 var(--family-fira-sans);
+  --text-small: 400 14px/1.5 var(--family-fira-sans);
+  --text-caption: 400 12px/1.5 var(--family-fira-sans);
+  --text-price-lg: 400 28px/1.2 var(--family-google-sans-code);
+  --text-badge: 600 12px/1.2 var(--family-google-sans-code);
+}
+
+/* ---------------------------------------------------------------- */
+/* 2. Tailwind theme                                                 */
+/* ---------------------------------------------------------------- */
+
+@theme {
+  /* Only design-system values: Tailwind defaults are removed. */
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --font-*: initial;
+  --breakpoint-*: initial;
+
+  /* Window classes. */
+  --breakpoint-medium: 600px;
+  --breakpoint-expanded: 840px;
+  --breakpoint-large: 1200px;
+  --breakpoint-xlarge: 1600px;
+
+  /* Radii. */
+  --radius-sm: 8px; /* controls: buttons, inputs, selects, nav tabs, image placeholders, role badge */
+  --radius-md: 12px; /* containers: panels, cards, forms */
+  --radius-full: 999px; /* pills and circles: tags, chips, avatars */
 }
 
 @theme inline {
-  --color-secondary-fixed: var(--color-secondary-fixed);
-  --color-on-secondary: var(--color-on-secondary);
-  --color-inverse-primary: var(--color-inverse-primary);
-  --color-on-primary: var(--color-on-primary);
-  --color-surface: var(--color-surface);
-  --color-tertiary-fixed-dim: var(--color-tertiary-fixed-dim);
-  --color-primary-fixed: var(--color-primary-fixed);
-  --color-surface-dim: var(--color-surface-dim);
-  --color-surface-container-high: var(--color-surface-container-high);
-  --color-on-secondary-fixed: var(--color-on-secondary-fixed);
-  --color-on-background: var(--color-on-background);
-  --color-surface-container-highest: var(--color-surface-container-highest);
-  --color-on-surface-variant: var(--color-on-surface-variant);
-  --color-tertiary-fixed: var(--color-tertiary-fixed);
-  --color-on-tertiary-container: var(--color-on-tertiary-container);
-  --color-on-error-container: var(--color-on-error-container);
-  --color-on-tertiary-fixed: var(--color-on-tertiary-fixed);
-  --color-background: var(--color-background);
-  --color-surface-bright: var(--color-surface-bright);
-  --color-tertiary: var(--color-tertiary);
-  --color-secondary: var(--color-secondary);
-  --color-on-error: var(--color-on-error);
-  --color-on-primary-fixed-variant: var(--color-on-primary-fixed-variant);
-  --color-error: var(--color-error);
-  --color-surface-container: var(--color-surface-container);
-  --color-on-secondary-container: var(--color-on-secondary-container);
-  --color-primary: var(--color-primary);
-  --color-outline: var(--color-outline);
-  --color-on-secondary-fixed-variant: var(--color-on-secondary-fixed-variant);
-  --color-error-container: var(--color-error-container);
-  --color-on-tertiary: var(--color-on-tertiary);
-  --color-on-tertiary-fixed-variant: var(--color-on-tertiary-fixed-variant);
-  --color-primary-container: var(--color-primary-container);
-  --color-secondary-fixed-dim: var(--color-secondary-fixed-dim);
-  --color-primary-fixed-dim: var(--color-primary-fixed-dim);
-  --color-secondary-container: var(--color-secondary-container);
-  --color-on-primary-container: var(--color-on-primary-container);
-  --color-inverse-surface: var(--color-inverse-surface);
-  --color-surface-container-low: var(--color-surface-container-low);
-  --color-surface-container-lowest: var(--color-surface-container-lowest);
-  --color-surface-tint: var(--color-surface-tint);
-  --color-tertiary-container: var(--color-tertiary-container);
-  --color-inverse-on-surface: var(--color-inverse-on-surface);
-  --color-surface-variant: var(--color-surface-variant);
-  --color-outline-variant: var(--color-outline-variant);
-  --color-on-primary-fixed: var(--color-on-primary-fixed);
-  --color-on-surface: var(--color-on-surface);
+  /* Colors: bg-*, text-*, border-*, outline-* … */
+  --color-background: var(--background);
+  --color-container: var(--container);
+  --color-component: var(--component);
+  --color-element: var(--element);
+  --color-primary: var(--primary);
+  --color-text: var(--text);
+  --color-component-hover: var(--component-hover);
+  --color-row-hover: var(--row-hover);
 
-  --color-crt-center: var(--color-crt-center);
-  --color-crt-mid: var(--color-crt-mid);
-  --color-crt-outer: var(--color-crt-outer);
-  --color-crt-edge: var(--color-crt-edge);
+  /* Semantic spacing: p-*, m-*, gap-* … */
+  --spacing-related-xs: var(--related-xs);
+  --spacing-related-sm: var(--related-sm);
+  --spacing-related-md: var(--related-md);
+  --spacing-related-lg: var(--related-lg);
+  --spacing-attention-sm: var(--attention-sm);
+  --spacing-attention-md: var(--attention-md);
+  --spacing-attention-lg: var(--attention-lg);
+  --spacing-edge-x: var(--edge-x);
+  --spacing-edge-y: var(--edge-y);
 
-  --spacing-space-md: 1rem;
-  --spacing-gutter: 1rem;
-  --spacing-margin-tablet: 2rem;
-  --spacing-margin: 1rem;
-  --spacing-space-lg: 1.5rem;
-  --spacing-space-sm: 0.5rem;
-  --spacing-space-xl: 2rem;
-  --spacing-margin-desktop: 3rem;
-  --spacing-gutter-desktop: 1.5rem;
-  --spacing-space-xs: 0.25rem;
-  --spacing-gutter-tablet: 1.25rem;
+  /* Shadow for containers lying on the page background. */
+  --shadow-container: 2px 4px 8px -2px var(--shadow-color);
 
-  --font-bitcount: "Bitcount Single", monospace, sans-serif;
-  --font-code: "M PLUS Code Latin", monospace, sans-serif;
-  --font-jetbrains: "JetBrains Mono", monospace;
-  --font-space: "Space Grotesk", sans-serif;
-  --font-geist: "Geist", sans-serif;
-
-  --text-label-sm: 10px;
-  --text-label-sm--line-height: 14px;
-  --text-label-sm--letter-spacing: 0.06em;
-  --text-label-sm--font-weight: 500;
-
-  --text-label-md: 12px;
-  --text-label-md--line-height: 16px;
-  --text-label-md--letter-spacing: 0.04em;
-  --text-label-md--font-weight: 500;
-
-  --text-label-lg: 14px;
-  --text-label-lg--line-height: 20px;
-  --text-label-lg--letter-spacing: 0.05em;
-  --text-label-lg--font-weight: 600;
-
-  --text-body-sm: 12px;
-  --text-body-sm--line-height: 16px;
-  --text-body-sm--letter-spacing: 0.01em;
-  --text-body-sm--font-weight: 400;
-
-  --text-body-md: 14px;
-  --text-body-md--line-height: 20px;
-  --text-body-md--letter-spacing: 0em;
-  --text-body-md--font-weight: 400;
-
-  --text-body-lg: 16px;
-  --text-body-lg--line-height: 24px;
-  --text-body-lg--letter-spacing: 0em;
-  --text-body-lg--font-weight: 400;
-
-  --text-headline-sm: 20px;
-  --text-headline-sm--line-height: 28px;
-  --text-headline-sm--letter-spacing: 0em;
-  --text-headline-sm--font-weight: 500;
-
-  --text-headline-md: 24px;
-  --text-headline-md--line-height: 32px;
-  --text-headline-md--letter-spacing: -0.01em;
-  --text-headline-md--font-weight: 600;
-
-  --text-headline-lg: 32px;
-  --text-headline-lg--line-height: 40px;
-  --text-headline-lg--letter-spacing: 0em;
-  --text-headline-lg--font-weight: 600;
-
-  --text-display-lg: 48px;
-  --text-display-lg--line-height: 56px;
-  --text-display-lg--letter-spacing: -0.02em;
-  --text-display-lg--font-weight: 700;
-
-  --font-label: "JetBrains Mono", monospace;
-  --font-body: "Geist", sans-serif;
-  --font-headline: "Space Grotesk", sans-serif;
+  /* Families. */
+  --font-sans: var(--family-fira-sans);
+  --font-doto: var(--family-doto);
+  --font-code: var(--family-google-sans-code);
 }
+
+/* ---------------------------------------------------------------- */
+/* 3. Text styles                                                    */
+/* ---------------------------------------------------------------- */
+
+@utility typo-main {
+  font: var(--text-main-text);
+}
+@utility typo-styled-header {
+  font: var(--text-styled-header);
+}
+@utility typo-code {
+  font: var(--text-code);
+}
+@utility typo-logo {
+  font: var(--text-logo);
+}
+@utility typo-logo-footer {
+  font: var(--text-logo-footer);
+}
+@utility typo-display {
+  font: var(--text-display);
+}
+/* h1 and h2 switch from -compact to full size at bp-expanded (840px). */
+@utility typo-h1 {
+  font: var(--text-heading-1-compact);
+  @media (min-width: 840px) {
+    font: var(--text-heading-1);
+  }
+}
+@utility typo-h2 {
+  font: var(--text-heading-2-compact);
+  @media (min-width: 840px) {
+    font: var(--text-heading-2);
+  }
+}
+@utility typo-button {
+  font: var(--text-button);
+}
+@utility typo-label {
+  font: var(--text-label);
+}
+@utility typo-small {
+  font: var(--text-small);
+}
+@utility typo-caption {
+  font: var(--text-caption);
+}
+@utility typo-price-lg {
+  font: var(--text-price-lg);
+}
+@utility typo-badge {
+  font: var(--text-badge);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------- */
+/* 4. Base styles                                                    */
+/* ---------------------------------------------------------------- */
 
 @layer base {
-  html,
+  html {
+    color-scheme: light;
+  }
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
   body {
-    background-color: var(--color-surface);
-    color: var(--color-on-surface);
-    font-family: var(--font-code);
+    min-height: 100vh;
+    font: var(--text-main-text);
+    color: var(--text);
+    /* Page background: primary at 25% fading to transparent, over the theme background. */
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--primary) 25%, transparent), transparent)
+      var(--background);
   }
-}
 
-::-webkit-scrollbar {
-  display: none;
-}
-
-@media (max-width: 640px) {
-  .text-display-lg {
-    font-size: var(--text-headline-lg);
-    line-height: var(--text-headline-lg--line-height);
-    letter-spacing: var(--text-headline-md--letter-spacing);
+  a {
+    color: var(--text);
   }
-}
 
-/* CRT and Matrix Styling */
-.crt-background {
-  background:
-    repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.45) 0px,
-        rgba(0, 0, 0, 0.45) 1px,
-        transparent 1px,
-        transparent 3px
-      )
-      fixed,
-    radial-gradient(
-      circle at 50% 45%,
-      var(--color-crt-center) 0%,
-      var(--color-crt-mid) 42%,
-      var(--color-crt-outer) 75%,
-      var(--color-crt-edge) 100%
-    );
-}
+  /* Keyboard focus: 2px text outline. Primary is never used for focus (invisible in the dark theme). */
+  :focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+  }
 
-.crt-scanlines {
-  background:
-    linear-gradient(rgba(18, 16, 38, 0) 50%, rgba(0, 0, 0, 0.5) 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-  background-size:
-    100% 4px,
-    6px 100%;
-}
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text);
+  }
 
-.disable-animations *,
-.disable-animations *::before,
-.disable-animations *::after {
-  animation: none !important;
-  transition: none !important;
-}
-
-.disable-decor .retro-decor,
-.disable-decor .retro-scanlines,
-.disable-decor .crt-scanlines,
-.disable-decor .retro-glow,
-.disable-decor .tactical-bracket {
-  display: none !important;
-}
-
-.disable-decor.crt-background {
-  background: var(--color-surface) !important;
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
