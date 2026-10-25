@@ -5,6 +5,7 @@ export {
   default as Button,
   ButtonLink,
   buttonClass,
+  type ButtonJustify,
   type ButtonSize,
   type ButtonVariant,
 } from "./button";

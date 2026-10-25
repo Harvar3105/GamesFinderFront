@@ -2,6 +2,12 @@ export function formatPrice(amount: number, currency: string): string {
   return new Intl.NumberFormat("en", { style: "currency", currency }).format(amount);
 }
 
+export function formatDateTime(date: Date | string): string {
+  return new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(
+    new Date(date),
+  );
+}
+
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;

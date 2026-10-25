@@ -1,10 +1,11 @@
 import type { FormHTMLAttributes, HTMLAttributes } from "react";
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
 
-export type PanelPadding = "none" | "related" | "attention";
+export type PanelPadding = "none" | "tight" | "related" | "attention";
 
 const paddings: Record<PanelPadding, string> = {
   none: "p-0 overflow-hidden",
+  tight: "p-related-sm",
   related: "p-related-lg",
   attention: "p-attention-sm",
 };
