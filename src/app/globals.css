@@ -327,7 +327,11 @@
     font: var(--text-main-text);
     color: var(--text);
     /* Page background: primary at 25% fading to transparent, over the theme background. */
-    background: linear-gradient(to bottom, color-mix(in srgb, var(--primary) 25%, transparent), transparent)
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--primary) 25%, transparent),
+        transparent
+      )
       var(--background);
   }
 

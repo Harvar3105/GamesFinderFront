@@ -47,6 +47,8 @@ Empty for now. The logo in the new design is text set in Doto.
 
 | folder | contents |
 | --- | --- |
+| `ui/` | base design-system components, imported from `@/components/ui`: `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel`, `Field` / `Input` / `Select` / `Checkbox`, `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `Thumb`, `Table` / `TableHeader` / `TableCell` |
+| `helpers/` | small helpers for components: `mergeClassNames` |
 | `layouts/` | layout parts: `header.tsx`, `footer.tsx` |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
 | `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / user block in the header) |
@@ -93,7 +95,7 @@ Tailwind's default colors, radii, shadows, fonts and breakpoints are disabled: o
 
 ## Data flow
 
-```
+```text
 Browser (page / component)
   └─ BFFFetch / useMutation ─► src/app/api/*/route.ts (Next.js server)
                                   ├─ lib/server/auth/authClient ─► Identity service

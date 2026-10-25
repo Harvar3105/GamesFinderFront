@@ -14,6 +14,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Code comments, documentation and descriptions, and all Markdown (`.md`) files must be written in English.
 
+### Comments
+
+- Do not comment obvious code (e.g. a `DEFAULT_AVATAR` constant needs no comment). Comment only what the code cannot say itself: reasons, constraints, non-obvious behavior.
+- Placeholders are marked with `FIX: <comment>`; types that must be checked against the backend with `TODO: <comment>`.
+
+### Naming
+
+- Use descriptive names; avoid vague abbreviations (e.g. `mergeClassNames`, not `cn`).
+
 ### Project structure
 
 - See `PROJECT_STRUCTURE.md`.
