@@ -1,8 +1,9 @@
 import PageContainer from "@/components/layouts/pageContainer";
 import { ButtonLink, Icon, Panel, SectionHeading } from "@/components/ui";
 import GuestOnly from "@/components/widgets/guestOnly";
-import ProductCard, { type ProductCardData } from "@/components/widgets/productCard";
+import ProductCard from "@/components/widgets/productCard";
 import { NavPages } from "@/config/navPages";
+import type { Product } from "@/domain/entities/product";
 
 const STEPS = [
   {
@@ -20,13 +21,15 @@ const STEPS = [
 ];
 
 // FIX: Placeholder products. Replace with recently updated products from the BFF once the endpoint exists.
-const RECENT_PRODUCTS: ProductCardData[] = [1, 2, 3, 4].map((n) => ({
+const RECENT_PRODUCTS: Product[] = [1, 2, 3, 4].map((n) => ({
   id: `placeholder-${n}`,
   name: `[Product name ${n}]`,
+  description: "",
   imageUrl: null,
+  originalPrice: null,
   lowestPrice: 0,
   currency: "EUR",
-  sourcesCount: 0,
+  sources: [],
   updatedAt: new Date(),
 }));
 

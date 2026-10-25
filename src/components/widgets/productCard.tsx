@@ -2,20 +2,9 @@ import Link from "next/link";
 import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
 import { Chip, Thumb, panelClass } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
+import type { Product } from "@/domain/entities/product";
 
-// TODO: Check the fields against the backend product contract.
-export interface ProductCardData {
-  id: string;
-  name: string;
-  imageUrl?: string | null;
-  lowestPrice: number;
-  /** ISO 4217 code, e.g. "EUR". */
-  currency: string;
-  sourcesCount: number;
-  updatedAt: Date | string;
-}
-
-export default function ProductCard({ product }: { product: ProductCardData }) {
+export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={NavPages.product(product.id)}
@@ -33,7 +22,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
       </div>
       <div className="flex flex-wrap justify-between gap-related-sm">
         <Chip>
-          {product.sourcesCount} {product.sourcesCount === 1 ? "source" : "sources"}
+          {product.sources.length} {product.sources.length === 1 ? "source" : "sources"}
         </Chip>
         <span className="typo-small">{formatTimeAgo(product.updatedAt)}</span>
       </div>
