@@ -1,59 +1,58 @@
 import Entity from "./entity";
 
+export type UserDTO = Omit<User, "identity">;
+
 export class User extends Entity {
   public username: string;
-  private roles: string[];
-  public passwordHash?: string;
+  public lastLogin: Date | null;
   public email: string;
-  public jwt?: string;
-  public rt?: string;
+  public roles: string[];
   public data?: UserData;
 
   constructor(
     id: string,
     createdAt: Date,
-    updatedAt: Date,
     username: string,
     email: string,
-    roles: string[] = [],
-    passwordHash?: string,
-    jwt?: string,
-    rt?: string,
+    lastLogin: Date | null,
+    roles?: string[],
     data?: UserData,
   ) {
-    super(id, createdAt, updatedAt);
+    super(id, createdAt);
     this.username = username;
     this.email = email;
-    this.roles = roles;
-    this.passwordHash = passwordHash;
-    this.jwt = jwt;
-    this.rt = rt;
+    this.roles = roles ?? [];
+    this.lastLogin = lastLogin;
     this.data = data;
+  }
+
+  public toString(): string {
+    return `${this.username}: ${this.roles.join(", ")}\n\tID: ${this.id}\n\tdata: ${this.data}`;
   }
 }
 
 export class UserData extends Entity {
-  public userId: string;
   public usersWishlist: number[];
-  public avatarName?: string;
-  public avatarContent?: string;
-  public avatarContentType?: string;
+  public pfpName?: string;
+  public pfpContent?: string;
+  public pfpExtension?: string;
 
   constructor(
-    id: string,
-    createdAt: Date,
-    updatedAt: Date,
     userId: string,
-    usersWishlist: number[] = [],
-    avatarName?: string,
-    avatarContent?: string,
-    avatarContentType?: string,
+    usersWishlist: number[],
+    pfpName?: string,
+    pfpContent?: string,
+    pfpExt?: string,
+    createdAt: Date = new Date(),
   ) {
-    super(id, createdAt, updatedAt);
-    this.userId = userId;
+    super(userId, createdAt);
     this.usersWishlist = usersWishlist;
-    this.avatarName = avatarName;
-    this.avatarContent = avatarContent;
-    this.avatarContentType = avatarContentType;
+    this.pfpName = pfpName;
+    this.pfpContent = pfpContent;
+    this.pfpExtension = pfpExt;
+  }
+
+  public toString(): string {
+    return `${this.usersWishlist.join(" ")}`;
   }
 }

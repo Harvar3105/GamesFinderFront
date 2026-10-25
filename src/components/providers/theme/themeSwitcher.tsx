@@ -7,22 +7,56 @@ export default function ThemeSwitcher() {
 
   return (
     <button
-      title="Theme switcher"
+      id="theme-switcher-btn"
+      type="button"
       onClick={toggleTheme}
-      className="h-12 w-12 rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+      className="flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-code bg-surface-container-low hover:bg-surface-container border border-surface-container-highest hover:border-primary/50 text-on-surface-variant hover:text-on-surface rounded-sm transition-all cursor-pointer select-none group min-w-[58px] max-w-[68px]"
+      title={`Toggle Theme Mode [Current: ${theme.toUpperCase()}]`}
+      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
     >
-      <svg
-        className={`fill-violet-700 ${theme === "dark" ? "block" : "hidden"}`}
-        viewBox="0 0 20 20"
-      >
-        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-      </svg>
-      <svg
-        className={`fill-yellow-500 ${theme === "light" ? "block" : "hidden"}`}
-        viewBox="0 0 20 20"
-      >
-        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />
-      </svg>
+      {theme === "dark" ? (
+        <>
+          <svg
+            className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+          </svg>
+          <span className="text-[11px] font-label-sm font-semibold tracking-wider text-primary">
+            DRK
+          </span>
+        </>
+      ) : (
+        <>
+          <svg
+            className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" />
+            <path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" />
+            <path d="m19.07 4.93-1.41 1.41" />
+          </svg>
+          <span className="text-[11px] font-label-sm font-semibold tracking-wider text-secondary">
+            LIT
+          </span>
+        </>
+      )}
     </button>
   );
 }

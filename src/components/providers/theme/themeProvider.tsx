@@ -1,6 +1,6 @@
 "use client";
 
-import { ETheme } from "@/domain/enums/eTheme";
+import { ETheme } from "@/domain/entities/enums/ETheme";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface ThemeContextValue {
