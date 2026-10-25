@@ -90,7 +90,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <Link
               id="hero-browse-games-btn"
-              href={NavPages.games}
+              href={NavPages.catalog}
               className="w-full sm:w-auto px-8 py-3.5 bg-primary text-on-primary-container font-label-lg font-bold text-sm tracking-wider uppercase rounded hover:bg-primary-fixed transition-all shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-3 cursor-pointer group"
             >
               <span>[ ENTER THE ARCHIVES // BROWSE GAMES ]</span>
@@ -100,7 +100,7 @@ export default function HomePage() {
             {user ? (
               <Link
                 id="hero-profile-btn"
-                href={NavPages.profile}
+                href={NavPages.account}
                 className="w-full sm:w-auto px-6 py-3.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg font-semibold text-sm tracking-wider uppercase border border-surface-container-highest hover:border-tertiary/40 rounded transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <span className="text-tertiary">&gt;</span>

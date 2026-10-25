@@ -5,6 +5,7 @@ export { default as Chip, ChipToggle } from "./chip";
 export { default as Field, Input, Select, Checkbox } from "./field";
 export { default as Icon, type IconName } from "./icon";
 export { default as IconButton, IconLink } from "./iconButton";
+export { default as NavLink } from "./navLink";
 export { default as Panel } from "./panel";
 export { default as Table, TableHeader, TableCell } from "./table";
 export { default as Thumb } from "./thumb";

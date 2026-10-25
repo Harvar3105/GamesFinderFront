@@ -47,11 +47,11 @@ Empty for now. The logo in the new design is text set in Doto.
 
 | folder | contents |
 | --- | --- |
-| `ui/` | base design-system components, imported from `@/components/ui`: `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel`, `Field` / `Input` / `Select` / `Checkbox`, `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `Thumb`, `Table` / `TableHeader` / `TableCell` |
-| `helpers/` | small helpers for components: `mergeClassNames` |
-| `layouts/` | layout parts: `header.tsx`, `footer.tsx` |
+| `ui/` | base design-system components, imported from `@/components/ui`: `Button` / `ButtonLink`, `IconButton` / `IconLink`, `Icon`, `Panel`, `Field` / `Input` / `Select` / `Checkbox`, `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `Thumb`, `Table` / `TableHeader` / `TableCell` |
+| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`) |
+| `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
-| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / user block in the header) |
+| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
 
@@ -64,7 +64,7 @@ Types shared by the client and the server. No side effects.
 | `contracts/in/` | what the browser sends to the BFF (`LoginPayload`, `RegistrationPayload`) |
 | `contracts/out/` | what the BFF sends to and receives from external services (`LoginRequest`, `IdentityAuthModel`, `SessionTokens`) |
 | `entities/` | entities: `Entity` (base: id, dates), `User`, `UserData`, `UserDTO`; `enums/ETheme` (`light` / `dark`) |
-| `navPages.tsx` | page URLs for navigation |
+| `navPages.tsx` | page URLs: `/`, `/catalog`, `/catalog/[id]` (`NavPages.product(id)`), `/account`, `/admin`, `/login`, `/registration` |
 
 ## `src/lib` — helpers and the server side of the BFF
 

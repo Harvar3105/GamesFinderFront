@@ -1,8 +1,9 @@
 export const NavPages = {
   home: "/",
-  games: "/games",
-  game: "/game",
-  profile: "/profile",
+  catalog: "/catalog",
+  product: (id: string) => `/catalog/${encodeURIComponent(id)}`,
+  account: "/account",
+  admin: "/admin",
   login: "/login",
   registration: "/registration",
 };
