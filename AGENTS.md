@@ -17,7 +17,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ### Comments
 
 - Do not comment obvious code (e.g. a `DEFAULT_AVATAR` constant needs no comment). Comment only what the code cannot say itself: reasons, constraints, non-obvious behavior.
-- Placeholders are marked with `FIX: <comment>`; types that must be checked against the backend with `TODO: <comment>`.
+- Placeholders are marked with `FIXME: <comment>`; types that must be checked against the backend with `TODO: <comment>`.
 
 ### Naming
 

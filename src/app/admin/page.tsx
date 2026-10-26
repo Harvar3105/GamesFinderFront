@@ -8,7 +8,7 @@ import SectionNav, { type SectionNavItem } from "@/components/widgets/sectionNav
 import { EVendor } from "@/domain/entities/enums/EVendor";
 import type { ScrapingTask } from "@/domain/entities/scrapingTask";
 
-// FIX: Section links are placeholders until the administration sections get their own pages.
+// FIXME: Section links are placeholders until the administration sections get their own pages.
 const SECTIONS: SectionNavItem[] = [
   { label: "Overview", href: "#" },
   { label: "Scraping tasks", href: "#", active: true },

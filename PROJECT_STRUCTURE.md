@@ -40,7 +40,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/registration/route.ts` | `POST /api/registration` | BFF: sign up |
 | `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out, delete the session |
 
-All pages from the mockups are implemented; data is still placeholder (`FIX:`).
+All pages from the mockups are implemented; data is still placeholder (`FIXME:`).
 
 ## `src/assets` — embedded media
 
@@ -121,4 +121,4 @@ Browser (page / component)
 
 - Rewritten: `src/app` (pages, `layout.tsx`, `globals.css`), `src/components`, `src/assets`, `src/config`.
 - Not touched: `src/app/api`, `src/lib`, and `src/domain` except entities added for the new pages (`entities/game.ts`, formerly `product.ts`; `entities/offer.ts`, `entities/scrapingTask.ts`).
-- Placeholders are marked with `FIX:` comments; types that must be checked against the backend are marked with `TODO:`.
+- Placeholders are marked with `FIXME:` comments; types that must be checked against the backend are marked with `TODO:`.

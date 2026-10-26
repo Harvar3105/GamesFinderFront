@@ -7,7 +7,7 @@ import PlaceholderSection from "@/components/widgets/placeholderSection";
 import RequireAccess from "@/components/widgets/requireAccess";
 import SectionNav, { type SectionNavItem } from "@/components/widgets/sectionNav";
 
-// FIX: Account sections are not defined yet. Replace the placeholders with real sections.
+// FIXME: Account sections are not defined yet. Replace the placeholders with real sections.
 const SECTIONS: SectionNavItem[] = [
   { label: "Profile", href: "#", active: true },
   { label: "[Section]", href: "#" },

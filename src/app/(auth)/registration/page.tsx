@@ -20,7 +20,7 @@ import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 
-// FIX: Password requirements are not defined yet. Replace with the real rules.
+// FIXME: Password requirements are not defined yet. Replace with the real rules.
 const PASSWORD_REQUIREMENTS = "[Password requirements]";
 
 interface RegistrationForm {

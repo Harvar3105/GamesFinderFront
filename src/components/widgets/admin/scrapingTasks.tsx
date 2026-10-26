@@ -14,7 +14,7 @@ export default function ScrapingTasks({ sources, tasks }: ScrapingTasksProps) {
   const [source, setSource] = useState("");
 
   const startScraping = () => {
-    // FIX: Start a scraping task through the BFF once the endpoint exists.
+    // FIXME: Start a scraping task through the BFF once the endpoint exists.
   };
 
   return (
