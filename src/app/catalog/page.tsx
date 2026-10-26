@@ -2,12 +2,12 @@ import PageContainer from "@/components/layouts/pageContainer";
 import { Chip, PageHeading, Panel } from "@/components/ui";
 import CatalogFilters from "@/components/widgets/catalog/catalogFilters";
 import CatalogTable from "@/components/widgets/catalog/catalogTable";
-import type { Product } from "@/domain/entities/product";
+import { EVendor } from "@/domain/entities/enums/EVendor";
+import { Game } from "@/domain/entities/game";
 import Pagination from "@/components/widgets/pagination";
 import { PAGE_SIZE_OPTIONS } from "@/config/pagination";
 
-// FIX: Example values from the mockup. Replace with sources, tags and genres from the BFF.
-const SOURCES: string[] = [];
+// FIXME: Example values from the mockup. Replace with sources, tags and genres from the BFF.
 const TAGS = [
   "Singleplayer",
   "Multiplayer",
@@ -57,18 +57,25 @@ const GENRES = [
   "Battle Royale",
 ];
 
-// FIX: Placeholder products. Replace with the catalog page from the BFF once the endpoint exists.
-const PRODUCTS: Product[] = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
-  id: `placeholder-${n}`,
-  name: `[Product name ${n}]`,
-  description: "[Short product description]",
-  imageUrl: null,
-  originalPrice: 0,
-  lowestPrice: 0,
-  currency: "EUR",
-  sources: ["[Source A]", "[Source B]", "[Source C]"],
-  updatedAt: new Date(),
-}));
+// FIXME: Placeholder games. Replace with the catalog page from the BFF once the endpoint exists.
+const GAMES: Game[] = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
+  const offers = Object.values(EVendor).map((vendor) => ({
+    id: `placeholder-offer-${n}-${vendor}`,
+    vendor,
+    price: 0,
+    currency: "EUR",
+    url: "#",
+    updatedAt: new Date(),
+  }));
+  return new Game(
+    `placeholder-${n}`,
+    new Date(),
+    `[Product name ${n}]`,
+    n,
+    offers,
+    "[Short product description]",
+  );
+});
 
 function readPositiveInt(value: string | string[] | undefined, fallback: number): number {
   const parsed = Number(Array.isArray(value) ? value[0] : value);
@@ -84,18 +91,18 @@ export default async function CatalogPage({
   const perPage = readPositiveInt(params.perPage, PAGE_SIZE_OPTIONS[0]);
   const pageSize = PAGE_SIZE_OPTIONS.includes(perPage) ? perPage : PAGE_SIZE_OPTIONS[0];
   const page = readPositiveInt(params.page, 1);
-  const totalItems = PRODUCTS.length;
+  const totalItems = GAMES.length;
 
   return (
     <PageContainer>
       <PageHeading title="Catalog" spread aside={<Chip>{totalItems} products found</Chip>} />
 
       <Panel as="section" aria-label="Filters and sorting">
-        <CatalogFilters sources={SOURCES} tags={TAGS} genres={GENRES} />
+        <CatalogFilters sources={Object.values(EVendor)} tags={TAGS} genres={GENRES} />
       </Panel>
 
       <Panel as="section" padding="none" aria-label="Product list">
-        <CatalogTable products={PRODUCTS} />
+        <CatalogTable games={GAMES} />
       </Panel>
 
       <Pagination page={page} pageSize={pageSize} totalItems={totalItems} />

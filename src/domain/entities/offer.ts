@@ -1,7 +1,9 @@
+import type { EVendor } from "./enums/EVendor";
+
 // TODO: Check the fields against the backend offer contract.
 export interface Offer {
   id: string;
-  vendor: string;
+  vendor: EVendor;
   price: number;
   /** ISO 4217 code, e.g. "EUR". */
   currency: string;

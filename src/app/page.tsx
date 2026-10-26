@@ -1,9 +1,9 @@
 import PageContainer from "@/components/layouts/pageContainer";
 import { ButtonLink, Icon, Panel, SectionHeading } from "@/components/ui";
 import GuestOnly from "@/components/widgets/guestOnly";
-import ProductCard from "@/components/widgets/productCard";
+import GameCard from "@/components/widgets/gameCard";
 import { NavPages } from "@/config/navPages";
-import type { Product } from "@/domain/entities/product";
+import { Game } from "@/domain/entities/game";
 
 const STEPS = [
   {
@@ -20,18 +20,10 @@ const STEPS = [
   },
 ];
 
-// FIX: Placeholder products. Replace with recently updated products from the BFF once the endpoint exists.
-const RECENT_PRODUCTS: Product[] = [1, 2, 3, 4].map((n) => ({
-  id: `placeholder-${n}`,
-  name: `[Product name ${n}]`,
-  description: "",
-  imageUrl: null,
-  originalPrice: null,
-  lowestPrice: 0,
-  currency: "EUR",
-  sources: [],
-  updatedAt: new Date(),
-}));
+// FIXME: Placeholder games. Replace with recently updated games from the BFF once the endpoint exists.
+const RECENT_GAMES: Game[] = [1, 2, 3, 4].map(
+  (n) => new Game(`placeholder-${n}`, new Date(), `[Product name ${n}]`, n),
+);
 
 export default function HomePage() {
   return (
@@ -90,8 +82,8 @@ export default function HomePage() {
           }
         />
         <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-related-lg">
-          {RECENT_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {RECENT_GAMES.map((game) => (
+            <GameCard key={game.id} game={game} />
           ))}
         </div>
       </section>

@@ -2,7 +2,6 @@ import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
 import { ButtonLink, Icon, Table, TableCell, TableHeader } from "@/components/ui";
 import type { Offer } from "@/domain/entities/offer";
 
-/** Offers sorted by price, lowest first. The lowest offer is highlighted. */
 export default function OffersTable({ offers }: { offers: Offer[] }) {
   const sorted = [...offers].sort((a, b) => a.price - b.price);
 
