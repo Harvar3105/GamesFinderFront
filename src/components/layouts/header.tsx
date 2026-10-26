@@ -1,87 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import ThemeSwitcher from "../providers/theme/themeSwitcher";
-import Image from "next/image";
-import { NavPages } from "@/domain/navPages";
 import { usePathname } from "next/navigation";
-import Logo from "@/assets/logo.png";
-import LoginWidget from "../widgets/loginWidget";
+import { isAdmin } from "@/components/helpers/userRoles";
+import ThemeSwitcher from "@/components/providers/theme/themeSwitcher";
+import { useUser } from "@/components/providers/userProvider";
+import { NavLink } from "@/components/ui";
+import LoginWidget from "@/components/widgets/loginWidget";
+import { NavPages } from "@/config/navPages";
+
+function isActive(pathname: string, href: string): boolean {
+  if (href === NavPages.home) return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function Header() {
-  const currentView = usePathname();
+  const pathname = usePathname();
+  const { user, isLoggedIn } = useUser();
+
+  const links = [
+    { href: NavPages.home, label: "Home" },
+    { href: NavPages.catalog, label: "Catalog" },
+    ...(isLoggedIn() ? [{ href: NavPages.account, label: "Account" }] : []),
+    ...(isAdmin(user) ? [{ href: NavPages.admin, label: "Administration" }] : []),
+  ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-md border-b border-surface-container-highest">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Left: Brand / Logo */}
-        <div className="flex items-center gap-6">
-          <Link
-            id="brand-logo-btn"
-            href={NavPages.home}
-            className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
-          >
-            <div className="relative w-60 h-15 rounded-lg overflow-hidden border border-primary/40 p-0.5 bg-surface-container-high">
-              <Image
-                src={Logo}
-                alt="Games Finder Logo"
-                className="w-full h-full object-cover rounded"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          </Link>
+    // relative z-10: keeps the shadow above the page content.
+    <header className="relative z-10 flex flex-wrap items-center justify-between gap-related-lg bg-container px-edge-x py-related-md shadow-container">
+      <Link href={NavPages.home} className="no-underline typo-logo" aria-label="GamesFinder — home">
+        GamesFinder
+      </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-2">
-            <Link
-              id="nav-link-home"
-              href={NavPages.home}
-              className={`px-3 py-1.5 text-xs font-label-md tracking-wider transition-colors border cursor-pointer ${
-                currentView === "home"
-                  ? "text-primary bg-primary/10 border-primary/40"
-                  : "text-on-surface-variant hover:text-on-surface border-transparent hover:border-surface-container-highest"
-              }`}
-            >
-              HOME
-            </Link>
-            <Link
-              id="nav-link-games-list"
-              href={NavPages.games}
-              className={`px-3 py-1.5 text-xs font-label-md tracking-wider flex items-center gap-2 transition-colors border cursor-pointer ${
-                currentView === "games-list" || currentView === "game-detail"
-                  ? "text-primary bg-primary/10 border-primary/40"
-                  : "text-on-surface-variant hover:text-on-surface border-transparent hover:border-surface-container-highest"
-              }`}
-            >
-              <span>GAMES_LIST</span>
-              <span className="px-1 text-[9px] font-label-sm text-secondary bg-secondary/10 border border-secondary/30 rounded">
-                1,517 DB
-              </span>
-            </Link>
-          </nav>
-        </div>
+      <nav aria-label="Main navigation" className="flex flex-wrap gap-related-sm">
+        {links.map((link) => (
+          <NavLink key={link.href} href={link.href} active={isActive(pathname, link.href)}>
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
 
-        {/* Center/Right: Search bar trigger + Auth/Profile */}
-        <div className="flex items-center gap-3">
-          {/* Quick Search trigger button */}
-          <button
-            id="quick-search-trigger"
-            // TODO: Add search modal
-            // onClick={onOpenSearch}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-code bg-surface-container-low hover:bg-surface-container border border-surface-container-highest hover:border-primary/50 text-on-surface-variant hover:text-on-surface transition-all cursor-pointer rounded-sm group"
-          >
-            <span className="text-primary font-bold">{">"}</span>
-            <span className="hidden sm:inline">SEARCH REPOSITORY...</span>
-            <span className="inline sm:hidden">SEARCH</span>
-            <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[9px] font-label-sm text-on-surface-variant bg-surface-container-highest border border-outline-variant/40 rounded">
-              CTRL+K
-            </kbd>
-          </button>
-
-          <ThemeSwitcher />
-
-          <LoginWidget />
-        </div>
+      <div className="flex flex-wrap items-center gap-related-sm">
+        <ThemeSwitcher />
+        <LoginWidget />
       </div>
     </header>
   );

@@ -3,7 +3,7 @@ import { redis } from "@/lib/server/redisClient";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
 
