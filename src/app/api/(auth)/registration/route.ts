@@ -1,6 +1,6 @@
 import { RegistrationPayload } from "@/shared/contracts/auth/auth";
 import { config } from "@/lib/config";
-import { logger } from "@/lib/server/auth/logger";
+import { logger } from "@/lib/server/logger";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

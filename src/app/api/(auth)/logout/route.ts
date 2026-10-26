@@ -1,4 +1,4 @@
-import { logger } from "@/lib/server/auth/logger";
+import { logger } from "@/lib/server/logger";
 import { redis } from "@/lib/server/redisClient";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
