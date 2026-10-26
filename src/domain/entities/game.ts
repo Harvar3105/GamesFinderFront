@@ -36,7 +36,7 @@ export class Game extends Entity {
   public isDLC: boolean;
   public description: string | null;
   public headerImage: string | null;
-  public offers?: Offer[];
+  public offers?: Offer[] | null;
   public isReleased: boolean;
   public initialPrice: number | null;
   public initialCurrency: ECurrency | null;
