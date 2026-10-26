@@ -87,6 +87,8 @@ Types shared by the client and the server. No side effects.
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
 | `server/apiClient.ts` | base axios client for external services |
 | `server/auth/authClient.ts` | Identity client: sign up, sign in, tokens |
+| `server/game/gameClient.ts` | backend games client (`getGamesPaged`); GET endpoints need no JWT |
+| `server/contracts/game/` | backend games contracts: `GamesPagedRequest` (`page`, `pageSize`), `GamesPagedResponse` (`games`, `totalGamesCount`) |
 | `server/auth/logger.ts`, `withLogging.ts` | BFF request logging |
 | `server/redisClient.ts` | Redis connection |
 
@@ -113,7 +115,7 @@ Tailwind's default colors, radii, shadows, fonts and breakpoints are disabled: o
 Browser (page / component)
   └─ BFFFetch / useMutation ─► src/app/api/*/route.ts (Next.js server)
                                   ├─ lib/server/auth/authClient ─► Identity service
-                                  ├─ lib/server/apiClient       ─► backend
+                                  ├─ lib/server/game/gameClient ─► backend
                                   └─ lib/server/redisClient     ─► Redis (sessions)
 ```
 
