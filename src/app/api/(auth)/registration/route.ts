@@ -1,4 +1,4 @@
-import { RegistrationPayload } from "@/domain/contracts/in/auth";
+import { RegistrationPayload } from "@/shared/contracts/auth/auth";
 import { config } from "@/lib/config";
 import { logger } from "@/lib/server/auth/logger";
 import { NextRequest, NextResponse } from "next/server";
