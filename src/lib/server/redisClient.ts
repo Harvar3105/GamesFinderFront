@@ -4,6 +4,12 @@ import { createClient, type RedisClientType } from "redis";
 import { config } from "../config";
 import { logger } from "./auth/logger";
 
+const DELETE_IF_EQUALS_SCRIPT = `
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+  return redis.call("DEL", KEYS[1])
+end
+return 0`;
+
 export class RedisClient {
   private readonly client: RedisClientType;
 
@@ -48,10 +54,29 @@ export class RedisClient {
     await this.client.set(key, value);
   }
 
+  /** Returns false when the key already exists. */
+  async setIfAbsent(key: string, value: string, expirationMs: number): Promise<boolean> {
+    await this.connect();
+
+    const reply = await this.client.set(key, value, {
+      condition: "NX",
+      expiration: { type: "PX", value: expirationMs },
+    });
+
+    return reply === "OK";
+  }
+
   async delete(key: string): Promise<void> {
     await this.connect();
 
     await this.client.del(key);
+  }
+
+  // One script, so a lock that has expired and been taken by another request is never deleted.
+  async deleteIfEquals(key: string, value: string): Promise<void> {
+    await this.connect();
+
+    await this.client.eval(DELETE_IF_EQUALS_SCRIPT, { keys: [key], arguments: [value] });
   }
 
   async exists(key: string): Promise<boolean> {

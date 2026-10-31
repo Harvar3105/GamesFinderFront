@@ -83,12 +83,15 @@ Types shared by the client and the server. No side effects.
 | path | purpose |
 | --- | --- |
 | `config.ts` | reads environment variables (server only) |
-| `toQueryString.ts` | object → `URLSearchParams` |
+| `toQueryString.ts` | object → `URLSearchParams`; arrays as repeated keys (`tags=a&tags=b`), as ASP.NET expects |
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
 | `server/apiClient.ts` | base axios client for external services |
-| `server/auth/authClient.ts` | Identity client: sign up, sign in, tokens |
+| `server/auth/authClient.ts` | Identity client: sign up, sign in, token refresh |
+| `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
+| `server/session.ts` | Redis sessions (`Session`: tokens, user, `keepSignedIn`), session cookie, token refresh under a per-session lock, `withAccessToken` (refresh and retry once on 401) |
+| `server/errors.ts` | `BffError` and `toErrorResponse`: turns Identity and backend errors into a JSON string with the upstream status |
 | `server/auth/logger.ts`, `withLogging.ts` | BFF request logging |
-| `server/redisClient.ts` | Redis connection |
+| `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |
 
 ## Styles (Tailwind v4)
 

@@ -1,10 +1,8 @@
 import "server-only";
 
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { toQueryString } from "@/lib/toQueryString";
 
-// FIXME: [Stage1] Add a BackendClient on top of this class: it sends the session access token as a Bearer
-// header and on 401 refreshes the tokens once and retries. Identity rejects access tokens right after a role
-// change (security stamp check), so 401 is expected during normal use.
 export default abstract class ApiClient {
   protected readonly client: AxiosInstance;
 
@@ -14,7 +12,15 @@ export default abstract class ApiClient {
       headers: {
         "Content-Type": "application/json",
       },
+      // axios writes arrays as tags[]=a, which ASP.NET does not bind.
+      paramsSerializer: { serialize: (params) => toQueryString(params).toString() },
     });
+  }
+
+  protected async request<TResponse>(config: AxiosRequestConfig): Promise<TResponse> {
+    const response = await this.client.request<TResponse>(config);
+
+    return response.data;
   }
 
   protected async get<TResponse>(url: string, config?: AxiosRequestConfig): Promise<TResponse> {

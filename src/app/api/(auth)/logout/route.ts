@@ -1,11 +1,9 @@
 import { logger } from "@/lib/server/auth/logger";
-import { redis } from "@/lib/server/redisClient";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { deleteSession, deleteSessionCookie, readSessionId } from "@/lib/server/session";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get("sessionId")?.value;
+export async function POST() {
+  const sessionId = await readSessionId();
 
   if (!sessionId) {
     logger.error({ msg: "Cannot login, no sessionId found!" });
@@ -13,8 +11,8 @@ export async function POST(request: NextRequest) {
   }
 
   // TODO: [Stage2] Identity has no logout/revoke endpoint yet, so the refresh token stays active until it expires.
-  await redis.delete(sessionId);
-  cookieStore.delete("sessionId");
+  await deleteSession(sessionId);
+  await deleteSessionCookie();
 
   return NextResponse.json({ success: true });
 }

@@ -4,9 +4,7 @@ export function isServerError(error: FetchError): boolean {
   return error.status >= 500;
 }
 
-// FIXME: [Stage1] Identity returns IdentityError[] ({ code, description }) on registration, the backend returns
-// ProblemDetails on 500, and rate limiting returns 429 with an empty body. Normalize them in the BFF so the
-// client always receives a string.
+// BFF routes answer errors with a JSON string (toErrorResponse in lib/server/errors).
 export function readErrorMessage(error: FetchError): string {
   try {
     const parsed: unknown = JSON.parse(error.message);

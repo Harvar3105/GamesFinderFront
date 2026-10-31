@@ -1,7 +1,12 @@
 import { config } from "@/lib/config";
 import ApiClient from "../apiClient";
 import { LoginPayload, RegistrationPayload } from "@/domain/contracts/in/auth";
-import { IdentityAuthModel, LoginRequest } from "@/domain/contracts/out/auth";
+import {
+  IdentityAuthModel,
+  IdentityTokens,
+  LoginRequest,
+  TokenRefreshRequest,
+} from "@/domain/contracts/out/auth";
 
 // TODO: [Stage2] Identity rate-limits /api/auth/* per IP, and every request comes from the BFF IP, so all users
 // share one limit. Needs ForwardedHeaders in Identity and X-Forwarded-For from the BFF.
@@ -18,9 +23,11 @@ export class AuthClient extends ApiClient {
     return this.post<IdentityAuthModel, LoginRequest>(config.userLoginEndpoint, data);
   }
 
-  // FIXME: [Stage1] Add refresh(): POST config.tokenRefreshEndpoint with { refreshTokenHash: rt }, returns
-  // { accessToken, refreshToken }. Refresh tokens are single-use and presenting a revoked one revokes every
-  // session of the user, so concurrent refreshes of one session must be serialized (Redis lock per sessionId).
+  // Call only through refreshSession() from lib/server/session: it serializes refreshes of one session,
+  // and a refresh token used twice makes Identity revoke every session of the user.
+  async refresh(data: TokenRefreshRequest): Promise<IdentityTokens> {
+    return this.post<IdentityTokens, TokenRefreshRequest>(config.tokenRefreshEndpoint, data);
+  }
 }
 
 const globalForClient = globalThis as unknown as {
