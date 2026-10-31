@@ -13,6 +13,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json("Failed to parse incoming request data", { status: 500 });
   }
 
+  // FIXME: [Stage2] Drop the roles check (Identity assigns Roles:Initial). Use authClient.register, create a
+  // session from the returned tokens like login does, and map IdentityError[] to a message.
   if (
     !body.roles.includes("user_gfp") ||
     body.username.includes("@") ||

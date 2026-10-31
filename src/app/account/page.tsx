@@ -7,7 +7,9 @@ import PlaceholderSection from "@/components/widgets/placeholderSection";
 import RequireAccess from "@/components/widgets/requireAccess";
 import SectionNav, { type SectionNavItem } from "@/components/widgets/sectionNav";
 
-// FIX: Account sections are not defined yet. Replace the placeholders with real sections.
+// FIXME: [Stage5] Sections from the backend UserData and Identity: profile picture, preferences (currency,
+// region), hidden games, Steam account (unlink), delete data.
+// TODO: [Stage5] Linking a Steam account (Steam OpenID) and wishlist sync are not implemented on the backend yet.
 const SECTIONS: SectionNavItem[] = [
   { label: "Profile", href: "#", active: true },
   { label: "[Section]", href: "#" },

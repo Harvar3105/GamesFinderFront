@@ -1,4 +1,4 @@
-// TODO: Check the fields and status values against the backend scraping task contract.
+// TODO: [Stage6] The backend has no scraping task contract; scraping requests return 201 without a body.
 export interface ScrapingTask {
   id: string;
   source: string;

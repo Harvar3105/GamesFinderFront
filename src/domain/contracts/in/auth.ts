@@ -11,5 +11,6 @@ export interface RegistrationPayload {
   username: string;
   email: string;
   password: string;
+  // FIXME: [Stage2] Remove: Identity ignores roles and assigns Roles:Initial on registration.
   roles: string[];
 }

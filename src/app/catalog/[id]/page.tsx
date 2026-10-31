@@ -5,8 +5,8 @@ import OffersTable from "@/components/widgets/product/offersTable";
 import { NavPages } from "@/config/navPages";
 import type { ProductDetails } from "@/domain/entities/product";
 
-// FIX: Placeholder product. Load the product by id from the BFF once the endpoint exists
-// (and call notFound() when it does not exist).
+// FIXME: [Stage4] Load the game (Game/getGame) and its offers (GameOffer/getGameOffers) in parallel;
+// call notFound() on 404.
 function getPlaceholderProduct(id: string): ProductDetails {
   return {
     id,

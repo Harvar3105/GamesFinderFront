@@ -6,8 +6,11 @@ import TagPicker from "@/components/widgets/tagPicker";
 
 export type CatalogSort = "updated" | "price-asc" | "price-desc" | "name-asc";
 
-// TODO: Check the filter fields and sort keys against the backend catalog query.
+// FIXME: [Stage3] Match the backend GamesFilter: min, max, vendor (Steam | InstantGaming | G2A), sort (ESort),
+// tags[], genres[]. Sort keys: updated -> newestUpdated, price-asc -> priceAsc, price-desc -> priceDesc,
+// name-asc -> name.
 export interface CatalogFilterValues {
+  // TODO: [Stage3] The backend has no name search yet.
   search: string;
   /** Empty string means all sources. */
   source: string;
@@ -49,7 +52,7 @@ export default function CatalogFilters({ sources, tags, genres }: CatalogFilters
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // FIX: Filters are not applied yet. Send them to the BFF catalog query once the endpoint exists.
+    // FIXME: [Stage3] Apply the filters through the URL query and the BFF catalog route.
   };
 
   return (

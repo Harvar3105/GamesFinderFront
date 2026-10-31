@@ -6,6 +6,7 @@ import type { Product } from "@/domain/entities/product";
 
 const VISIBLE_SOURCES = 2;
 
+// TODO: [Stage3] See Product.sources: the catalog endpoint does not return vendors.
 function SourceChips({ sources }: { sources: string[] }) {
   const hidden = sources.length - VISIBLE_SOURCES;
 

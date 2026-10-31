@@ -6,7 +6,8 @@ import type { Product } from "@/domain/entities/product";
 import Pagination from "@/components/widgets/pagination";
 import { PAGE_SIZE_OPTIONS } from "@/config/pagination";
 
-// FIX: Example values from the mockup. Replace with sources, tags and genres from the BFF.
+// FIXME: [Stage3] Load sources from GameOffer/vendors.
+// TODO: [Stage3] The backend has no endpoint for the tag and genre lists yet; these are mockup values.
 const SOURCES: string[] = [];
 const TAGS = [
   "Singleplayer",
@@ -57,7 +58,8 @@ const GENRES = [
   "Battle Royale",
 ];
 
-// FIX: Placeholder products. Replace with the catalog page from the BFF once the endpoint exists.
+// FIXME: [Stage3] Load the page from Game/GetPagedWithLowestFiltered ({ games: [{ game, lowestPrice }],
+// totalGamesCount }) in the user's preferred currency.
 const PRODUCTS: Product[] = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
   id: `placeholder-${n}`,
   name: `[Product name ${n}]`,

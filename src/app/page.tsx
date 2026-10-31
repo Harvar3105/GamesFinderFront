@@ -20,7 +20,7 @@ const STEPS = [
   },
 ];
 
-// FIX: Placeholder products. Replace with recently updated products from the BFF once the endpoint exists.
+// FIXME: [Stage3] Load from Game/GetPagedWithLowestFiltered with sort=newestUpdated.
 const RECENT_PRODUCTS: Product[] = [1, 2, 3, 4].map((n) => ({
   id: `placeholder-${n}`,
   name: `[Product name ${n}]`,

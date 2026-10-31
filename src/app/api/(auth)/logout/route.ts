@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json("User not logged in", { status: 400 });
   }
 
+  // TODO: [Stage2] Identity has no logout/revoke endpoint yet, so the refresh token stays active until it expires.
   await redis.delete(sessionId);
   cookieStore.delete("sessionId");
 

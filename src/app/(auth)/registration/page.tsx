@@ -20,7 +20,8 @@ import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 
-// FIX: Password requirements are not defined yet. Replace with the real rules.
+// FIXME: [Stage2] Password rules come from the Identity Security:Password config (RequiredLength,
+// RequireDigit, ...). Mirror them here or show the server errors per field.
 const PASSWORD_REQUIREMENTS = "[Password requirements]";
 
 interface RegistrationForm {
@@ -93,6 +94,7 @@ export default function RegistrationPage() {
       username: form.username.trim(),
       email: form.email.trim(),
       password: form.password,
+      // FIXME: [Stage2] Remove: Identity ignores roles.
       roles: ["user_gfp"],
     });
   };

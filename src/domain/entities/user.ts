@@ -31,6 +31,9 @@ export class User extends Entity {
   }
 }
 
+// FIXME: [Stage5] Replace with the backend UserData: steamId64, wishlistSyncedAt, wishlistSyncStatus,
+// steamWishlist ({ steamAppId, priority, addedAt }[]), hiddenSteamIds, preferredCurrency ("EUR" | "USD"),
+// region (ISO 3166-1 alpha-2). The profile picture moved to Identity.
 export class UserData extends Entity {
   public usersWishlist: number[];
   public pfpName?: string;

@@ -2,6 +2,9 @@ import "server-only";
 
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 
+// FIXME: [Stage1] Add a BackendClient on top of this class: it sends the session access token as a Bearer
+// header and on 401 refreshes the tokens once and retries. Identity rejects access tokens right after a role
+// change (security stamp check), so 401 is expected during normal use.
 export default abstract class ApiClient {
   protected readonly client: AxiosInstance;
 

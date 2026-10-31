@@ -7,7 +7,7 @@ export default function PlaceholderSection() {
       aria-label="Future content"
       className="flex min-h-60 items-center justify-center border border-dashed border-text text-center"
     >
-      {/* FIX: Section content is not defined yet. */}
+      {/* FIXME: [Stage5] [Stage6] Remove once the account and admin sections are implemented. */}
       <p>[Section content to be defined]</p>
     </Panel>
   );

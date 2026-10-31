@@ -1,6 +1,8 @@
 import type { Offer } from "./offer";
 
-// TODO: Check the fields against the backend catalog contract.
+// FIXME: [Stage3] Map from the backend Game + lowestPrice: name, description, headerImage, initialPrice and
+// initialCurrency (original price), steamId, steamUrl, storeMetadata (tags, genres, reviews), isDLC, isReleased,
+// updatedAt. Currency is "EUR" | "USD".
 export interface Product {
   id: string;
   name: string;
@@ -12,11 +14,13 @@ export interface Product {
   /** ISO 4217 code, e.g. "EUR". */
   currency: string;
   /** Names of the sources (vendors) that have an offer. */
+  // TODO: [Stage3] The catalog endpoint returns no offers, so sources are unknown; ask the backend or drop them.
   sources: string[];
   updatedAt: Date | string;
 }
 
-// TODO: Check the fields against the backend product details contract.
+// FIXME: [Stage4] storeId and storeUrl are Game.steamId and Game.steamUrl; offers come from
+// GameOffer/getGameOffers (Game.offers is always empty).
 export interface ProductDetails extends Product {
   /** Product ID in the original store. */
   storeId: string;

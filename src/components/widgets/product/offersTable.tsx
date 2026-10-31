@@ -4,6 +4,7 @@ import type { Offer } from "@/domain/entities/offer";
 
 /** Offers sorted by price, lowest first. The lowest offer is highlighted. */
 export default function OffersTable({ offers }: { offers: Offer[] }) {
+  // FIXME: [Stage4] amount is nullable: put offers without a price or unavailable ones last.
   const sorted = [...offers].sort((a, b) => a.price - b.price);
 
   return (

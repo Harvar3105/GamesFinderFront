@@ -7,7 +7,8 @@ import RequireAccess from "@/components/widgets/requireAccess";
 import SectionNav, { type SectionNavItem } from "@/components/widgets/sectionNav";
 import type { ScrapingTask } from "@/domain/entities/scrapingTask";
 
-// FIX: Section links are placeholders until the administration sections get their own pages.
+// FIXME: [Stage6] Sections: scraping (Steam, InstantGaming), users (roles via Identity manage/*, profile
+// picture moderation).
 const SECTIONS: SectionNavItem[] = [
   { label: "Overview", href: "#" },
   { label: "Scraping tasks", href: "#", active: true },
@@ -15,7 +16,8 @@ const SECTIONS: SectionNavItem[] = [
   { label: "Users", href: "#" },
 ];
 
-// FIX: Placeholder sources and tasks. Replace with data from the BFF once the endpoints exist.
+// FIXME: [Stage6] Sources are Steam and InstantGaming, the only scraping workers.
+// TODO: [Stage6] The backend has no endpoint to list scraping tasks.
 const SOURCES: string[] = [];
 const TASKS: ScrapingTask[] = [1, 2, 3, 4].map((n) => ({
   id: `[task-id-${n}]`,
