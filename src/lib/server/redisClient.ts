@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient, type RedisClientType } from "redis";
 import { config } from "../config";
-import { logger } from "./auth/logger";
+import { logger } from "./logger";
 
 const DELETE_IF_EQUALS_SCRIPT = `
 if redis.call("GET", KEYS[1]) == ARGV[1] then

@@ -25,7 +25,8 @@
       "@/components/*": ["./src/components/*"],
       "@/config/*": ["./src/config/*"],
       "@/domain/*": ["./src/domain/*"],
-      "@/lib/*": ["./src/lib/*"]
+      "@/lib/*": ["./src/lib/*"],
+      "@/shared/*": ["./src/shared/*"]
     }
   },
   "include": [

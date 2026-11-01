@@ -1,8 +1,7 @@
-// FIXME: [Stage4] Match the backend GameOffer: gameId, vendor (Steam | InstantGaming | G2A), vendorsGameId,
-// vendorsUrl, available, amount (nullable), currency (nullable), offerName.
+// TODO: Check the fields against the backend offer contract.
 export interface Offer {
   id: string;
-  vendor: string;
+  vendor: EVendor;
   price: number;
   /** ISO 4217 code, e.g. "EUR". */
   currency: string;

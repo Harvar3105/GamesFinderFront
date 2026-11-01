@@ -1,9 +1,10 @@
 import { LoginPayload } from "@/domain/contracts/in/auth";
-import { LoginRequest } from "@/domain/contracts/out/auth";
+import { LoginRequest, SessionTokens } from "@/domain/contracts/out/auth";
 import { User } from "@/domain/entities/user";
 import { authClient } from "@/lib/server/auth/authClient";
 import { logger } from "@/lib/server/auth/logger";
-import { createSession, setSessionCookie } from "@/lib/server/session";
+import { redis } from "@/lib/server/redisClient";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

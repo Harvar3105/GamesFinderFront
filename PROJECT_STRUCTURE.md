@@ -30,8 +30,8 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `globals.css` | — | design tokens (theme colors, spacing per window class, radii, shadow, text styles), their Tailwind mapping (`@theme`), `typo-*` utilities, base styles |
 | `page.tsx` | `/` | home page |
 | `(auth)/layout.tsx` | — | centers the sign-in / sign-up panel |
-| `catalog/page.tsx` | `/catalog` | catalog: filters, product table, pagination (`?page=`, `?perPage=`) |
-| `catalog/[id]/page.tsx` | `/catalog/<id>` | product: image, store ID, original price and store link, description, offers |
+| `catalog/page.tsx` | `/catalog` | catalog: reads `?page=` / `?perPage=` and renders `CatalogView`, which loads games from `GET /api/games` (`useQuery` + `BFFFetch`); filters, game table, pagination (`?page=`, `?perPage=`) |
+| `catalog/[id]/page.tsx` | `/catalog/<id>` | game: header image, Steam ID, original price and store link, description, offers |
 | `account/page.tsx` | `/account` | account (signed-in users): section menu, profile |
 | `admin/page.tsx` | `/admin` | administration (administrators): section menu, scraping tasks |
 | `(auth)/login/page.tsx` | `/login` | sign in |
@@ -39,8 +39,9 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/login/route.ts` | `POST /api/login` | BFF: sign in via Identity, create a Redis session, set the cookie |
 | `api/(auth)/registration/route.ts` | `POST /api/registration` | BFF: sign up |
 | `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out, delete the session |
+| `api/games/route.ts` | `GET /api/games?page=&pageSize=` | BFF: a page of games from the backend (`gameClient`) |
 
-All pages from the mockups are implemented; data is still placeholder (`FIX:`).
+All pages from the mockups are implemented; data is still placeholder (`FIXME:`).
 
 ## `src/assets` — embedded media
 
@@ -53,28 +54,35 @@ Empty for now. The logo in the new design is text set in Doto.
 | folder | contents |
 | --- | --- |
 | `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
-| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `isValidEmail` / `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
+| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `isValidEmail` / `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm), `sectionPageLayout.tsx` (closed pages: heading, section menu, content) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
-| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `productCard.tsx` (product card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (catalog filters with their types, product table), `product/` (offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
+| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
 
-## `src/domain` — BFF contracts and entities
+## `src/shared` — contracts
 
-Types shared by the client and the server. No side effects.
+Request and response types shared by the browser, the BFF and the backend clients. No side effects.
 
 | path | purpose |
 | --- | --- |
-| `contracts/in/` | what the browser sends to the BFF (`LoginPayload`, `RegistrationPayload`) |
-| `contracts/out/` | what the BFF sends to and receives from external services (`LoginRequest`, `IdentityAuthModel`, `SessionTokens`) |
-| `entities/` | entities: `Entity` (base: id, dates), `User`, `UserData`, `UserDTO`, `Product` / `ProductDetails`, `Offer`, `ScrapingTask`; `enums/ETheme` (`light` / `dark`) |
+| `contracts/auth/auth.ts` | sign in / sign up: `LoginPayload`, `RegistrationPayload`, `LoginRequest`, `IdentityAuthModel`, `SessionTokens` |
+| `contracts/game/gamesPaged.ts` | `GamesPagedRequest` (`page`, `pageSize`), `GamesPagedResponse` (`games`, `totalGamesCount`) |
+
+## `src/domain` — entities
+
+Entity types shared by the client and the server. No side effects.
+
+| path | purpose |
+| --- | --- |
+| `entities/` | entities: `Entity` (base: id, dates), `User`, `UserData`, `UserDTO`, `Game` / `GameStoreMetadata`, `Offer`, `ScrapingTask`; `enums/ETheme` (`light` / `dark`), `enums/ECurrency`, `enums/EVendor` (offer vendors: Steam, InstantGaming, G2A) |
 
 ## `src/config` — app-wide constants
 
 | path | purpose |
 | --- | --- |
-| `navPages.tsx` | page URLs: `/`, `/catalog`, `/catalog/[id]` (`NavPages.product(id)`), `/account`, `/admin`, `/login`, `/registration` |
+| `navPages.tsx` | page URLs: `/`, `/catalog`, `/catalog/[id]` (`NavPages.game(id)`), `/account`, `/admin`, `/login`, `/registration` |
 | `externalLinks.ts` | external links: `GITHUB_URL`, `CONTACT_EMAIL_HREF` |
 | `pagination.ts` | `PAGE_SIZE_OPTIONS` |
 
@@ -86,12 +94,9 @@ Types shared by the client and the server. No side effects.
 | `toQueryString.ts` | object → `URLSearchParams`; arrays as repeated keys (`tags=a&tags=b`), as ASP.NET expects |
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
 | `server/apiClient.ts` | base axios client for external services |
-| `server/auth/authClient.ts` | Identity client: sign up, sign in, token refresh |
-| `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
-| `server/session.ts` | Redis sessions (`Session`: tokens, user, `keepSignedIn`), session cookie, token refresh under a per-session lock, `withAccessToken` (refresh and retry once on 401) |
-| `server/errors.ts` | `BffError` and `toErrorResponse`: turns Identity and backend errors into a JSON string with the upstream status |
+| `server/auth/authClient.ts` | Identity client: sign up, sign in, tokens |
 | `server/auth/logger.ts`, `withLogging.ts` | BFF request logging |
-| `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |
+| `server/redisClient.ts` | Redis connection |
 
 ## Styles (Tailwind v4)
 
@@ -116,12 +121,12 @@ Tailwind's default colors, radii, shadows, fonts and breakpoints are disabled: o
 Browser (page / component)
   └─ BFFFetch / useMutation ─► src/app/api/*/route.ts (Next.js server)
                                   ├─ lib/server/auth/authClient ─► Identity service
-                                  ├─ lib/server/apiClient       ─► backend
+                                  ├─ lib/server/game/gameClient ─► backend
                                   └─ lib/server/redisClient     ─► Redis (sessions)
 ```
 
 ## Rules for the current task (redesign)
 
 - Rewritten: `src/app` (pages, `layout.tsx`, `globals.css`), `src/components`, `src/assets`, `src/config`.
-- Not touched: `src/app/api`, `src/lib`, and `src/domain` except entities added for the new pages (`entities/product.ts`, `entities/offer.ts`, `entities/scrapingTask.ts`).
-- Placeholders are marked with `FIX:` comments; types that must be checked against the backend are marked with `TODO:`.
+- Not touched: `src/app/api`, `src/lib`, and `src/domain` except entities added for the new pages (`entities/game.ts`, formerly `product.ts`; `entities/offer.ts`, `entities/scrapingTask.ts`).
+- Placeholders are marked with `FIXME:` comments; types that must be checked against the backend are marked with `TODO:`.
