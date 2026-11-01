@@ -29,6 +29,8 @@ export async function POST(request: NextRequest) {
   if (body.login.includes("@")) login.email = body.login;
   else login.username = body.login;
 
+  // FIXME: [Stage2] Handle Identity errors: 401 invalid credentials, 429 account lockout or rate limit,
+  // 400 missing fields. Now any axios error becomes an unhandled 500.
   const response = await authClient.login(login);
 
   const clientUser: User = new User(
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
     response.userRoles,
   );
 
-  //TODO: add userDataClient
+  // FIXME: [Stage5] Load UserData from the backend (GET UserData/userData) with the new access token.
 
   const sessionId = randomBytes(32).toString("base64url");
   const sessionTokens: SessionTokens = {
@@ -48,6 +50,7 @@ export async function POST(request: NextRequest) {
     rt: response.refreshToken,
   };
 
+  // FIXME: [Stage2] Respect keepSignedIn: no maxAge (session cookie) when it is false.
   (await cookies()).set("sessionId", sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

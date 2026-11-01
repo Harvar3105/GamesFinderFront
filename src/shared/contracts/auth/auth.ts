@@ -1,17 +1,3 @@
-export interface LoginPayload {
-  login: string;
-  password: string;
-  keepSignedIn: boolean;
-  usesEmail: boolean;
-}
-
-export interface RegistrationPayload {
-  username: string;
-  email: string;
-  password: string;
-  roles: string[];
-}
-
 export interface IdentityAuthModel {
   readonly user: IdentityUser;
   readonly userRoles: string[];
@@ -32,6 +18,7 @@ export interface LoginRequest {
   email?: string;
   password: string;
   accessToken?: string;
+  // FIXME: [Stage1] Identity reads the refresh token from "refreshTokenHash" (it carries the raw token).
   refreshToken?: string;
 }
 
@@ -41,6 +28,8 @@ export interface RegistrationRequest {
   password: string;
 }
 
+// FIXME: [Stage1] Store the whole session: { at, rt, user, keepSignedIn }, so the layout can restore the user
+// without calling Identity.
 export interface SessionTokens {
   at: string;
   atExpireAt?: Date;

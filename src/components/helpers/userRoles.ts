@@ -1,6 +1,6 @@
 import type { UserDTO } from "@/domain/entities/user";
 
-// TODO: Roles are in development. Replace with the real administrator role name from the backend.
+// FIXME: [Stage2] The backend requires "admin_gfp" (Authorize(Roles = "admin_gfp")).
 const ADMIN_ROLE = "admin";
 
 export function isAdmin(user: UserDTO | null | undefined): boolean {

@@ -3,6 +3,7 @@ import CatalogView from "@/components/widgets/catalog/catalogView";
 import { PAGE_SIZE_OPTIONS } from "@/config/pagination";
 
 // FIXME: Example values from the mockup. Replace with tags and genres from the BFF.
+const SOURCES: string[] = [];
 const TAGS = [
   "Singleplayer",
   "Multiplayer",

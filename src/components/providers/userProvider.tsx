@@ -21,7 +21,7 @@ export default function UserProvider({
 }) {
   const [user, setUser] = useState<UserDTO | null>(clientUser);
 
-  //TODO: monipulations with user should be handeled at server
+  // FIXME: [Stage2] The server session owns the user; this state only mirrors it.
   const authUser = (u: UserDTO) => {
     setUser(u);
   };

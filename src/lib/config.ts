@@ -1,12 +1,17 @@
 import "server-only";
 
 export class Config {
+  // FIXME: [Stage5] Add the Identity profilePicture endpoint.
+  // FIXME: [Stage6] Add the Identity manage/* role endpoints.
   public readonly identityUri: string;
   public readonly userRegisterEndpoint: string;
   public readonly userLoginEndpoint: string;
   public readonly tokenRefreshEndpoint: string;
   public readonly tokenValidateEndpoint: string;
 
+  // FIXME: [Stage1] The backend moved these routes (Steam/* -> Game/*, GameOffer/*). Remove the worker-only
+  // check/getId endpoints; add Game/getPagedWithLowest, Game/GetPagedWithLowestFiltered, Game/getGame,
+  // GameOffer/getGameOffers, GameOffer/vendors, UserData/* and the scraping endpoints. Update .env.* to match.
   public readonly backendUrl: string;
   public readonly checkGameEndpoint: string;
   public readonly checkSteamOfferEndpoint: string;

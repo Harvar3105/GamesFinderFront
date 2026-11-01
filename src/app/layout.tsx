@@ -21,7 +21,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const initialTheme = cookieStore.get("theme")?.value === ETheme.DARK ? ETheme.DARK : ETheme.LIGHT;
-  //TODO: Store session cookie.
+  // FIXME: [Stage2] Read the session by the sessionId cookie and pass its user to UserProvider instead of null.
 
   return (
     <html lang="en" data-theme={initialTheme} className={fontVariables}>

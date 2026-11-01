@@ -17,6 +17,7 @@ const SECTIONS: SectionNavItem[] = [
 ];
 
 // FIXME: Placeholder tasks. Replace with data from the BFF once the endpoints exist.
+const SOURCES: string[] = [];
 const TASKS: ScrapingTask[] = [1, 2, 3, 4].map((n) => ({
   id: `[task-id-${n}]`,
   source: "[Source]",

@@ -93,6 +93,7 @@ export default function RegistrationPage() {
       username: form.username.trim(),
       email: form.email.trim(),
       password: form.password,
+      // FIXME: [Stage2] Remove: Identity ignores roles.
       roles: ["user_gfp"],
     });
   };

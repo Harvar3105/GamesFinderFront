@@ -1,5 +1,3 @@
-import type { EVendor } from "./enums/EVendor";
-
 // TODO: Check the fields against the backend offer contract.
 export interface Offer {
   id: string;

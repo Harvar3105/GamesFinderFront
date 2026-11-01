@@ -12,7 +12,8 @@ const sizes: Record<AvatarSize, { px: number; className: string }> = {
   lg: { px: 72, className: "size-18" },
 };
 
-// TODO: Check with the backend whether pfpExtension is stored with or without a leading dot ("png" / ".png").
+// FIXME: [Stage5] Identity serves profile pictures (GET profilePicture/{userId}, ETag). Load them through a BFF
+// proxy route by user id, fall back to DEFAULT_AVATAR on 404, and drop the data: URI.
 function avatarSource(user?: UserDTO | null): string {
   const content = user?.data?.pfpContent;
   const extension = user?.data?.pfpExtension?.replace(/^\./, "");
