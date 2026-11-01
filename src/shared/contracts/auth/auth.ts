@@ -1,5 +1,3 @@
-// FIXME: [Stage1] Match the Identity ResponseDTO: register returns no userRoles, so the field is optional.
-// TODO: [Stage2] Login with a refresh token returns the roles as "roles", not "userRoles"; ask Identity to unify.
 export interface IdentityAuthModel {
   readonly user: IdentityUser;
   readonly userRoles: string[];

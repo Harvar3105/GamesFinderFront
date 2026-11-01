@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient, type RedisClientType } from "redis";
 import { config } from "../config";
-import { logger } from "./auth/logger";
+import { logger } from "./logger";
 
 export class RedisClient {
   private readonly client: RedisClientType;

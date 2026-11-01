@@ -52,7 +52,7 @@ export default function CatalogFilters({ sources, tags, genres }: CatalogFilters
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // FIXME: [Stage3] Apply the filters through the URL query and the BFF catalog route.
+    // FIX: Filters are not applied yet. Send them to the BFF catalog query once the endpoint exists.
   };
 
   return (

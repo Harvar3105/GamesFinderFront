@@ -1,8 +1,8 @@
-import { LoginPayload } from "@/domain/contracts/in/auth";
-import { LoginRequest, SessionTokens } from "@/domain/contracts/out/auth";
+import { LoginPayload } from "@/shared/contracts/auth/auth";
+import { LoginRequest, SessionTokens } from "@/shared/contracts/auth/auth";
 import { User } from "@/domain/entities/user";
 import { authClient } from "@/lib/server/auth/authClient";
-import { logger } from "@/lib/server/auth/logger";
+import { logger } from "@/lib/server/logger";
 import { redis } from "@/lib/server/redisClient";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";

@@ -1,7 +1,7 @@
 import { config } from "@/lib/config";
 import ApiClient from "../apiClient";
-import { LoginPayload, RegistrationPayload } from "@/domain/contracts/in/auth";
-import { IdentityAuthModel, LoginRequest } from "@/domain/contracts/out/auth";
+import { RegistrationPayload } from "@/shared/contracts/auth/auth";
+import { IdentityAuthModel, LoginRequest } from "@/shared/contracts/auth/auth";
 
 // TODO: [Stage2] Identity rate-limits /api/auth/* per IP, and every request comes from the BFF IP, so all users
 // share one limit. Needs ForwardedHeaders in Identity and X-Forwarded-For from the BFF.

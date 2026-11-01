@@ -15,6 +15,7 @@ export class FetchError {
   }
 }
 
+// Used to fetch data from BFF. Use with react-query mutations for caching
 export default async function BFFFetch<TResponse = object, TBody = object>({
   uri,
   method,

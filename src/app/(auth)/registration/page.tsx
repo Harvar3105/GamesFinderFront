@@ -15,13 +15,12 @@ import { Button, Field, Input } from "@/components/ui";
 import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
 import AuthPanel from "@/components/widgets/authPanel";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { RegistrationPayload } from "@/domain/contracts/in/auth";
+import { RegistrationPayload } from "@/shared/contracts/auth/auth";
 import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 
-// FIXME: [Stage2] Password rules come from the Identity Security:Password config (RequiredLength,
-// RequireDigit, ...). Mirror them here or show the server errors per field.
+// FIXME: Password requirements are not defined yet. Replace with the real rules.
 const PASSWORD_REQUIREMENTS = "[Password requirements]";
 
 interface RegistrationForm {

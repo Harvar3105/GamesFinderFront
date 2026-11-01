@@ -14,9 +14,7 @@ export default function ScrapingTasks({ sources, tasks }: ScrapingTasksProps) {
   const [source, setSource] = useState("");
 
   const startScraping = () => {
-    // FIXME: [Stage6] Per-source forms: Steam/scrap { steamIds, updateExistingGames, updateExistingOffers };
-    // InstantGaming/scrapIds { instantGamingIds, updateExisting }, scrapRange { minimumId, maximumId,
-    // updateExisting }, scrapUpTo { maxIdCount, updateExisting }. Requires the admin_gfp role.
+    // FIXME: Start a scraping task through the BFF once the endpoint exists.
   };
 
   return (
