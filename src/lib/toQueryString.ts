@@ -6,11 +6,11 @@ export function toQueryString(obj: object, prefix = ""): URLSearchParams {
 
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
-    if (typeof value === "object" && !Array.isArray(value)) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => params.append(fullKey, String(item)));
+    } else if (typeof value === "object") {
       toQueryString(value, fullKey).forEach((v, k) => params.append(k, v));
     } else {
-      // FIXME: [Stage1] Arrays are joined as "a,b"; ASP.NET binds collections only from repeated keys
-      // (tags=a&tags=b).
       params.append(fullKey, String(value));
     }
   });

@@ -91,12 +91,11 @@ Entity types shared by the client and the server. No side effects.
 | path | purpose |
 | --- | --- |
 | `config.ts` | reads environment variables (server only) |
-| `toQueryString.ts` | object → `URLSearchParams` |
+| `toQueryString.ts` | object → `URLSearchParams`; arrays as repeated keys (`tags=a&tags=b`), as ASP.NET expects |
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
 | `server/apiClient.ts` | base axios client for external services |
 | `server/auth/authClient.ts` | Identity client: sign up, sign in, tokens |
-| `server/game/gameClient.ts` | backend games client (`getGamesPaged`); GET endpoints need no JWT |
-| `server/logger.ts`, `server/withLogging.ts` | BFF request logging |
+| `server/auth/logger.ts`, `withLogging.ts` | BFF request logging |
 | `server/redisClient.ts` | Redis connection |
 
 ## Styles (Tailwind v4)
