@@ -2,7 +2,7 @@ import "server-only";
 
 import { isAxiosError } from "axios";
 import { NextResponse } from "next/server";
-import { logger } from "@/lib/server/auth/logger";
+import { logger } from "@/lib/server/logger";
 
 export const SERVER_UNAVAILABLE_MESSAGE =
   "Server is currently unavailable, please try again later.";

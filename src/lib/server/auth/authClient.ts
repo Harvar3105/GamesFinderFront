@@ -1,7 +1,13 @@
+import "server-only";
+
 import { config } from "@/lib/config";
 import ApiClient from "../apiClient";
-import { LoginPayload, RegistrationPayload } from "@/domain/contracts/in/auth";
-import { IdentityAuthModel, LoginRequest } from "@/domain/contracts/out/auth";
+import type { IdentityAuthResponse, IdentityLoginRequest } from "@/lib/server/contracts/auth/login";
+import type { IdentityRegistrationRequest } from "@/lib/server/contracts/auth/registration";
+import type {
+  IdentityTokenRefreshRequest,
+  IdentityTokens,
+} from "@/lib/server/contracts/auth/token";
 
 // TODO: [Stage2] Identity rate-limits /api/auth/* per IP, and every request comes from the BFF IP, so all users
 // share one limit. Needs ForwardedHeaders in Identity and X-Forwarded-For from the BFF.
@@ -10,18 +16,24 @@ export class AuthClient extends ApiClient {
     super(uri);
   }
 
-  async register(data: RegistrationPayload): Promise<IdentityAuthModel> {
-    return this.post<IdentityAuthModel, RegistrationPayload>(config.userRegisterEndpoint, data);
+  async register(data: IdentityRegistrationRequest): Promise<IdentityAuthResponse> {
+    return this.post<IdentityAuthResponse, IdentityRegistrationRequest>(
+      config.userRegisterEndpoint,
+      data,
+    );
   }
 
-  async login(data: LoginRequest): Promise<IdentityAuthModel> {
-    return this.post<IdentityAuthModel, LoginRequest>(config.userLoginEndpoint, data);
+  async login(data: IdentityLoginRequest): Promise<IdentityAuthResponse> {
+    return this.post<IdentityAuthResponse, IdentityLoginRequest>(config.userLoginEndpoint, data);
   }
 
   // Call only through refreshSession() from lib/server/session: it serializes refreshes of one session,
   // and a refresh token used twice makes Identity revoke every session of the user.
-  async refresh(data: TokenRefreshRequest): Promise<IdentityTokens> {
-    return this.post<IdentityTokens, TokenRefreshRequest>(config.tokenRefreshEndpoint, data);
+  async refresh(data: IdentityTokenRefreshRequest): Promise<IdentityTokens> {
+    return this.post<IdentityTokens, IdentityTokenRefreshRequest>(
+      config.tokenRefreshEndpoint,
+      data,
+    );
   }
 }
 

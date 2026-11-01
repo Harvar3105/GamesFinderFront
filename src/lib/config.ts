@@ -10,6 +10,7 @@ export class Config {
   public readonly tokenValidateEndpoint: string;
 
   public readonly backendUrl: string;
+  public readonly gamesPagedEndpoint: string;
   public readonly gamesFilteredPagedEndpoint: string;
   public readonly gameEndpoint: string;
   public readonly gameOffersEndpoint: string;
@@ -38,6 +39,7 @@ export class Config {
     this.tokenValidateEndpoint = process.env.TOKEN_VALIDATE!;
 
     this.backendUrl = process.env.BACKEND_URL!;
+    this.gamesPagedEndpoint = process.env.BACKEND_GET_GAMES_PAGED!;
     this.gamesFilteredPagedEndpoint = process.env.BACKEND_GET_GAMES_FILTERED!;
     this.gameEndpoint = process.env.BACKEND_GET_GAME!;
     this.gameOffersEndpoint = process.env.BACKEND_GET_GAME_OFFERS!;

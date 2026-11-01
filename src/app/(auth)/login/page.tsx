@@ -15,10 +15,10 @@ import { Button, Checkbox, Field, Input } from "@/components/ui";
 import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
 import AuthPanel from "@/components/widgets/authPanel";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { LoginPayload } from "@/shared/contracts/auth/auth";
 import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
+import LoginPayload from "@/lib/client/contracts/auth/loginPayload";
 
 interface LoginErrors {
   login?: string;
@@ -76,7 +76,6 @@ export default function LoginPage() {
     mutation.mutate({
       login: trimmed,
       password,
-      usesEmail: trimmed.includes("@"),
       keepSignedIn,
     });
   };

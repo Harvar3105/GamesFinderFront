@@ -41,7 +41,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out, delete the session |
 | `api/games/route.ts` | `GET /api/games?page=&pageSize=` | BFF: a page of games from the backend (`gameClient`) |
 
-All pages from the mockups are implemented; data is still placeholder (`FIXME:`).
+All pages from the mockups are implemented. The catalog loads games through the BFF; the other pages still show placeholder data (`FIXME: [StageN]`).
 
 ## `src/assets` — embedded media
 
@@ -60,15 +60,6 @@ Empty for now. The logo in the new design is text set in Doto.
 | `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
-
-## `src/shared` — contracts
-
-Request and response types shared by the browser, the BFF and the backend clients. No side effects.
-
-| path | purpose |
-| --- | --- |
-| `contracts/auth/auth.ts` | sign in / sign up: `LoginPayload`, `RegistrationPayload`, `LoginRequest`, `IdentityAuthModel`, `SessionTokens` |
-| `contracts/game/gamesPaged.ts` | `GamesPagedRequest` (`page`, `pageSize`), `GamesPagedResponse` (`games`, `totalGamesCount`) |
 
 ## `src/domain` — entities
 
@@ -92,11 +83,28 @@ Entity types shared by the client and the server. No side effects.
 | --- | --- |
 | `config.ts` | reads environment variables (server only) |
 | `toQueryString.ts` | object → `URLSearchParams`; arrays as repeated keys (`tags=a&tags=b`), as ASP.NET expects |
+| `client/contracts/` | the BFF API (`/api/*`): what the browser sends and receives. Used by pages and by route handlers. `auth/loginPayload.ts`, `auth/registrationPayload.ts` |
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
+| `server/contracts/` | external services, server only; names start with the service (`Identity*`, `Backend*`). `auth/login.ts` (`IdentityLoginRequest`, `IdentityAuthResponse`, `IdentityUser`), `auth/registration.ts`, `auth/token.ts` (refresh) |
 | `server/apiClient.ts` | base axios client for external services |
-| `server/auth/authClient.ts` | Identity client: sign up, sign in, tokens |
-| `server/auth/logger.ts`, `withLogging.ts` | BFF request logging |
-| `server/redisClient.ts` | Redis connection |
+| `server/auth/authClient.ts` | Identity client: sign up, sign in, token refresh |
+| `server/game/gameClient.ts` | backend games client |
+| `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
+| `server/session.ts` | Redis sessions (`Session`: tokens, user, `keepSignedIn`; the BFF's own storage format, not a contract), session cookie, token refresh under a per-session lock, `withAccessToken` |
+| `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status |
+| `server/logger.ts`, `withLogging.ts` | BFF request logging |
+| `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |
+| `shared/contracts/` | contracts with the same shape in the BFF API and in the external service; the route passes them through. `game/gamesPaged.ts` (`GamesPagedRequest`, `GamesPagedResponse`: `GET /api/games` and backend `Game/getPaged`) |
+
+### Contracts
+
+| folder | boundary | imported by | names |
+| --- | --- | --- | --- |
+| `lib/client/contracts/` | browser ↔ BFF (`/api/*`) | pages, components, route handlers | `*Payload` for requests; responses are entities (e.g. `UserDTO`) |
+| `lib/server/contracts/` | BFF ↔ Identity / backend | `lib/server` and route handlers only | prefixed with the service: `Identity*`, `Backend*` |
+| `lib/shared/contracts/` | both, when the shapes are identical | everyone | plain names (`GamesPagedRequest`) |
+
+A route handler takes a `client/contracts` type, builds the `server/contracts` request from it and maps the service response back to a `client/contracts` type. A contract with the same shape on both sides lives in `shared/contracts` and is passed through; once the shapes diverge, split it into `client/` and `server/`. Contract files hold types only, no side effects. Upstream errors are answered with `toErrorResponse`, never parsed in the route.
 
 ## Styles (Tailwind v4)
 
@@ -115,18 +123,43 @@ Tailwind's default colors, radii, shadows, fonts and breakpoints are disabled: o
 | window classes | `medium:` ≥600, `expanded:` ≥840, `large:` ≥1200, `xlarge:` ≥1600 |
 | themes | `dark:`, `light:` |
 
+## BFF
+
+The BFF is the server side of this Next.js app, not a separate service: `next dev` / `next start` serves both the pages and the API. There is no single entry point; Next.js routes requests by file:
+
+- **Route handlers** (`src/app/api/**/route.ts`) are the BFF entry points. Each one is a public HTTP endpoint; its exported `GET` / `POST` functions handle the request. The browser reaches the BFF only through them.
+- **Server Components** (pages and layouts without `"use client"`) render on the server and may call `lib/server` directly, without HTTP (e.g. `layout.tsx` reads cookies).
+- **`proxy.ts`** (formerly `middleware`) would run before every matched route; at most one per project. Not used yet.
+
+Server-only code is `src/app/api/**`, `src/lib/server/**` and `src/lib/config.ts`. These modules start with `import "server-only"`, so importing one into a client component fails the build. The browser never sees the Identity and backend addresses, tokens or Redis: only `/api/*` and the httpOnly `sessionId` cookie.
+
 ## Data flow
 
 ```text
-Browser (page / component)
-  └─ BFFFetch / useMutation ─► src/app/api/*/route.ts (Next.js server)
-                                  ├─ lib/server/auth/authClient ─► Identity service
-                                  ├─ lib/server/game/gameClient ─► backend
-                                  └─ lib/server/redisClient     ─► Redis (sessions)
+Browser (components with "use client")
+  └─ BFFFetch (lib/client/fetch) ──HTTP──► src/app/api/*/route.ts        ← BFF entry points
+                                              │ request types: lib/client/contracts, lib/shared/contracts
+                                              ├─ lib/server/session.ts       session, cookie, token refresh
+                                              ├─ lib/server/auth/authClient ─► Identity service
+                                              ├─ lib/server/game/gameClient ─► backend
+                                              ├─ lib/server/backendClient   ─► backend (Bearer token)
+                                              ├─ lib/server/redisClient     ─► Redis (sessions)
+                                              └─ lib/server/errors.ts        upstream errors → JSON string
+Server Components (layout, pages) ──────────► lib/server/* directly, without HTTP
 ```
 
-## Rules for the current task (redesign)
+## Current task: migration to the new backend and Identity
 
-- Rewritten: `src/app` (pages, `layout.tsx`, `globals.css`), `src/components`, `src/assets`, `src/config`.
-- Not touched: `src/app/api`, `src/lib`, and `src/domain` except entities added for the new pages (`entities/game.ts`, formerly `product.ts`; `entities/offer.ts`, `entities/scrapingTask.ts`).
-- Placeholders are marked with `FIXME:` comments; types that must be checked against the backend are marked with `TODO:`.
+The backend (GamesFinderOrchester) and the Identity server are the source of truth for contracts; the frontend adapts to them. The work is split into stages, each committed separately:
+
+| stage | scope |
+| --- | --- |
+| Stage1 | BFF infrastructure: endpoints config, Redis sessions, token refresh, backend client, error normalization (done) |
+| Stage2 | auth: registration without roles and with a session, login errors, session restore in the layout, `admin_gfp` role |
+| Stage3 | catalog and home page from the backend (filters, sort, vendors, currency) |
+| Stage4 | game page: game and offers |
+| Stage5 | account: UserData, preferences, profile picture |
+| Stage6 | administration: scraping tasks, roles, picture moderation |
+| Stage7 | documentation |
+
+Planned frontend work is marked with `FIXME: [StageN]`; work blocked on the backend or Identity with `TODO: [StageN]`.

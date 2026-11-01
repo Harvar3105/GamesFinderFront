@@ -15,7 +15,7 @@ import { Button, Field, Input } from "@/components/ui";
 import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
 import AuthPanel from "@/components/widgets/authPanel";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { RegistrationPayload } from "@/shared/contracts/auth/auth";
+import type RegistrationPayload from "@/lib/client/contracts/auth/registrationPayload";
 import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
@@ -93,8 +93,8 @@ export default function RegistrationPage() {
       username: form.username.trim(),
       email: form.email.trim(),
       password: form.password,
-      // FIXME: [Stage2] Remove: Identity ignores roles.
-      roles: ["user_gfp"],
+      // FIXME: [Stage2] Add a "Keep me signed in" checkbox like on the sign-in page.
+      keepSignedIn: false,
     });
   };
 

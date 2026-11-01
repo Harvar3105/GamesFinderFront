@@ -1,7 +1,6 @@
-import { logger } from "@/lib/server/auth/logger";
-import { redis } from "@/lib/server/redisClient";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/server/logger";
+import { deleteSession, deleteSessionCookie, readSessionId } from "@/lib/server/session";
+import { NextResponse } from "next/server";
 
 export async function POST() {
   const sessionId = await readSessionId();

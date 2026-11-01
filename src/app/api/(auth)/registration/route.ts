@@ -1,5 +1,6 @@
-import { RegistrationPayload } from "@/shared/contracts/auth/auth";
+import type RegistrationPayload from "@/lib/client/contracts/auth/registrationPayload";
 import { config } from "@/lib/config";
+import type { IdentityRegistrationRequest } from "@/lib/server/contracts/auth/registration";
 import { logger } from "@/lib/server/logger";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,23 +14,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json("Failed to parse incoming request data", { status: 500 });
   }
 
-  // FIXME: [Stage2] Drop the roles check (Identity assigns Roles:Initial). Use authClient.register, create a
-  // session from the returned tokens like login does, and map IdentityError[] to a message.
-  if (
-    !body.roles.includes("user_gfp") ||
-    body.username.includes("@") ||
-    body.username.includes(".")
-  ) {
-    logger.warn({ msg: "Invalid data provided", data: body });
+  if (body.username.includes("@") || body.username.includes(".")) {
+    logger.warn({ msg: "Invalid data provided", ctx: { username: body.username } });
     return NextResponse.json("Invalid data provided", { status: 400 });
   }
 
+  const registration: IdentityRegistrationRequest = {
+    username: body.username,
+    email: body.email,
+    password: body.password,
+  };
+
+  // FIXME: [Stage2] Use authClient.register, create a session from the returned tokens like login does
+  // (respecting keepSignedIn), return the UserDTO the page expects, and map IdentityError[] to a message.
   const response = await fetch(`${config.identityUri}${config.userRegisterEndpoint}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(registration),
   });
 
   let data;

@@ -1,0 +1,6 @@
+export default interface LoginPayload {
+  login: string;
+  password: string;
+  keepSignedIn: boolean;
+  accessToken?: string;
+}

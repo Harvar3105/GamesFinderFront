@@ -9,7 +9,7 @@ import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
 import { EVendor } from "@/domain/entities/enums/EVendor";
 import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
 import { toQueryString } from "@/lib/toQueryString";
-import type { GamesPagedResponse } from "@/shared/contracts/game/gamesPaged";
+import type { GamesPagedRequest, GamesPagedResponse } from "@/lib/shared/contracts/game/gamesPaged";
 
 interface CatalogViewProps {
   page: number;
@@ -19,11 +19,12 @@ interface CatalogViewProps {
 }
 
 export default function CatalogView({ page, pageSize, tags, genres }: CatalogViewProps) {
+  const pageQuery: GamesPagedRequest = { page, pageSize };
   const query = useQuery<GamesPagedResponse, FetchError>({
     queryKey: ["games", page, pageSize],
     queryFn: () =>
       BFFFetch<GamesPagedResponse>({
-        uri: `/api/games?${toQueryString({ page, pageSize })}`,
+        uri: `/api/games?${toQueryString(pageQuery)}`,
         method: "GET",
       }),
     placeholderData: keepPreviousData,

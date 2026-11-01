@@ -4,11 +4,19 @@ import { isAxiosError } from "axios";
 import { cookies } from "next/headers";
 import { randomBytes, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
-import type { Session } from "@/domain/contracts/out/auth";
+import type { UserDTO } from "@/domain/entities/user";
 import { authClient } from "@/lib/server/auth/authClient";
-import { logger } from "@/lib/server/auth/logger";
 import { BffError, SERVER_UNAVAILABLE_MESSAGE } from "@/lib/server/errors";
+import { logger } from "@/lib/server/logger";
 import { redis } from "@/lib/server/redisClient";
+
+/** Stored in Redis under the session id from the cookie. Never sent to the browser as is. */
+export interface Session {
+  accessToken: string;
+  refreshToken: string;
+  user: UserDTO;
+  keepSignedIn: boolean;
+}
 
 const SESSION_COOKIE = "sessionId";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;

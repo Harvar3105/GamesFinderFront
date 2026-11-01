@@ -1,10 +1,9 @@
-import { LoginPayload } from "@/domain/contracts/in/auth";
-import { LoginRequest, SessionTokens } from "@/domain/contracts/out/auth";
+import type LoginPayload from "@/lib/client/contracts/auth/loginPayload";
 import { User } from "@/domain/entities/user";
 import { authClient } from "@/lib/server/auth/authClient";
-import { logger } from "@/lib/server/auth/logger";
-import { redis } from "@/lib/server/redisClient";
-import { cookies } from "next/headers";
+import type { IdentityLoginRequest } from "@/lib/server/contracts/auth/login";
+import { logger } from "@/lib/server/logger";
+import { createSession, setSessionCookie } from "@/lib/server/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -22,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json("No login were provided", { status: 400 });
   }
 
-  const login: LoginRequest = {
+  const login: IdentityLoginRequest = {
     password: body.password,
   };
   if (body.login.includes("@")) login.email = body.login;
