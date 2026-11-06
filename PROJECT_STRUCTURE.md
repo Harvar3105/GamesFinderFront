@@ -25,7 +25,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 
 | path | URL | purpose |
 | --- | --- | --- |
-| `layout.tsx` | — | root layout: `<html data-theme>`, fonts, providers, header, footer. The theme is read from the `theme` cookie on the server |
+| `layout.tsx` | — | root layout: `<html data-theme>`, fonts, providers, header, footer. On the server it reads the theme from the `theme` cookie and restores the user from Identity with the session access token |
 | `fonts.ts` | — | fonts via `next/font/google`: Fira Sans, Doto, Google Sans Code |
 | `globals.css` | — | design tokens (theme colors, spacing per window class, radii, shadow, text styles), their Tailwind mapping (`@theme`), `typo-*` utilities, base styles |
 | `page.tsx` | `/` | home page |
@@ -37,8 +37,9 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `(auth)/login/page.tsx` | `/login` | sign in |
 | `(auth)/registration/page.tsx` | `/registration` | sign up |
 | `api/(auth)/login/route.ts` | `POST /api/login` | BFF: sign in via Identity, create a Redis session, set the cookie |
-| `api/(auth)/registration/route.ts` | `POST /api/registration` | BFF: sign up |
-| `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out, delete the session |
+| `api/(auth)/registration/route.ts` | `POST /api/registration` | BFF: sign up via Identity, create a Redis session, set the cookie |
+| `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out: revoke the session tokens in Identity, delete the session cookie and the Redis session |
+| `api/(auth)/logout-all/route.ts` | `POST /api/logout-all` | BFF: sign out of all devices: revoke every session of the user in Identity, then as `/api/logout` |
 | `api/games/route.ts` | `GET /api/games?page=&pageSize=` | BFF: a page of games from the backend (`gameClient`) |
 
 All pages from the mockups are implemented. The catalog loads games through the BFF; the other pages still show placeholder data (`FIXME: [StageN]`).
@@ -54,7 +55,7 @@ Empty for now. The logo in the new design is text set in Doto.
 | folder | contents |
 | --- | --- |
 | `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
-| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `isValidEmail` / `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
+| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm), `sectionPageLayout.tsx` (closed pages: heading, section menu, content) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
 | `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
@@ -85,15 +86,18 @@ Entity types shared by the client and the server. No side effects.
 | `toQueryString.ts` | object → `URLSearchParams`; arrays as repeated keys (`tags=a&tags=b`), as ASP.NET expects |
 | `client/contracts/` | the BFF API (`/api/*`): what the browser sends and receives. Used by pages and by route handlers. `auth/loginPayload.ts`, `auth/registrationPayload.ts` |
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
-| `server/contracts/` | external services, server only; names start with the service (`Identity*`, `Backend*`). `auth/login.ts` (`IdentityLoginRequest`, `IdentityAuthResponse`, `IdentityUser`), `auth/registration.ts`, `auth/token.ts` (refresh) |
+| `server/contracts/` | external services, server only; names start with the service (`Identity*`, `Backend*`). `auth/login.ts` (`IdentityLoginRequest`, `IdentityAuthResponse`, `IdentityUser`), `auth/registration.ts`, `auth/logout.ts`, `auth/token.ts` (refresh) |
 | `server/apiClient.ts` | base axios client for external services |
-| `server/auth/authClient.ts` | Identity client: sign up, sign in, token refresh |
+| `server/auth/authClient.ts` | Identity client: sign up, sign in, sign out (one session / all sessions), token refresh; forwards the client `X-Forwarded-For` |
+| `server/auth/signOut.ts` | body of the sign-out routes |
+| `server/auth/authPayloads.ts` | parsing and validation of the sign-in / sign-up request bodies (the BFF repeats the page checks) |
 | `server/game/gameClient.ts` | backend games client |
 | `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
-| `server/session.ts` | Redis sessions (`Session`: tokens, user, `keepSignedIn`; the BFF's own storage format, not a contract), session cookie, token refresh under a per-session lock, `withAccessToken` |
+| `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it), `extendSession` (for `proxy.ts`), `startSession` (after login / register), `getCurrentUser` (the layout restores the user from Identity by the access token), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
 | `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status |
 | `server/logger.ts`, `withLogging.ts` | BFF request logging |
 | `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |
+| `shared/authValidation.ts` | sign-in / sign-up field checks shared by the pages and the BFF: login, username, email (password rules belong to Identity) |
 | `shared/contracts/` | contracts with the same shape in the BFF API and in the external service; the route passes them through. `game/gamesPaged.ts` (`GamesPagedRequest`, `GamesPagedResponse`: `GET /api/games` and backend `Game/getPaged`) |
 
 ### Contracts
@@ -129,7 +133,7 @@ The BFF is the server side of this Next.js app, not a separate service: `next de
 
 - **Route handlers** (`src/app/api/**/route.ts`) are the BFF entry points. Each one is a public HTTP endpoint; its exported `GET` / `POST` functions handle the request. The browser reaches the BFF only through them.
 - **Server Components** (pages and layouts without `"use client"`) render on the server and may call `lib/server` directly, without HTTP (e.g. `layout.tsx` reads cookies).
-- **`proxy.ts`** (formerly `middleware`) would run before every matched route; at most one per project. Not used yet.
+- **`proxy.ts`** (formerly `middleware`, `src/proxy.ts`) runs before every matched route; at most one per project. It extends the session (Redis TTL and cookie maxAge) on every request except static files and the sign-in / sign-up / sign-out routes.
 
 Server-only code is `src/app/api/**`, `src/lib/server/**` and `src/lib/config.ts`. These modules start with `import "server-only"`, so importing one into a client component fails the build. The browser never sees the Identity and backend addresses, tokens or Redis: only `/api/*` and the httpOnly `sessionId` cookie.
 
@@ -155,7 +159,7 @@ The backend (GamesFinderOrchester) and the Identity server are the source of tru
 | stage | scope |
 | --- | --- |
 | Stage1 | BFF infrastructure: endpoints config, Redis sessions, token refresh, backend client, error normalization (done) |
-| Stage2 | auth: registration without roles and with a session, login errors, session restore in the layout, `admin_gfp` role |
+| Stage2 | auth: registration without roles and with a session, login errors, session restore in the layout, sign-out with token revocation, `ADMIN` / `USER` roles (done) |
 | Stage3 | catalog and home page from the backend (filters, sort, vendors, currency) |
 | Stage4 | game page: game and offers |
 | Stage5 | account: UserData, preferences, profile picture |

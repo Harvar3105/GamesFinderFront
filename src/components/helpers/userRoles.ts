@@ -1,8 +1,9 @@
 import type { UserDTO } from "@/domain/entities/user";
 
-// FIXME: [Stage2] The backend requires "admin_gfp" (Authorize(Roles = "admin_gfp")).
-const ADMIN_ROLE = "admin";
+// Identity roles: "ADMIN", "USER". Identity normalizes role names, so they are compared case-insensitively.
+// TODO: [Stage2] The backend still checks Authorize(Roles = "admin_gfp"); it must switch to "ADMIN".
+const ADMIN_ROLE = "ADMIN";
 
 export function isAdmin(user: UserDTO | null | undefined): boolean {
-  return user?.roles.includes(ADMIN_ROLE) ?? false;
+  return user?.roles.some((role) => role.toUpperCase() === ADMIN_ROLE) ?? false;
 }

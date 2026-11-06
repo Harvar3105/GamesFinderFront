@@ -1,50 +1,36 @@
-import type RegistrationPayload from "@/lib/client/contracts/auth/registrationPayload";
-import { config } from "@/lib/config";
+import { authClient } from "@/lib/server/auth/authClient";
+import { parseRegistrationPayload } from "@/lib/server/auth/authPayloads";
 import type { IdentityRegistrationRequest } from "@/lib/server/contracts/auth/registration";
+import { toErrorResponse } from "@/lib/server/errors";
 import { logger } from "@/lib/server/logger";
+import { startSession } from "@/lib/server/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  let body;
+  let body: unknown;
   try {
-    body = (await request.json()) as RegistrationPayload;
-  } catch (error) {
-    if (error instanceof Error)
-      logger.error({ msg: "Failed to parse incoming request data", data: error });
-    return NextResponse.json("Failed to parse incoming request data", { status: 500 });
+    body = await request.json();
+  } catch {
+    logger.warn({ msg: "Registration request body is not JSON" });
+    return NextResponse.json("Invalid request body.", { status: 400 });
   }
 
-  if (body.username.includes("@") || body.username.includes(".")) {
-    logger.warn({ msg: "Invalid data provided", ctx: { username: body.username } });
-    return NextResponse.json("Invalid data provided", { status: 400 });
+  const parsed = parseRegistrationPayload(body);
+  if (!parsed.ok) {
+    logger.warn({ msg: "Invalid registration data", ctx: { reason: parsed.message } });
+    return NextResponse.json(parsed.message, { status: 400 });
   }
+  const { username, email, password, keepSignedIn } = parsed.value;
 
-  const registration: IdentityRegistrationRequest = {
-    username: body.username,
-    email: body.email,
-    password: body.password,
-  };
+  const registration: IdentityRegistrationRequest = { username, email, password };
 
-  // FIXME: [Stage2] Use authClient.register, create a session from the returned tokens like login does
-  // (respecting keepSignedIn), return the UserDTO the page expects, and map IdentityError[] to a message.
-  const response = await fetch(`${config.identityUri}${config.userRegisterEndpoint}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(registration),
-  });
-
-  let data;
   try {
-    data = await response.json();
-  } catch (error) {
-    if (error instanceof Error)
-      logger.error({ msg: "Failed to parse incoming request data", data: error });
-    return NextResponse.json("Failed to parse response data", { status: 500 });
-  }
+    const response = await authClient.register(registration);
+    const user = await startSession(response, keepSignedIn);
 
-  return NextResponse.json(data, {
-    status: response.status,
-  });
+    return NextResponse.json(user, { status: 200 });
+  } catch (error) {
+    // Identity reports password policy and duplicate username / email as IdentityError[].
+    return toErrorResponse(error);
+  }
 }

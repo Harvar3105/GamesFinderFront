@@ -3,10 +3,10 @@ export interface IdentityLoginRequest {
   email?: string;
   password?: string;
   accessToken?: string;
-  /** The raw refresh token: Identity keeps the old field name. */
+  /** FIXME: The raw refresh token: Identity keeps the old field name. */
   refreshTokenHash?: string;
 }
-
+// FIXME: Contracts should be rewritten on the backend first
 // Identity ResponseDTO, returned by login and register. Every endpoint fills only some of the fields,
 // the rest come as null.
 // TODO: [Stage2] Login with a refresh token returns the roles as "roles", not "userRoles"; ask Identity to unify.
@@ -14,6 +14,7 @@ export interface IdentityAuthResponse {
   readonly user: IdentityUser;
   /** null in the register response. */
   readonly userRoles: string[] | null;
+  /** accessToken and refreshToken are null when signing in with an access token. */
   readonly accessToken: string;
   readonly refreshToken: string;
 }

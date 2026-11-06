@@ -1,66 +1,41 @@
-import type LoginPayload from "@/lib/client/contracts/auth/loginPayload";
-import { User } from "@/domain/entities/user";
 import { authClient } from "@/lib/server/auth/authClient";
+import { parseLoginPayload } from "@/lib/server/auth/authPayloads";
 import type { IdentityLoginRequest } from "@/lib/server/contracts/auth/login";
+import { toErrorResponse } from "@/lib/server/errors";
 import { logger } from "@/lib/server/logger";
-import { createSession, setSessionCookie } from "@/lib/server/session";
+import { startSession } from "@/lib/server/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  let body;
+  let body: unknown;
   try {
-    body = (await request.json()) as LoginPayload;
-  } catch (error) {
-    if (error instanceof Error)
-      logger.error({ msg: "Failed to parse incoming request data", data: error });
-    return NextResponse.json("Failed to parse incoming request data", { status: 500 });
+    body = await request.json();
+  } catch {
+    logger.warn({ msg: "Login request body is not JSON" });
+    return NextResponse.json("Invalid request body.", { status: 400 });
   }
 
-  if (!body.login) {
-    logger.error({ msg: "No login were provided" });
-    return NextResponse.json("No login were provided", { status: 400 });
+  const parsed = parseLoginPayload(body);
+  if (!parsed.ok) {
+    logger.warn({ msg: "Invalid login data", ctx: { reason: parsed.message } });
+    return NextResponse.json(parsed.message, { status: 400 });
   }
+  const { login, password, keepSignedIn } = parsed.value;
 
-  const login: IdentityLoginRequest = {
-    password: body.password,
-  };
-  if (body.login.includes("@")) login.email = body.login;
-  else login.username = body.login;
+  const identityLogin: IdentityLoginRequest = login.includes("@")
+    ? { email: login, password }
+    : { username: login, password };
 
-  // FIXME: [Stage2] Handle Identity errors: 401 invalid credentials, 429 account lockout or rate limit,
-  // 400 missing fields. Now any axios error becomes an unhandled 500.
-  const response = await authClient.login(login);
-
-  const clientUser: User = new User(
-    response.user.id,
-    response.user.createdAt,
-    response.user.username,
-    response.user.email,
-    response.user.lastLogin,
-    response.userRoles ?? [],
-  );
-
-  // FIXME: [Stage5] Load UserData from the backend (GET UserData/userData) with the new access token.
-
-  let sessionId;
   try {
-    sessionId = await createSession({
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      user: clientUser,
-      keepSignedIn: body.keepSignedIn,
-    });
+    const response = await authClient.login(identityLogin);
+
+    // FIXME: [Stage5] Load UserData from the backend (GET UserData/userData) with the new access token.
+
+    const user = await startSession(response, keepSignedIn);
+
+    return NextResponse.json(user, { status: 200 });
   } catch (error) {
-    if (error instanceof Error) {
-      logger.error({ msg: "Cannot connect to redis!", data: error });
-    }
-    return NextResponse.json("Server is currently unavailable", { status: 500 });
+    // Identity explains the failure itself: 401 "Invalid credentials", 429 lockout, 400 missing fields.
+    return toErrorResponse(error);
   }
-
-  // FIXME: [Stage2] Respect keepSignedIn: no maxAge (session cookie) when it is false.
-  await setSessionCookie(sessionId);
-
-  return NextResponse.json(clientUser, {
-    status: 200,
-  });
 }
