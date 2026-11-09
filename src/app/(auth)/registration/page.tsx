@@ -17,8 +17,9 @@ import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 
-// FIXME: Password requirements are not defined yet. Replace with the real rules.
-const PASSWORD_REQUIREMENTS = "[Password requirements]";
+// Mirrors the Identity Security:Password config; Identity checks the password and reports a violation itself.
+const PASSWORD_REQUIREMENTS =
+  "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.";
 
 interface RegistrationForm {
   username: string;
