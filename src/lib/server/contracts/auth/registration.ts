@@ -1,4 +1,4 @@
-/** The response is IdentityAuthResponse. Identity ignores roles and assigns Roles:Initial. */
+/** The response is IdentityAuthResponse; Identity assigns the Roles:Initial role. */
 export interface IdentityRegistrationRequest {
   username: string;
   email: string;

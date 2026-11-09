@@ -87,14 +87,14 @@ Entity types shared by the client and the server. No side effects.
 | `toQueryString.ts` | object → `URLSearchParams`; arrays as repeated keys (`tags=a&tags=b`), as ASP.NET expects |
 | `client/contracts/` | the BFF API (`/api/*`): what the browser sends and receives. Used by pages and by route handlers. `auth/loginPayload.ts`, `auth/registrationPayload.ts` |
 | `client/fetch/bffFetch.ts` | client `fetch` to BFF routes with error handling (`FetchError`) |
-| `server/contracts/` | external services, server only; names start with the service (`Identity*`, `Backend*`). `auth/login.ts` (`IdentityLoginRequest`, `IdentityAuthResponse`, `IdentityUser`), `auth/registration.ts`, `auth/logout.ts`, `auth/token.ts` (refresh) |
+| `server/contracts/` | external services, server only; names start with the service (`Identity*`, `Backend*`). `auth/login.ts` (`IdentityLoginRequest`, `IdentityAuthResponse`, `IdentityUser`), `auth/registration.ts`, `auth/logout.ts`, `auth/token.ts` (refresh), `auth/session.ts` (`IdentitySessionRequest`, `IdentitySessionResponse`: session restore) |
 | `server/apiClient.ts` | base axios client for external services |
-| `server/auth/authClient.ts` | Identity client: sign up, sign in, sign out (one session / all sessions), token refresh; forwards the client `X-Forwarded-For` |
+| `server/auth/authClient.ts` | Identity client: sign up, sign in, session restore (`auth/session`), sign out (one session / all sessions), token refresh; forwards the client `X-Forwarded-For` |
 | `server/auth/signOut.ts` | body of the sign-out routes |
 | `server/auth/authPayloads.ts` | parsing and validation of the sign-in / sign-up request bodies (the BFF repeats the page checks) |
 | `server/game/gameClient.ts` | backend games client: `getGamesPaged`, `getGame` (`Game/getGame?id=`) |
 | `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
-| `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it), `extendSession` (for `proxy.ts`), `startSession` (after login / register), `getCurrentUser` (the layout restores the user from Identity by the access token), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
+| `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it), `extendSession` (for `proxy.ts`), `startSession` (after login / register), `fetchCurrentUser` (the layout restores the user from Identity `auth/session` by the access token only, so tokens are rotated under the refresh lock), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
 | `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status. In development every error is logged (method, full upstream URL, status, response body); in production only upstream 5xx, unreachable upstreams and unexpected errors |
 | `server/logger.ts`, `withLogging.ts` | BFF request logging |
 | `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |

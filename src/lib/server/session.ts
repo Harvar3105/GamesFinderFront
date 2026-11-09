@@ -7,7 +7,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { User, type UserDTO } from "@/domain/entities/user";
 import { config } from "@/lib/config";
 import { authClient } from "@/lib/server/auth/authClient";
-import type { IdentityAuthResponse } from "@/lib/server/contracts/auth/login";
+import type { IdentityAuthResponse, IdentityUser } from "@/lib/server/contracts/auth/login";
 import { BffError, SERVER_UNAVAILABLE_MESSAGE } from "@/lib/server/errors";
 import { logger } from "@/lib/server/logger";
 import { redis } from "@/lib/server/redisClient";
@@ -62,15 +62,8 @@ export async function extendSession(sessionId: string): Promise<boolean | null> 
   return session.keepSignedIn;
 }
 
-function toUser(auth: IdentityAuthResponse): UserDTO {
-  return new User(
-    auth.user.id,
-    auth.user.createdAt,
-    auth.user.username,
-    auth.user.email,
-    auth.user.lastLogin,
-    auth.userRoles ?? [],
-  );
+function toUser({ user, roles }: { user: IdentityUser; roles: string[] }): UserDTO {
+  return new User(user.id, user.createdAt, user.username, user.email, user.lastLogin, roles);
 }
 
 export async function fetchCurrentUser(): Promise<UserDTO | null> {
@@ -80,10 +73,10 @@ export async function fetchCurrentUser(): Promise<UserDTO | null> {
   try {
     // Only the access token is sent: with a refresh token Identity would rotate the tokens itself,
     // bypassing the refresh lock.
-    const auth = await withAccessToken(sessionId, (accessToken) =>
-      authClient.login({ accessToken }),
+    const restored = await withAccessToken(sessionId, (accessToken) =>
+      authClient.session({ accessToken }),
     );
-    return toUser(auth);
+    return toUser(restored);
   } catch (error) {
     if (error instanceof BffError && error.status === 401) return null;
 
@@ -163,7 +156,7 @@ export async function refreshSession(
     const session = await getSession(sessionId);
     if (session === null || session.accessToken !== staleAccessToken) return session;
 
-    const tokens = await authClient.refresh({ refreshTokenHash: session.refreshToken });
+    const tokens = await authClient.refresh({ refreshToken: session.refreshToken });
     const refreshed: Session = {
       ...session,
       accessToken: tokens.accessToken,
@@ -173,8 +166,8 @@ export async function refreshSession(
 
     return refreshed;
   } catch (error) {
-    if (isAxiosError(error) && error.response?.status === 400) {
-      logger.warn({ msg: "Refresh token rejected, the session is closed", data: { status: 400 } });
+    if (isAxiosError(error) && error.response?.status === 401) {
+      logger.warn({ msg: "Refresh token rejected, the session is closed", data: { status: 401 } });
       await deleteSession(sessionId);
       return null;
     }

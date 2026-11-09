@@ -1,20 +1,14 @@
+/** Exactly one of username or email identifies the user. */
 export interface IdentityLoginRequest {
   username?: string;
   email?: string;
-  password?: string;
-  accessToken?: string;
-  /** FIXME: The raw refresh token: Identity keeps the old field name. */
-  refreshTokenHash?: string;
+  password: string;
 }
-// FIXME: Contracts should be rewritten on the backend first
-// Identity ResponseDTO, returned by login and register. Every endpoint fills only some of the fields,
-// the rest come as null.
-// TODO: [Stage2] Login with a refresh token returns the roles as "roles", not "userRoles"; ask Identity to unify.
+
+/** Returned by register and password login: the user, their roles and the tokens of a new session. */
 export interface IdentityAuthResponse {
   readonly user: IdentityUser;
-  /** null in the register response. */
-  readonly userRoles: string[] | null;
-  /** accessToken and refreshToken are null when signing in with an access token. */
+  readonly roles: string[];
   readonly accessToken: string;
   readonly refreshToken: string;
 }
@@ -23,6 +17,7 @@ export interface IdentityUser {
   readonly id: string;
   readonly createdAt: Date;
   readonly lastLogin: Date | null;
+  /** Nullable in the Identity UserDTO, but registration requires both, so they are always set. */
   readonly username: string;
   readonly email: string;
 }

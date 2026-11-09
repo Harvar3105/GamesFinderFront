@@ -6,6 +6,7 @@ export class Config {
   public readonly identityUri: string;
   public readonly userRegisterEndpoint: string;
   public readonly userLoginEndpoint: string;
+  public readonly userSessionEndpoint: string;
   public readonly userLogoutEndpoint: string;
   public readonly userLogoutAllEndpoint: string;
   public readonly tokenRefreshEndpoint: string;
@@ -42,6 +43,7 @@ export class Config {
     this.identityUri = process.env.IDENTITY_URI!;
     this.userRegisterEndpoint = process.env.USER_REGISTRATION!;
     this.userLoginEndpoint = process.env.USER_LOGIN!;
+    this.userSessionEndpoint = process.env.USER_SESSION!;
     this.userLogoutEndpoint = process.env.USER_LOGOUT!;
     this.userLogoutAllEndpoint = process.env.USER_LOGOUT_ALL!;
     this.tokenRefreshEndpoint = process.env.TOKEN_REFRESH!;

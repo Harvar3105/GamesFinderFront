@@ -8,6 +8,10 @@ import type { IdentityAuthResponse, IdentityLoginRequest } from "@/lib/server/co
 import type { IdentityLogoutRequest } from "@/lib/server/contracts/auth/logout";
 import type { IdentityRegistrationRequest } from "@/lib/server/contracts/auth/registration";
 import type {
+  IdentitySessionRequest,
+  IdentitySessionResponse,
+} from "@/lib/server/contracts/auth/session";
+import type {
   IdentityTokenRefreshRequest,
   IdentityTokens,
 } from "@/lib/server/contracts/auth/token";
@@ -41,6 +45,14 @@ export class AuthClient extends ApiClient {
   async login(data: IdentityLoginRequest): Promise<IdentityAuthResponse> {
     return this.post<IdentityAuthResponse, IdentityLoginRequest>(
       config.userLoginEndpoint,
+      data,
+      await identityRequestConfig(),
+    );
+  }
+
+  async session(data: IdentitySessionRequest): Promise<IdentitySessionResponse> {
+    return this.post<IdentitySessionResponse, IdentitySessionRequest>(
+      config.userSessionEndpoint,
       data,
       await identityRequestConfig(),
     );
