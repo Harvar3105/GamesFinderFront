@@ -95,7 +95,7 @@ Entity types shared by the client and the server. No side effects.
 | `server/game/gameClient.ts` | backend games client: `getGamesPaged`, `getGame` (`Game/getGame?id=`) |
 | `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
 | `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it), `extendSession` (for `proxy.ts`), `startSession` (after login / register), `getCurrentUser` (the layout restores the user from Identity by the access token), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
-| `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status |
+| `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status. In development every error is logged (method, full upstream URL, status, response body); in production only upstream 5xx, unreachable upstreams and unexpected errors |
 | `server/logger.ts`, `withLogging.ts` | BFF request logging |
 | `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |
 | `shared/authValidation.ts` | sign-in / sign-up field checks shared by the pages and the BFF: login, username, email (password rules belong to Identity) |
