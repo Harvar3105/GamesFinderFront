@@ -31,7 +31,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `page.tsx` | `/` | home page |
 | `(auth)/layout.tsx` | — | centers the sign-in / sign-up panel |
 | `catalog/page.tsx` | `/catalog` | catalog: reads `?page=` / `?perPage=` and renders `CatalogView`, which loads games from `GET /api/games` (`useQuery` + `BFFFetch`); filters, game table, pagination (`?page=`, `?perPage=`) |
-| `catalog/[id]/page.tsx` | `/catalog/<id>` | game: header image, Steam ID, original price and store link, description, offers |
+| `catalog/[id]/page.tsx` | `/catalog/<id>` | game: renders `GameView`, which loads the game from `GET /api/games/<id>` (`useQuery` + `BFFFetch`); header image, Steam ID, original price and store link, description, offers |
 | `account/page.tsx` | `/account` | account (signed-in users): section menu, profile |
 | `admin/page.tsx` | `/admin` | administration (administrators): section menu, scraping tasks |
 | `(auth)/login/page.tsx` | `/login` | sign in |
@@ -41,8 +41,9 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out: revoke the session tokens in Identity, delete the session cookie and the Redis session |
 | `api/(auth)/logout-all/route.ts` | `POST /api/logout-all` | BFF: sign out of all devices: revoke every session of the user in Identity, then as `/api/logout` |
 | `api/games/route.ts` | `GET /api/games?page=&pageSize=` | BFF: a page of games from the backend (`gameClient`) |
+| `api/games/[id]/route.ts` | `GET /api/games/<id>` | BFF: one game from the backend (`gameClient`); backend 400 / 404 pass through with their status |
 
-All pages from the mockups are implemented. The catalog loads games through the BFF; the other pages still show placeholder data (`FIXME: [StageN]`).
+All pages from the mockups are implemented. The catalog loads games through the BFF and so does the game page; the other pages still show placeholder data (`FIXME: [StageN]`).
 
 ## `src/assets` — embedded media
 
@@ -58,7 +59,7 @@ Empty for now. The logo in the new design is text set in Doto.
 | `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm), `sectionPageLayout.tsx` (closed pages: heading, section menu, content) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
-| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
+| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (`gameView.tsx`: loads the game and renders it with its offers; offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
 
@@ -91,7 +92,7 @@ Entity types shared by the client and the server. No side effects.
 | `server/auth/authClient.ts` | Identity client: sign up, sign in, sign out (one session / all sessions), token refresh; forwards the client `X-Forwarded-For` |
 | `server/auth/signOut.ts` | body of the sign-out routes |
 | `server/auth/authPayloads.ts` | parsing and validation of the sign-in / sign-up request bodies (the BFF repeats the page checks) |
-| `server/game/gameClient.ts` | backend games client |
+| `server/game/gameClient.ts` | backend games client: `getGamesPaged`, `getGame` (`Game/getGame?id=`) |
 | `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
 | `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it), `extendSession` (for `proxy.ts`), `startSession` (after login / register), `getCurrentUser` (the layout restores the user from Identity by the access token), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
 | `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status |
