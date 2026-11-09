@@ -8,22 +8,19 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-## Project rules
+## Agent Guidelines
 
-### Language
-
-- Code comments, documentation and descriptions, and all Markdown (`.md`) files must be written in English.
-
-### Comments
-
-- Do not comment obvious code (e.g. a `DEFAULT_AVATAR` constant needs no comment). Comment only what the code cannot say itself: reasons, constraints, non-obvious behavior.
-- The backend and the Identity server are the source of truth for contracts; the frontend adapts to them.
-- Planned frontend work (placeholders, mismatches with the backend contracts) is marked with `FIXME: [StageN] <comment>`; work blocked on the backend or Identity (missing endpoints, open contract questions) with `TODO: [StageN] <comment>`. `N` is the stage of the frontend migration plan.
-
-### Naming
-
-- Use descriptive names; avoid vague abbreviations (e.g. `mergeClassNames`, not `cn`).
+Rules for AI agents and contributors working in this repository.
 
 ### Project structure
 
-- See `PROJECT_STRUCTURE.md`.
+The project structure is described in [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md). Read it before starting work and keep it up to date when the structure changes.
+
+### Rules
+
+- Write comments, documentation, descriptions and Markdown files in English.
+- Do not comment obvious code whose logic speaks for itself.
+- Mark placeholders and known bugs with `FIXME: <comment>`.
+- Mark future tasks and places that require a decision with `TODO: <comment>`.
+- Use descriptive names and avoid ambiguous ones.
+
