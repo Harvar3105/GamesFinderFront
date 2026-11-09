@@ -55,10 +55,10 @@ Empty for now. The logo in the new design is text set in Doto.
 
 | folder | contents |
 | --- | --- |
-| `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
+| `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Banner` (notification banner: `notice` / `error` / `announcement`, text, optional action buttons; a click on the banner itself closes it), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
 | `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm), `sectionPageLayout.tsx` (closed pages: heading, section menu, content) |
-| `providers/` | React contexts: `theme/` (theme and switcher), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
+| `providers/` | React contexts: `theme/` (theme and switcher), `notificationProvider.tsx` (`useNotifications().notify({ type, text, actions?, durationMs? })`: banners stacked at the top of the window; without `durationMs` a banner stays until closed), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
 | `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (`gameView.tsx`: loads the game and renders it with its offers; offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
@@ -119,7 +119,7 @@ Tailwind's default colors, radii, shadows, fonts and breakpoints are disabled: o
 
 | what | utilities |
 | --- | --- |
-| colors | `bg-background`, `bg-container`, `bg-component`, `bg-element`, `bg-primary`, `text-text`, `text-error` / `border-error`, `bg-error-bg`, `bg-component-hover`, `bg-row-hover` |
+| colors | `bg-background`, `bg-container`, `bg-component`, `bg-element`, `bg-primary`, `text-text`, `text-error` / `border-error`, `bg-error-bg`, `bg-error-subtle-bg`, `notice` / `bg-notice-bg`, `announcement` / `bg-announcement-bg` (banners), `bg-component-hover`, `bg-row-hover` |
 | spacing | `*-related-xs/sm/md/lg`, `*-attention-sm/md/lg`, `*-edge-x`, `*-edge-y` (values depend on the window width) |
 | radii | `rounded-sm` 8px, `rounded-md` 12px, `rounded-full` |
 | shadow | `shadow-container` |

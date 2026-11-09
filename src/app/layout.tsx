@@ -5,6 +5,7 @@ import { fontVariables } from "./fonts";
 import Header from "@/components/layouts/header";
 import Footer from "@/components/layouts/footer";
 import ThemeProvider from "@/components/providers/theme/themeProvider";
+import NotificationProvider from "@/components/providers/notificationProvider";
 import QueryProvider from "@/components/providers/queryProvider";
 import UserProvider from "@/components/providers/userProvider";
 import { ETheme } from "@/domain/entities/enums/ETheme";
@@ -28,13 +29,15 @@ export default async function RootLayout({
     <html lang="en" data-theme={initialTheme} className={fontVariables}>
       <body className="flex min-h-screen flex-col">
         <ThemeProvider initialTheme={initialTheme}>
-          <QueryProvider>
-            <UserProvider clientUser={sessionUser}>
-              <Header />
-              <main className="flex w-full flex-1 flex-col">{children}</main>
-              <Footer />
-            </UserProvider>
-          </QueryProvider>
+          <NotificationProvider>
+            <QueryProvider>
+              <UserProvider clientUser={sessionUser}>
+                <Header />
+                <main className="flex w-full flex-1 flex-col">{children}</main>
+                <Footer />
+              </UserProvider>
+            </QueryProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>
