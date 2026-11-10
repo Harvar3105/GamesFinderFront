@@ -30,6 +30,10 @@ interface BannerProps {
   className?: string;
 }
 
+// TODO: Build a persistent notification system. Banners are transient and disappear once dismissed.
+//  Add a button to the interface that shows the user their recent notifications.
+//  Requires a separate database or table to store notifications.
+
 // Clicking the banner itself closes it; clicks on its buttons do not.
 export default function Banner({ type, text, actions, onDismiss, className }: BannerProps) {
   const style = STYLES[type];
