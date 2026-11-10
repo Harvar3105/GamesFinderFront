@@ -16,12 +16,29 @@ import type {
   IdentityTokens,
 } from "@/lib/server/contracts/auth/token";
 
+// The incoming X-Forwarded-For is client-controlled: Next.js fills it with the socket address only when it
+// is absent. In production the BFF must be reachable only through a reverse proxy that overwrites X-Real-IP
+// with the peer address (nginx: `proxy_set_header X-Real-IP $remote_addr;`).
+// TODO: Set up an edge reverse proxy on the hosting (TLS, X-Real-IP overwrite, no direct access to the BFF),
+// until then production requests reach Identity without the client IP.
+async function resolveClientIp(): Promise<string | undefined> {
+  const requestHeaders = await headers();
+
+  const realIp = requestHeaders.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+
+  // Without a proxy (development) the rightmost entry is the one appended closest to the BFF.
+  if (process.env.NODE_ENV !== "production") {
+    return requestHeaders.get("x-forwarded-for")?.split(",").pop()?.trim() || undefined;
+  }
+
+  return undefined;
+}
+
 // Identity rate-limits /api/auth/* per IP, and every request comes from the BFF IP, so the client IP is
-// forwarded in X-Forwarded-For. Next.js fills the header with the socket address only when it is absent,
-// so in production the BFF must sit behind a reverse proxy that sets it; otherwise a client can spoof it.
-// TODO: [Stage2] Identity must enable ForwardedHeaders and trust only the BFF, until then all users share one limit.
+// forwarded as a single X-Forwarded-For value rather than the incoming chain.
 async function identityRequestConfig(accessToken?: string): Promise<AxiosRequestConfig> {
-  const clientIp = (await headers()).get("x-forwarded-for");
+  const clientIp = await resolveClientIp();
   const requestHeaders: Record<string, string> = {};
   if (clientIp) requestHeaders["X-Forwarded-For"] = clientIp;
   if (accessToken) requestHeaders.Authorization = `Bearer ${accessToken}`;
