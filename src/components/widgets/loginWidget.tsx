@@ -1,44 +1,16 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import { usePathname, useRouter } from "next/navigation";
-import { isServerError, readErrorMessage } from "@/components/helpers/fetchErrors";
+import { usePathname } from "next/navigation";
+import { useSignOut } from "@/components/hooks/useSignOut";
 import { isAdmin } from "@/components/helpers/userRoles";
-import { useNotifications } from "@/components/providers/notificationProvider";
 import { useUser } from "@/components/providers/userProvider";
 import { Avatar, Badge, Button, ButtonLink } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
-import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
 
 export default function LoginWidget() {
-  const { user, isLoggedIn, logout } = useUser();
-  const { notify } = useNotifications();
+  const { user, isLoggedIn } = useUser();
   const pathname = usePathname();
-  const router = useRouter();
-
-  const mutation = useMutation<unknown, FetchError>({
-    mutationFn: () => BFFFetch({ uri: "/api/logout", method: "POST" }),
-    onSuccess: () => {
-      logout();
-      router.replace(NavPages.home);
-    },
-    onError: (error) =>
-      notify({
-        type: "error",
-        text: isServerError(error)
-          ? "We couldn’t reach the server, so you are still signed in. Please try again."
-          : readErrorMessage(error),
-        actions: [
-          {
-            label: "Try again",
-            onClick: (dismiss) => {
-              dismiss();
-              mutation.mutate();
-            },
-          },
-        ],
-      }),
-  });
+  const signOut = useSignOut();
 
   // `!user` narrows the type for the code below; isLoggedIn() is the source of truth.
   if (!isLoggedIn() || !user) {
@@ -65,7 +37,7 @@ export default function LoginWidget() {
         {user.username}
       </ButtonLink>
       {isAdmin(user) && <Badge>admin</Badge>}
-      <Button variant="secondary" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+      <Button variant="secondary" onClick={() => signOut.mutate()} disabled={signOut.isPending}>
         Sign out
       </Button>
     </>

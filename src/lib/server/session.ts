@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { randomBytes, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 import { User, type UserDTO } from "@/domain/entities/user";
+import type SessionStatus from "@/lib/client/contracts/auth/sessionStatus";
 import { config } from "@/lib/config";
 import { authClient } from "@/lib/server/auth/authClient";
 import type { IdentityAuthResponse, IdentityUser } from "@/lib/server/contracts/auth/login";
@@ -19,7 +20,7 @@ export interface Session {
 }
 
 export const SESSION_COOKIE = "sessionId";
-const SESSION_EXPIRED_MESSAGE = "Your session has expired, please sign in again.";
+export const SESSION_EXPIRED_MESSAGE = "Your session has expired, please sign in again.";
 
 const REFRESH_LOCK_MS = 10_000;
 const REFRESH_WAIT_STEP_MS = 100;
@@ -60,6 +61,21 @@ export async function extendSession(sessionId: string): Promise<boolean | null> 
   await redis.expire(sessionKey(sessionId), sessionTtlSeconds(session));
 
   return session.keepSignedIn;
+}
+
+/** Reads the remaining lifetime without extending it. Returns null when the session no longer exists. */
+export async function getSessionStatus(sessionId: string): Promise<SessionStatus | null> {
+  const session = await getSession(sessionId);
+  if (session === null) return null;
+
+  const expiresInSeconds = await redis.ttl(sessionKey(sessionId));
+  if (expiresInSeconds < 0) return null;
+
+  return {
+    keepSignedIn: session.keepSignedIn,
+    expiresInSeconds,
+    warnBeforeExpirySeconds: config.sessionShortTtlSeconds - config.sessionShortNotifyTtlSeconds,
+  };
 }
 
 function toUser({ user, roles }: { user: IdentityUser; roles: string[] }): UserDTO {

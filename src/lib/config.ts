@@ -36,6 +36,8 @@ export class Config {
 
   /** Session lifetime without "Remember me": the cookie maxAge and the Redis TTL, extended on every request. */
   public readonly sessionShortTtlSeconds: number;
+  /** Inactivity after which a short session warns the user that it is about to expire; less than the short TTL. */
+  public readonly sessionShortNotifyTtlSeconds: number;
   /** Session lifetime with "Remember me", extended the same way. */
   public readonly sessionPersistentTtlSeconds: number;
 
@@ -72,6 +74,14 @@ export class Config {
     this.redisDB = Number.parseInt(process.env.REDIS_DATABASE!);
 
     this.sessionShortTtlSeconds = readPositiveInt("SESSION_SHORT_TTL_SECONDS", 60 * 30);
+    const notifyTtlSeconds = readPositiveInt(
+      "SESSION_SHORT_NOTIFY_TTL_SECONDS",
+      this.sessionShortTtlSeconds - 60 * 5,
+    );
+    this.sessionShortNotifyTtlSeconds =
+      notifyTtlSeconds < this.sessionShortTtlSeconds
+        ? notifyTtlSeconds
+        : Math.floor(this.sessionShortTtlSeconds * 0.8);
     this.sessionPersistentTtlSeconds = readPositiveInt(
       "SESSION_PERSISTENT_TTL_SECONDS",
       60 * 60 * 24 * 30,

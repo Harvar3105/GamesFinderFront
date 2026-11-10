@@ -8,6 +8,7 @@ import ThemeProvider from "@/components/providers/theme/themeProvider";
 import NotificationProvider from "@/components/providers/notificationProvider";
 import QueryProvider from "@/components/providers/queryProvider";
 import UserProvider from "@/components/providers/userProvider";
+import SessionExpiryWatcher from "@/components/widgets/sessionExpiryWatcher";
 import { ETheme } from "@/domain/entities/enums/ETheme";
 import { fetchCurrentUser } from "@/lib/server/session";
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
           <NotificationProvider>
             <QueryProvider>
               <UserProvider clientUser={sessionUser}>
+                <SessionExpiryWatcher />
                 <Header />
                 <main className="flex w-full flex-1 flex-col">{children}</main>
                 <Footer />
