@@ -1,5 +1,6 @@
 import Entity from "./entity";
 
+// FIXME: [Stage2.5] Rewrite user system. Remove unnecessary fields. DTO for client.
 export type UserDTO = Omit<User, "identity">;
 
 export class User extends Entity {

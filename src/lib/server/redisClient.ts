@@ -85,6 +85,13 @@ export class RedisClient {
     return (await this.client.exists(key)) === 1;
   }
 
+  /** Seconds until the key expires: -1 when it has no expiration, -2 when it does not exist. */
+  async ttl(key: string): Promise<number> {
+    await this.connect();
+
+    return this.client.ttl(key);
+  }
+
   async expire(key: string, seconds: number): Promise<void> {
     await this.connect();
 

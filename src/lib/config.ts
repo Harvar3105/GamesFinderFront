@@ -6,6 +6,9 @@ export class Config {
   public readonly identityUri: string;
   public readonly userRegisterEndpoint: string;
   public readonly userLoginEndpoint: string;
+  public readonly userSessionEndpoint: string;
+  public readonly userLogoutEndpoint: string;
+  public readonly userLogoutAllEndpoint: string;
   public readonly tokenRefreshEndpoint: string;
   public readonly tokenValidateEndpoint: string;
 
@@ -31,10 +34,20 @@ export class Config {
   public readonly redisPassword: string;
   public readonly redisDB: number;
 
+  /** Session lifetime without "Remember me": the cookie maxAge and the Redis TTL, extended on every request. */
+  public readonly sessionShortTtlSeconds: number;
+  /** Inactivity after which a short session warns the user that it is about to expire; less than the short TTL. */
+  public readonly sessionShortNotifyTtlSeconds: number;
+  /** Session lifetime with "Remember me", extended the same way. */
+  public readonly sessionPersistentTtlSeconds: number;
+
   constructor() {
     this.identityUri = process.env.IDENTITY_URI!;
     this.userRegisterEndpoint = process.env.USER_REGISTRATION!;
     this.userLoginEndpoint = process.env.USER_LOGIN!;
+    this.userSessionEndpoint = process.env.USER_SESSION!;
+    this.userLogoutEndpoint = process.env.USER_LOGOUT!;
+    this.userLogoutAllEndpoint = process.env.USER_LOGOUT_ALL!;
     this.tokenRefreshEndpoint = process.env.TOKEN_REFRESH!;
     this.tokenValidateEndpoint = process.env.TOKEN_VALIDATE!;
 
@@ -59,7 +72,26 @@ export class Config {
     this.redisPort = Number.parseInt(process.env.REDIS_PORT!);
     this.redisPassword = process.env.REDIS_PASSWORD!;
     this.redisDB = Number.parseInt(process.env.REDIS_DATABASE!);
+
+    this.sessionShortTtlSeconds = readPositiveInt("SESSION_SHORT_TTL_SECONDS", 60 * 30);
+    const notifyTtlSeconds = readPositiveInt(
+      "SESSION_SHORT_NOTIFY_TTL_SECONDS",
+      this.sessionShortTtlSeconds - 60 * 5,
+    );
+    this.sessionShortNotifyTtlSeconds =
+      notifyTtlSeconds < this.sessionShortTtlSeconds
+        ? notifyTtlSeconds
+        : Math.floor(this.sessionShortTtlSeconds * 0.8);
+    this.sessionPersistentTtlSeconds = readPositiveInt(
+      "SESSION_PERSISTENT_TTL_SECONDS",
+      60 * 60 * 24 * 30,
+    );
   }
+}
+
+function readPositiveInt(name: string, fallback: number): number {
+  const value = Number(process.env[name]);
+  return Number.isInteger(value) && value > 0 ? value : fallback;
 }
 
 export const config = new Config();

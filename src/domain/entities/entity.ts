@@ -1,3 +1,4 @@
+// TODO: Looks like no reason to make Entity as class. Refer as Data Model instead. Declare as interface.
 export default class Entity {
   public id: string;
   public createdAt: Date;

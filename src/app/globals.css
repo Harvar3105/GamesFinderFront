@@ -40,6 +40,13 @@
   --error: #e50000;
   --error-bg: #ef6666;
 
+  /* Notification banners (Banner) always render with the light theme, so they have no dark values. */
+  --error-subtle-bg: #fde2e2;
+  --notice: #1565c0;
+  --notice-bg: #dceafb;
+  --announcement: #1e7d34;
+  --announcement-bg: #dcf3e2;
+
   --shadow-color: rgba(53, 49, 72, 0.3);
 
   /* Derived states (README «Компоненты и состояния»). */
@@ -237,6 +244,11 @@
   --color-text: var(--text);
   --color-error: var(--error);
   --color-error-bg: var(--error-bg);
+  --color-error-subtle-bg: var(--error-subtle-bg);
+  --color-notice: var(--notice);
+  --color-notice-bg: var(--notice-bg);
+  --color-announcement: var(--announcement);
+  --color-announcement-bg: var(--announcement-bg);
   --color-component-hover: var(--component-hover);
   --color-row-hover: var(--row-hover);
 

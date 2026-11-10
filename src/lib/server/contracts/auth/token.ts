@@ -1,6 +1,5 @@
 export interface IdentityTokenRefreshRequest {
-  /** The raw refresh token: Identity keeps the old field name. */
-  refreshTokenHash: string;
+  refreshToken: string;
 }
 
 export interface IdentityTokens {

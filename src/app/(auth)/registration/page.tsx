@@ -5,13 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CONTACT_EMAIL_HREF } from "@/config/externalLinks";
-import {
-  hasErrors,
-  INVALID_EMAIL_MESSAGE,
-  isValidEmail,
-} from "@/components/helpers/authValidations";
+import { hasErrors } from "@/components/helpers/authValidations";
+import { USERNAME_MAX_LENGTH, validateEmail, validateUsername } from "@/lib/shared/authValidation";
 import { useUser } from "@/components/providers/userProvider";
-import { Button, Field, Input } from "@/components/ui";
+import { Button, Checkbox, Field, Input } from "@/components/ui";
 import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
 import AuthPanel from "@/components/widgets/authPanel";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
@@ -20,8 +17,9 @@ import { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 
-// FIXME: Password requirements are not defined yet. Replace with the real rules.
-const PASSWORD_REQUIREMENTS = "[Password requirements]";
+// Mirrors the Identity Security:Password config; Identity checks the password and reports a violation itself.
+const PASSWORD_REQUIREMENTS =
+  "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.";
 
 interface RegistrationForm {
   username: string;
@@ -33,16 +31,9 @@ interface RegistrationForm {
 type RegistrationErrors = Partial<Record<keyof RegistrationForm, string>>;
 
 function validate(form: RegistrationForm): RegistrationErrors {
-  const username = form.username.trim();
-  const email = form.email.trim();
-
   return {
-    username: !username
-      ? "Enter a username."
-      : username.includes("@") || username.includes(".")
-        ? "Username can’t contain “@” or “.”."
-        : undefined,
-    email: !email ? "Enter your email." : !isValidEmail(email) ? INVALID_EMAIL_MESSAGE : undefined,
+    username: validateUsername(form.username.trim()),
+    email: validateEmail(form.email.trim()),
     password: form.password ? undefined : "Enter a password.",
     confirmPassword:
       form.password && form.password !== form.confirmPassword
@@ -60,6 +51,7 @@ export default function RegistrationPage() {
   const [signedInOnOpen] = useState(isLoggedIn);
 
   const [form, setForm] = useState<RegistrationForm>(EMPTY_FORM);
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [errors, setErrors] = useState<RegistrationErrors>({});
 
   const mutation = useMutation<User, FetchError, RegistrationPayload>({
@@ -93,8 +85,7 @@ export default function RegistrationPage() {
       username: form.username.trim(),
       email: form.email.trim(),
       password: form.password,
-      // FIXME: [Stage2] Add a "Keep me signed in" checkbox like on the sign-in page.
-      keepSignedIn: false,
+      keepSignedIn,
     });
   };
 
@@ -128,7 +119,7 @@ export default function RegistrationPage() {
             id="reg-username"
             type="text"
             autoComplete="username"
-            maxLength={128}
+            maxLength={USERNAME_MAX_LENGTH}
             value={form.username}
             onChange={update("username")}
             invalid={Boolean(errors.username)}
@@ -180,6 +171,11 @@ export default function RegistrationPage() {
             aria-describedby={describedBy("confirmPassword")}
           />
         </Field>
+        <Checkbox
+          label="Remember me"
+          checked={keepSignedIn}
+          onChange={(e) => setKeepSignedIn(e.target.checked)}
+        />
       </div>
 
       <div className="flex flex-col gap-related-md">

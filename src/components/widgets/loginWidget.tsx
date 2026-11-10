@@ -1,26 +1,16 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useSignOut } from "@/components/hooks/useSignOut";
 import { isAdmin } from "@/components/helpers/userRoles";
 import { useUser } from "@/components/providers/userProvider";
 import { Avatar, Badge, Button, ButtonLink } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
-import BFFFetch from "@/lib/client/fetch/bffFetch";
 
 export default function LoginWidget() {
-  const { user, isLoggedIn, logout } = useUser();
+  const { user, isLoggedIn } = useUser();
   const pathname = usePathname();
-  const router = useRouter();
-
-  const mutation = useMutation({
-    mutationFn: () => BFFFetch({ uri: "/api/logout", method: "POST" }),
-    onSuccess: () => {
-      logout();
-      router.replace(NavPages.home);
-    },
-    // TODO: On error show a notification. Notification widgets are not implemented yet.
-  });
+  const signOut = useSignOut();
 
   // `!user` narrows the type for the code below; isLoggedIn() is the source of truth.
   if (!isLoggedIn() || !user) {
@@ -47,7 +37,7 @@ export default function LoginWidget() {
         {user.username}
       </ButtonLink>
       {isAdmin(user) && <Badge>admin</Badge>}
-      <Button variant="secondary" onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+      <Button variant="secondary" onClick={() => signOut.mutate()} disabled={signOut.isPending}>
         Sign out
       </Button>
     </>

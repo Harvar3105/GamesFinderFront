@@ -1,13 +1,38 @@
+import Entity from "./entity";
+import { ECurrency } from "./enums/ECurrency";
 import type { EVendor } from "./enums/EVendor";
 
-// TODO: Check the fields against the backend offer contract.
-export interface Offer {
-  id: string;
-  vendor: EVendor;
-  price: number;
-  /** ISO 4217 code, e.g. "EUR". */
-  currency: string;
-  /** Product page on the vendor's site. */
-  url: string;
-  updatedAt: Date | string;
+export class Offer extends Entity {
+  public gameId: string;
+  public vendorsGameId: string;
+  public vendor: EVendor;
+  public vendorsUrl: string;
+  public available: boolean;
+  public amount: number | null;
+  public currency: ECurrency | null;
+  public offerName: string;
+
+  constructor(
+    id: string,
+    createdAt: Date,
+    updatedAt: Date | undefined,
+    gameId: string,
+    vendorsGameId: string,
+    vendor: EVendor,
+    vendorsUrl: string,
+    available: boolean,
+    offerName: string,
+    amount?: number,
+    currency?: ECurrency,
+  ) {
+    super(id, createdAt, updatedAt);
+    this.gameId = gameId;
+    this.vendorsGameId = vendorsGameId;
+    this.vendor = vendor;
+    this.vendorsUrl = vendorsUrl;
+    this.available = available;
+    this.amount = amount ?? null;
+    this.currency = currency ?? null;
+    this.offerName = offerName;
+  }
 }

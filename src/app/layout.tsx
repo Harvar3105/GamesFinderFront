@@ -5,9 +5,12 @@ import { fontVariables } from "./fonts";
 import Header from "@/components/layouts/header";
 import Footer from "@/components/layouts/footer";
 import ThemeProvider from "@/components/providers/theme/themeProvider";
+import NotificationProvider from "@/components/providers/notificationProvider";
 import QueryProvider from "@/components/providers/queryProvider";
 import UserProvider from "@/components/providers/userProvider";
+import SessionExpiryWatcher from "@/components/widgets/sessionExpiryWatcher";
 import { ETheme } from "@/domain/entities/enums/ETheme";
+import { fetchCurrentUser } from "@/lib/server/session";
 
 export const metadata: Metadata = {
   title: "Games Finder",
@@ -21,19 +24,22 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const initialTheme = cookieStore.get("theme")?.value === ETheme.DARK ? ETheme.DARK : ETheme.LIGHT;
-  // FIXME: [Stage2] Read the session by the sessionId cookie and pass its user to UserProvider instead of null.
+  const sessionUser = await fetchCurrentUser();
 
   return (
     <html lang="en" data-theme={initialTheme} className={fontVariables}>
       <body className="flex min-h-screen flex-col">
         <ThemeProvider initialTheme={initialTheme}>
-          <QueryProvider>
-            <UserProvider clientUser={null}>
-              <Header />
-              <main className="flex w-full flex-1 flex-col">{children}</main>
-              <Footer />
-            </UserProvider>
-          </QueryProvider>
+          <NotificationProvider>
+            <QueryProvider>
+              <UserProvider clientUser={sessionUser}>
+                <SessionExpiryWatcher />
+                <Header />
+                <main className="flex w-full flex-1 flex-col">{children}</main>
+                <Footer />
+              </UserProvider>
+            </QueryProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -5,11 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CONTACT_EMAIL_HREF } from "@/config/externalLinks";
-import {
-  hasErrors,
-  INVALID_EMAIL_MESSAGE,
-  isValidEmail,
-} from "@/components/helpers/authValidations";
+import { hasErrors } from "@/components/helpers/authValidations";
+import { validateLogin } from "@/lib/shared/authValidation";
 import { useUser } from "@/components/providers/userProvider";
 import { Button, Checkbox, Field, Input } from "@/components/ui";
 import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
@@ -26,13 +23,8 @@ interface LoginErrors {
 }
 
 function validate(login: string, password: string): LoginErrors {
-  const trimmed = login.trim();
   return {
-    login: !trimmed
-      ? "Enter your email or username."
-      : trimmed.includes("@") && !isValidEmail(trimmed)
-        ? INVALID_EMAIL_MESSAGE
-        : undefined,
+    login: validateLogin(login.trim()),
     password: password ? undefined : "Enter your password.",
   };
 }
