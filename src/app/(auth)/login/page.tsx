@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import { BffRoutes } from "@/config/bffRoutes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { Button, Checkbox, Field, Input } from "@/components/ui";
 import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
 import AuthPanel from "@/components/widgets/authPanel";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 import LoginPayload from "@/lib/client/contracts/auth/loginPayload";
@@ -43,7 +44,7 @@ export default function LoginPage() {
   const mutation = useMutation<User, FetchError, LoginPayload>({
     mutationFn: (data) =>
       BFFFetch<User, LoginPayload>({
-        uri: "/api/login",
+        uri: BffRoutes.login,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: data,

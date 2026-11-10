@@ -42,6 +42,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/logout-all/route.ts` | `POST /api/logout-all` | BFF: sign out of all devices: revoke every session of the user in Identity, then as `/api/logout` |
 | `api/(auth)/session/route.ts` | `GET` / `POST /api/session` | BFF: `GET` returns the remaining lifetime of the session (`SessionStatus`) without extending it; `POST` extends it ("Stay signed in"). 401 when the session is gone. Skipped by `proxy.ts` |
 | `api/games/route.ts` | `GET /api/games?page=&pageSize=` | BFF: a page of games from the backend (`gameClient`) |
+| `api/profilePicture/[userId]/route.ts` | `GET /api/profilePicture/<userId>` | BFF: anonymous proxy to the Identity profile picture; passes `If-None-Match` / `ETag` through (304); when the user has no picture, redirects to `DEFAULT_AVATAR` (302, not stored). Skipped by `proxy.ts` |
 | `api/games/[id]/route.ts` | `GET /api/games/<id>` | BFF: one game from the backend (`gameClient`); backend 400 / 404 pass through with their status |
 
 All pages from the mockups are implemented. The catalog loads games through the BFF and so does the game page; the other pages still show placeholder data (`FIXME: [StageN]`).
@@ -56,7 +57,7 @@ Empty for now. The logo in the new design is text set in Doto.
 
 | folder | contents |
 | --- | --- |
-| `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Banner` (notification banner: `notice` / `error` / `announcement`, text, optional action buttons; a click on the banner itself closes it), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a `UserDTO`), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
+| `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Banner` (notification banner: `notice` / `error` / `announcement`, text, optional action buttons; a click on the banner itself closes it), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a user id and loads `/api/profilePicture/<id>`; stateless, the BFF serves the default picture), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
 | `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
 | `hooks/` | shared hooks: `useSignOut` (sign-out mutation: `POST /api/logout`, clears the user, goes home; a failure shows a banner with a retry) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm), `sectionPageLayout.tsx` (closed pages: heading, section menu, content) |
@@ -67,17 +68,19 @@ Components from the mockups are added here during the redesign: buttons, inputs,
 
 ## `src/domain` — entities
 
-Entity types shared by the client and the server. No side effects.
+Data models shared by the client and the server, declared as interfaces / types (no classes, no side effects). Dates are ISO 8601 strings, as they come over JSON.
 
 | path | purpose |
 | --- | --- |
-| `entities/` | entities: `Entity` (base: id, dates), `User`, `UserData`, `UserDTO`, `Game` / `GameStoreMetadata`, `Offer`, `ScrapingTask`; `enums/ETheme` (`light` / `dark`), `enums/ECurrency`, `enums/EVendor` (offer vendors: Steam, InstantGaming, G2A) |
+| `entities/` | `Entity` (base of the backend entities: id, dates), `User` (the Identity account and its roles; the profile picture is stored in Identity and loaded by the user id), `UserData` / `WishlistItem` (backend user data), `Game` / `GameStoreMetadata`, `Offer`, `ScrapingTask`; `enums/ETheme` (`light` / `dark`), `enums/ECurrency`, `enums/EVendor` (offer vendors: Steam, InstantGaming, G2A), `enums/EWishlistSyncStatus` |
 
 ## `src/config` — app-wide constants
 
 | path | purpose |
 | --- | --- |
 | `navPages.tsx` | page URLs: `/`, `/catalog`, `/catalog/[id]` (`NavPages.game(id)`), `/account`, `/admin`, `/login`, `/registration` |
+| `assets.ts` | `DEFAULT_AVATAR` (`/pfp.jpg`) |
+| `bffRoutes.ts` | BFF routes the browser calls (`BffRoutes.login`, `BffRoutes.game(id)`, `BffRoutes.profilePicture(userId)` …); client code takes `/api/*` paths only from here |
 | `externalLinks.ts` | external links: `GITHUB_URL`, `CONTACT_EMAIL_HREF` |
 | `pagination.ts` | `PAGE_SIZE_OPTIONS` |
 
@@ -94,6 +97,7 @@ Entity types shared by the client and the server. No side effects.
 | `server/auth/authClient.ts` | Identity client: sign up, sign in, session restore (`auth/session`), sign out (one session / all sessions), token refresh; forwards the client `X-Forwarded-For` |
 | `server/auth/signOut.ts` | body of the sign-out routes |
 | `server/auth/authPayloads.ts` | parsing and validation of the sign-in / sign-up request bodies (the BFF repeats the page checks) |
+| `server/profilePicture/profilePictureClient.ts` | Identity profile pictures client: `getPicture` (anonymous GET with the ETag) |
 | `server/game/gameClient.ts` | backend games client: `getGamesPaged`, `getGame` (`Game/getGame?id=`) |
 | `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
 | `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it; `SESSION_SHORT_NOTIFY_TTL_SECONDS`, default 5 min less than the short TTL: inactivity after which the client warns about expiry), `extendSession` (for `proxy.ts` and `POST /api/session`), `getSessionStatus` (remaining TTL without extending), `startSession` (after login / register), `fetchCurrentUser` (the layout restores the user from Identity `auth/session` by the access token only, so tokens are rotated under the refresh lock), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
@@ -107,7 +111,7 @@ Entity types shared by the client and the server. No side effects.
 
 | folder | boundary | imported by | names |
 | --- | --- | --- | --- |
-| `lib/client/contracts/` | browser ↔ BFF (`/api/*`) | pages, components, route handlers | `*Payload` for requests; responses are entities (e.g. `UserDTO`) |
+| `lib/client/contracts/` | browser ↔ BFF (`/api/*`) | pages, components, route handlers | `*Payload` for requests; responses are entities (e.g. `User`) |
 | `lib/server/contracts/` | BFF ↔ Identity / backend | `lib/server` and route handlers only | prefixed with the service: `Identity*`, `Backend*` |
 | `lib/shared/contracts/` | both, when the shapes are identical | everyone | plain names (`GamesPagedRequest`) |
 
@@ -136,7 +140,7 @@ The BFF is the server side of this Next.js app, not a separate service: `next de
 
 - **Route handlers** (`src/app/api/**/route.ts`) are the BFF entry points. Each one is a public HTTP endpoint; its exported `GET` / `POST` functions handle the request. The browser reaches the BFF only through them.
 - **Server Components** (pages and layouts without `"use client"`) render on the server and may call `lib/server` directly, without HTTP (e.g. `layout.tsx` reads cookies).
-- **`proxy.ts`** (formerly `middleware`, `src/proxy.ts`) runs before every matched route; at most one per project. It extends the session (Redis TTL and cookie maxAge) on every request except static files, the sign-in / sign-up / sign-out routes and `/api/session`.
+- **`proxy.ts`** (formerly `middleware`, `src/proxy.ts`) runs before every matched route; at most one per project. It extends the session (Redis TTL and cookie maxAge) on every request except static files, the sign-in / sign-up / sign-out routes, `/api/session` and `/api/profilePicture`.
 
 Server-only code is `src/app/api/**`, `src/lib/server/**` and `src/lib/config.ts`. These modules start with `import "server-only"`, so importing one into a client component fails the build. The browser never sees the Identity and backend addresses, tokens or Redis: only `/api/*` and the httpOnly `sessionId` cookie.
 
@@ -148,6 +152,7 @@ Browser (components with "use client")
                                               │ request types: lib/client/contracts, lib/shared/contracts
                                               ├─ lib/server/session.ts       session, cookie, token refresh
                                               ├─ lib/server/auth/authClient ─► Identity service
+                                              ├─ lib/server/profilePicture  ─► Identity (profile pictures)
                                               ├─ lib/server/game/gameClient ─► backend
                                               ├─ lib/server/backendClient   ─► backend (Bearer token)
                                               ├─ lib/server/redisClient     ─► Redis (sessions)

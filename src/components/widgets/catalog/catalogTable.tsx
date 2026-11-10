@@ -61,14 +61,14 @@ export default function CatalogTable({ games }: { games: Game[] }) {
                   : formatPrice(game.initialPrice, game.initialCurrency)}
               </TableCell>
               <TableCell className="text-right font-code font-semibold whitespace-nowrap">
-                {lowestOffer === null ? "—" : formatPrice(lowestOffer.price, lowestOffer.currency)}
+                {lowestOffer === null || lowestOffer.amount === null
+                  ? "—"
+                  : formatPrice(lowestOffer.amount, lowestOffer.currency!)}
               </TableCell>
               <TableCell>
                 <SourceChips sources={(game.offers ?? []).map((offer) => offer.vendor)} />
               </TableCell>
-              <TableCell className="whitespace-nowrap">
-                {formatTimeAgo(game.updatedAt ?? game.createdAt)}
-              </TableCell>
+              <TableCell className="whitespace-nowrap">{formatTimeAgo(game.updatedAt)}</TableCell>
             </tr>
           );
         })}

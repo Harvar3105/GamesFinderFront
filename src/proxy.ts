@@ -27,7 +27,7 @@ export const config = {
   matcher: [
     // Static files are skipped. The auth routes set or delete the cookie themselves, and a second
     // Set-Cookie from here would conflict with theirs. GET api/session reads the remaining lifetime,
-    // so it must not extend the session.
-    "/((?!_next/static|_next/image|favicon.ico|pfp.jpg|api/login|api/registration|api/logout|api/session).*)",
+    // so it must not extend the session. Profile pictures are anonymous images, not user activity.
+    "/((?!_next/static|_next/image|favicon.ico|pfp.jpg|api/profilePicture|api/login|api/registration|api/logout|api/session).*)",
   ],
 };

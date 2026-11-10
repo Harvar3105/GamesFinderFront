@@ -1,8 +1,7 @@
 import Image from "next/image";
-import type { UserDTO } from "@/domain/entities/user";
 import { mergeClassNames } from "@/components/helpers/mergeClassNames";
-
-export const DEFAULT_AVATAR = "/pfp.jpg";
+import { DEFAULT_AVATAR } from "@/config/assets";
+import { BffRoutes } from "@/config/bffRoutes";
 
 type AvatarSize = "sm" | "md" | "lg";
 
@@ -12,26 +11,20 @@ const sizes: Record<AvatarSize, { px: number; className: string }> = {
   lg: { px: 72, className: "size-18" },
 };
 
-// FIXME: [Stage5] Identity serves profile pictures (GET profilePicture/{userId}, ETag). Load them through a BFF
-// proxy route by user id, fall back to DEFAULT_AVATAR on 404, and drop the data: URI.
-function avatarSource(user?: UserDTO | null): string {
-  const content = user?.data?.pfpContent;
-  const extension = user?.data?.pfpExtension?.replace(/^\./, "");
-
-  if (!content || !extension) return DEFAULT_AVATAR;
-
-  return `data:image/${extension};base64,${content}`;
-}
-
 interface AvatarProps {
-  user?: UserDTO | null;
+  /** The picture is loaded by the user id; the BFF serves DEFAULT_AVATAR when the user has no picture. */
+  userId?: string | null;
   /** Leave empty when the user's name is shown next to the avatar. */
   alt?: string;
   size?: AvatarSize;
   className?: string;
 }
 
-export default function Avatar({ user, alt = "", size = "sm", className }: AvatarProps) {
+// FIXME: [Stage5] The URL does not change after the picture is uploaded or deleted, so open avatars keep the
+// old one until a reload. Add a profile picture provider with a version per user id (the upload's contentHash)
+// and a hook to bump it after upload / delete; the avatar appends the version to the URL (?v=), which
+// requests the new picture past the browser cache.
+export default function Avatar({ userId, alt = "", size = "sm", className }: AvatarProps) {
   const { px, className: sizeClass } = sizes[size];
 
   return (
@@ -43,11 +36,11 @@ export default function Avatar({ user, alt = "", size = "sm", className }: Avata
       )}
     >
       <Image
-        src={avatarSource(user)}
+        src={userId ? BffRoutes.profilePicture(userId) : DEFAULT_AVATAR}
         alt={alt}
         width={px}
         height={px}
-        // The image optimizer does not process data: URIs.
+        // The picture is revalidated by its ETag through the BFF; the optimizer would cache it under its own rules.
         unoptimized
         className="size-full object-cover"
       />

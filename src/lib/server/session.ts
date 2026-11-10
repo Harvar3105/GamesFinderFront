@@ -4,7 +4,7 @@ import { isAxiosError } from "axios";
 import { cookies } from "next/headers";
 import { randomBytes, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
-import { User, type UserDTO } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user";
 import type SessionStatus from "@/lib/client/contracts/auth/sessionStatus";
 import { config } from "@/lib/config";
 import { authClient } from "@/lib/server/auth/authClient";
@@ -78,11 +78,18 @@ export async function getSessionStatus(sessionId: string): Promise<SessionStatus
   };
 }
 
-function toUser({ user, roles }: { user: IdentityUser; roles: string[] }): UserDTO {
-  return new User(user.id, user.createdAt, user.username, user.email, user.lastLogin, roles);
+function toUser({ user, roles }: { user: IdentityUser; roles: string[] }): User {
+  return {
+    id: user.id,
+    createdAt: user.createdAt,
+    lastLogin: user.lastLogin,
+    username: user.username,
+    email: user.email,
+    roles,
+  };
 }
 
-export async function fetchCurrentUser(): Promise<UserDTO | null> {
+export async function fetchCurrentUser(): Promise<User | null> {
   const sessionId = await readSessionId();
   if (!sessionId) return null;
 
@@ -138,7 +145,7 @@ export async function deleteSessionCookie(): Promise<void> {
 export async function startSession(
   auth: IdentityAuthResponse,
   keepSignedIn: boolean,
-): Promise<UserDTO> {
+): Promise<User> {
   const sessionId = await createSession({
     accessToken: auth.accessToken,
     refreshToken: auth.refreshToken,

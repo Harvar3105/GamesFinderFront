@@ -3,7 +3,7 @@ import { ButtonLink, Icon, Panel, SectionHeading } from "@/components/ui";
 import GuestOnly from "@/components/widgets/guestOnly";
 import GameCard from "@/components/widgets/gameCard";
 import { NavPages } from "@/config/navPages";
-import { Game } from "@/domain/entities/game";
+import type { Game } from "@/domain/entities/game";
 
 const STEPS = [
   {
@@ -21,9 +21,24 @@ const STEPS = [
 ];
 
 // FIXME: Placeholder games. Replace with recently updated games from the BFF once the endpoint exists.
-const RECENT_GAMES: Game[] = [1, 2, 3, 4].map(
-  (n) => new Game(`placeholder-${n}`, new Date(), `[Product name ${n}]`, n),
-);
+const PLACEHOLDER_DATE = new Date().toISOString();
+const RECENT_GAMES: Game[] = [1, 2, 3, 4].map((n) => ({
+  id: `placeholder-${n}`,
+  createdAt: PLACEHOLDER_DATE,
+  updatedAt: PLACEHOLDER_DATE,
+  name: `[Product name ${n}]`,
+  steamURL: null,
+  steamID: n,
+  inPackages: [],
+  isDLC: false,
+  description: null,
+  headerImage: null,
+  offers: [],
+  isReleased: false,
+  initialPrice: null,
+  initialCurrency: null,
+  storeMetadata: null,
+}));
 
 export default function HomePage() {
   return (

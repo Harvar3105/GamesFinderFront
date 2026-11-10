@@ -33,7 +33,7 @@ export default function AccountPage() {
               className="flex flex-col gap-attention-sm"
             >
               <div className="flex flex-wrap items-center gap-related-lg">
-                <Avatar user={user} size="lg" />
+                <Avatar userId={user.id} size="lg" />
                 <div className="flex flex-col gap-related-xs">
                   <h2 id="profile-title" className="typo-h2">
                     {user.username}

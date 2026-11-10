@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { BffRoutes } from "@/config/bffRoutes";
 import { formatPrice } from "@/components/helpers/format";
 import { ButtonLink, Chip, Icon, Panel, SectionHeading, Thumb } from "@/components/ui";
 import OffersTable from "@/components/widgets/game/offersTable";
@@ -13,7 +14,7 @@ export default function GameView({ id }: { id: string }) {
     queryKey: ["game", id],
     queryFn: () =>
       BFFFetch<Game>({
-        uri: `/api/games/${encodeURIComponent(id)}`,
+        uri: BffRoutes.game(id),
         method: "GET",
       }),
   });

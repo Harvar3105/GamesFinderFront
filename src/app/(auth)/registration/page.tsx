@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import { BffRoutes } from "@/config/bffRoutes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,7 +14,7 @@ import AlreadySignedIn from "@/components/widgets/alreadySignedIn";
 import AuthPanel from "@/components/widgets/authPanel";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
 import type RegistrationPayload from "@/lib/client/contracts/auth/registrationPayload";
-import { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user";
 import { NavPages } from "@/config/navPages";
 import BFFFetch, { FetchError } from "@/lib/client/fetch/bffFetch";
 
@@ -57,7 +58,7 @@ export default function RegistrationPage() {
   const mutation = useMutation<User, FetchError, RegistrationPayload>({
     mutationFn: (data) =>
       BFFFetch<User, RegistrationPayload>({
-        uri: "/api/registration",
+        uri: BffRoutes.registration,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: data,

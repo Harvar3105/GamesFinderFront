@@ -33,7 +33,7 @@ export default function LoginWidget() {
   return (
     <>
       <ButtonLink href={NavPages.account} variant="ghost" size="compact">
-        <Avatar user={user} />
+        <Avatar userId={user.id} />
         {user.username}
       </ButtonLink>
       {isAdmin(user) && <Badge>admin</Badge>}

@@ -6,11 +6,11 @@ import PageContainer from "@/components/layouts/pageContainer";
 import { useUser } from "@/components/providers/userProvider";
 import { Alert, ButtonLink, Panel } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
-import type { UserDTO } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user";
 
 interface RequireAccessProps {
   asAdmin?: boolean;
-  children: (user: UserDTO) => ReactNode;
+  children: (user: User) => ReactNode;
 }
 
 export default function RequireAccess({ asAdmin = false, children }: RequireAccessProps) {

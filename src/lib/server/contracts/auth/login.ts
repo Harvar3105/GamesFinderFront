@@ -15,8 +15,8 @@ export interface IdentityAuthResponse {
 
 export interface IdentityUser {
   readonly id: string;
-  readonly createdAt: Date;
-  readonly lastLogin: Date | null;
+  readonly createdAt: string;
+  readonly lastLogin: string | null;
   /** Nullable in the Identity UserDTO, but registration requires both, so they are always set. */
   readonly username: string;
   readonly email: string;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent } from "react";
+import { BffRoutes } from "@/config/bffRoutes";
 import { isServerError, readErrorMessage } from "@/components/helpers/fetchErrors";
 import { useSignOut } from "@/components/hooks/useSignOut";
 import { useNotifications } from "@/components/providers/notificationProvider";
@@ -89,7 +90,7 @@ export default function SessionExpiryWatcher() {
     };
 
     const check = () => {
-      BFFFetch<SessionStatus>({ uri: "/api/session", method: "GET" }).then(apply, (error) => {
+      BFFFetch<SessionStatus>({ uri: BffRoutes.session, method: "GET" }).then(apply, (error) => {
         if (!active) return;
         if (isSessionGone(error)) expire();
         else checkIn(RETRY_AFTER_ERROR_SECONDS);
@@ -97,7 +98,7 @@ export default function SessionExpiryWatcher() {
     };
 
     const extend = () => {
-      BFFFetch<SessionStatus>({ uri: "/api/session", method: "POST" }).then(apply, (error) => {
+      BFFFetch<SessionStatus>({ uri: BffRoutes.session, method: "POST" }).then(apply, (error) => {
         if (!active) return;
         if (isSessionGone(error)) expire();
         else onExtendFailed(error);

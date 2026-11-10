@@ -1,11 +1,11 @@
 "use client";
 
-import { UserDTO } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface UserContextValue {
-  user: UserDTO | null;
-  authUser: (u: UserDTO) => void;
+  user: User | null;
+  authUser: (u: User) => void;
   isLoggedIn: () => boolean;
   logout: () => void;
 }
@@ -16,12 +16,12 @@ export default function UserProvider({
   clientUser,
   children,
 }: {
-  clientUser: UserDTO | null;
+  clientUser: User | null;
   children: ReactNode;
 }) {
-  const [user, setUser] = useState<UserDTO | null>(clientUser);
+  const [user, setUser] = useState<User | null>(clientUser);
 
-  const authUser = (u: UserDTO) => {
+  const authUser = (u: User) => {
     setUser(u);
   };
 

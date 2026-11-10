@@ -1,6 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { BffRoutes } from "@/config/bffRoutes";
 import { Chip, PageHeading, Panel } from "@/components/ui";
 import CatalogFilters from "@/components/widgets/catalog/catalogFilters";
 import CatalogTable from "@/components/widgets/catalog/catalogTable";
@@ -24,7 +25,7 @@ export default function CatalogView({ page, pageSize, tags, genres }: CatalogVie
     queryKey: ["games", page, pageSize],
     queryFn: () =>
       BFFFetch<GamesPagedResponse>({
-        uri: `/api/games?${toQueryString(pageQuery)}`,
+        uri: `${BffRoutes.games}?${toQueryString(pageQuery)}`,
         method: "GET",
       }),
     placeholderData: keepPreviousData,

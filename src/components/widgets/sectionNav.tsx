@@ -1,5 +1,5 @@
 import { Avatar, ButtonLink, Panel } from "@/components/ui";
-import type { UserDTO } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user";
 
 export interface SectionNavItem {
   label: string;
@@ -8,7 +8,7 @@ export interface SectionNavItem {
 }
 
 interface SectionNavProps {
-  user: UserDTO;
+  user: User;
   label: string;
   items: SectionNavItem[];
 }
@@ -23,7 +23,7 @@ export default function SectionNav({ user, label, items }: SectionNavProps) {
       className="flex flex-[1_1_240px] flex-col gap-related-xs self-start"
     >
       <div className="mb-related-xs flex items-center gap-related-md border-b border-component p-related-sm">
-        <Avatar user={user} size="md" alt={`${user.username} avatar`} />
+        <Avatar userId={user.id} size="md" alt={`${user.username} avatar`} />
         <span className="min-w-0 truncate text-lg/[1.3] font-semibold">{user.username}</span>
       </div>
       {items.map((item) => (

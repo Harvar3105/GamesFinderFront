@@ -1,9 +1,9 @@
 import "server-only";
 
 export class Config {
-  // FIXME: [Stage5] Add the Identity profilePicture endpoint.
   // FIXME: [Stage6] Add the Identity manage/* role endpoints.
   public readonly identityUri: string;
+  public readonly profilePictureEndpoint: string;
   public readonly userRegisterEndpoint: string;
   public readonly userLoginEndpoint: string;
   public readonly userSessionEndpoint: string;
@@ -43,6 +43,7 @@ export class Config {
 
   constructor() {
     this.identityUri = process.env.IDENTITY_URI!;
+    this.profilePictureEndpoint = process.env.PROFILE_PICTURE!;
     this.userRegisterEndpoint = process.env.USER_REGISTRATION!;
     this.userLoginEndpoint = process.env.USER_LOGIN!;
     this.userSessionEndpoint = process.env.USER_SESSION!;

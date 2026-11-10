@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import { BffRoutes } from "@/config/bffRoutes";
 import { useRouter } from "next/navigation";
 import { isServerError, readErrorMessage } from "@/components/helpers/fetchErrors";
 import { useNotifications } from "@/components/providers/notificationProvider";
@@ -15,7 +16,7 @@ export function useSignOut() {
   const router = useRouter();
 
   const mutation = useMutation<unknown, FetchError>({
-    mutationFn: () => BFFFetch({ uri: "/api/logout", method: "POST" }),
+    mutationFn: () => BFFFetch({ uri: BffRoutes.logout, method: "POST" }),
     onSuccess: () => {
       logout();
       router.replace(NavPages.home);

@@ -23,16 +23,16 @@ export default function GameCard({ game }: { game: Game }) {
       <div className="flex flex-col gap-related-xs">
         <span className="font-semibold">{game.name}</span>
         <span className="font-code">
-          {lowestOffer === null
+          {lowestOffer === null || lowestOffer.amount === null
             ? "—"
-            : `from ${formatPrice(lowestOffer.price, lowestOffer.currency)}`}
+            : `from ${formatPrice(lowestOffer.amount, lowestOffer.currency!)}`}
         </span>
       </div>
       <div className="flex flex-wrap justify-between gap-related-sm">
         <Chip>
           {vendorsCount} {vendorsCount === 1 ? "source" : "sources"}
         </Chip>
-        <span className="typo-small">{formatTimeAgo(game.updatedAt ?? game.createdAt)}</span>
+        <span className="typo-small">{formatTimeAgo(game.updatedAt)}</span>
       </div>
     </Link>
   );
