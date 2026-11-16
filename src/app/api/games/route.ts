@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { toErrorResponse } from "@/lib/server/errors";
 import { gameClient } from "@/lib/server/game/gameClient";
 import { logger } from "@/lib/server/logger";
+import { readGamesFilter, validatePriceRange } from "@/lib/shared/gamesFilterParams";
 
 function readPositiveInt(value: string | null): number | null {
   const parsed = Number(value);
@@ -9,16 +10,23 @@ function readPositiveInt(value: string | null): number | null {
 }
 
 export async function GET(request: NextRequest) {
-  const page = readPositiveInt(request.nextUrl.searchParams.get("page"));
-  const pageSize = readPositiveInt(request.nextUrl.searchParams.get("pageSize"));
+  const params = request.nextUrl.searchParams;
+  const page = readPositiveInt(params.get("page"));
+  const pageSize = readPositiveInt(params.get("pageSize"));
 
   if (page === null || pageSize === null) {
     logger.warn({ msg: "Invalid paging parameters", ctx: { url: request.url } });
     return NextResponse.json("page and pageSize must be positive integers", { status: 400 });
   }
 
+  const filter = readGamesFilter(params);
+  const priceRangeError = validatePriceRange(filter.min, filter.max);
+  if (priceRangeError !== null) {
+    return NextResponse.json(priceRangeError, { status: 400 });
+  }
+
   try {
-    const response = await gameClient.getGamesPaged({ page, pageSize });
+    const response = await gameClient.getGamesFiltered({ page, pageSize, ...filter });
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     return toErrorResponse(error);

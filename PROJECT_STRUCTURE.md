@@ -28,9 +28,9 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `layout.tsx` | — | root layout: `<html data-theme>`, fonts, providers, header, footer. On the server it reads the theme from the `theme` cookie and restores the user from Identity with the session access token |
 | `fonts.ts` | — | fonts via `next/font/google`: Fira Sans, Doto, Google Sans Code |
 | `globals.css` | — | design tokens (theme colors, spacing per window class, radii, shadow, text styles), their Tailwind mapping (`@theme`), `typo-*` utilities, base styles |
-| `page.tsx` | `/` | home page |
+| `page.tsx` | `/` | home page: intro, how it works, "Recently updated" (`RecentGames`) |
 | `(auth)/layout.tsx` | — | centers the sign-in / sign-up panel |
-| `catalog/page.tsx` | `/catalog` | catalog: reads `?page=` / `?perPage=` and renders `CatalogView`, which loads games from `GET /api/games` (`useQuery` + `BFFFetch`); filters, game table, pagination (`?page=`, `?perPage=`) |
+| `catalog/page.tsx` | `/catalog` | catalog: reads `?page=`, `?perPage=` and the filter (`?min=`, `?max=`, `?vendor=`, `?sort=`, `?currency=`, repeated `?tags=` / `?genres=`) from the URL and renders `CatalogView`, which loads games with their lowest prices from `GET /api/games` and vendors from `GET /api/vendors`; filters, game table, pagination. Applying the filter rewrites the URL and returns to the first page |
 | `catalog/[id]/page.tsx` | `/catalog/<id>` | game: renders `GameView`, which loads the game from `GET /api/games/<id>` (`useQuery` + `BFFFetch`); header image, Steam ID, original price and store link, description, offers |
 | `account/page.tsx` | `/account` | account (signed-in users): section menu, profile |
 | `admin/page.tsx` | `/admin` | administration (administrators): section menu, scraping tasks |
@@ -41,11 +41,12 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out: revoke the session tokens in Identity, delete the session cookie and the Redis session |
 | `api/(auth)/logout-all/route.ts` | `POST /api/logout-all` | BFF: sign out of all devices: revoke every session of the user in Identity, then as `/api/logout` |
 | `api/(auth)/session/route.ts` | `GET` / `POST /api/session` | BFF: `GET` returns the remaining lifetime of the session (`SessionStatus`) without extending it; `POST` extends it ("Stay signed in"). 401 when the session is gone. Skipped by `proxy.ts` |
-| `api/games/route.ts` | `GET /api/games?page=&pageSize=` | BFF: a page of games from the backend (`gameClient`) |
+| `api/games/route.ts` | `GET /api/games?page=&pageSize=&min=&max=&vendor=&sort=&currency=&tags=&genres=` | BFF: a filtered page of games with their lowest prices from the backend `Game/GetPagedWithLowestFiltered` (`gameClient`); answers 400 to invalid paging or price bounds |
+| `api/vendors/route.ts` | `GET /api/vendors` | BFF: offer vendors from the backend `GameOffer/vendors` (`gameClient`) |
 | `api/profilePicture/[userId]/route.ts` | `GET /api/profilePicture/<userId>` | BFF: anonymous proxy to the Identity profile picture; passes `If-None-Match` / `ETag` through (304); when the user has no picture, redirects to `DEFAULT_AVATAR` (302, not stored). Skipped by `proxy.ts` |
 | `api/games/[id]/route.ts` | `GET /api/games/<id>` | BFF: one game from the backend (`gameClient`); backend 400 / 404 pass through with their status |
 
-All pages from the mockups are implemented. The catalog loads games through the BFF and so does the game page; the other pages still show placeholder data (`FIXME: [StageN]`).
+All pages from the mockups are implemented. The home page, the catalog and the game page load games through the BFF; the other pages still show placeholder data (`FIXME: [StageN]`).
 
 ## `src/assets` — embedded media
 
@@ -58,11 +59,11 @@ Empty for now. The logo in the new design is text set in Doto.
 | folder | contents |
 | --- | --- |
 | `ui/` | base design-system components, imported from `@/components/ui`: `Alert` (error message block), `Banner` (notification banner: `notice` / `error` / `announcement`, text, optional action buttons; a click on the banner itself closes it), `Button` / `ButtonLink` (sizes `md`, `compact`; `justify`), `IconButton` / `IconLink`, `Icon`, `Panel` / `panelClass` (padding `none`, `tight`, `related`, `attention`), `SectionHeading`, `Field` / `Input` / `Select` / `Checkbox` (fields support an error state), `Chip` / `ChipToggle`, `Badge`, `Avatar` (takes a user id and loads `/api/profilePicture/<id>`; stateless, the BFF serves the default picture), `NavLink`, `PageHeading`, `Thumb` / `ZoomThumb` (hover zoom), `Table` / `TableHeader` / `TableCell` |
-| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `findLowestOffer` (`gameOffers.ts`), `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
-| `hooks/` | shared hooks: `useSignOut` (sign-out mutation: `POST /api/logout`, clears the user, goes home; a failure shows a banner with a retry) |
+| `helpers/` | small helpers for components: `mergeClassNames`, `isAdmin` (`userRoles.ts`), `formatPrice` / `formatDateTime` / `formatTimeAgo` (`format.ts`), `vendorLabel` (`vendors.ts`), `hasErrors` (`authValidations.ts`), `isServerError` / `readErrorMessage` (`fetchErrors.ts`) |
+| `hooks/` | shared hooks: `useSignOut` (sign-out mutation: `POST /api/logout`, clears the user, goes home; a failure shows a banner with a retry), `useGamesFiltered` / `useVendors` (`useGames.ts`: `GET /api/games`, `GET /api/vendors`) |
 | `layouts/` | layout parts: `header.tsx` (logo, navigation, theme switcher, user block), `footer.tsx` (copyright, GitHub, contact), `pageContainer.tsx` (page width, side padding and vertical rhythm), `sectionPageLayout.tsx` (closed pages: heading, section menu, content) |
 | `providers/` | React contexts: `theme/` (theme and switcher), `notificationProvider.tsx` (`useNotifications().notify({ type, text, actions?, durationMs? })`: banners stacked at the top of the window; without `durationMs` a banner stays until closed), `userProvider.tsx` (current user), `queryProvider.tsx` (TanStack Query) |
-| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and renders heading, filters, table and pagination; filters with their types; game table), `game/` (`gameView.tsx`: loads the game and renders it with its offers; offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `sessionExpiryWatcher.tsx` (rendered in the layout; for a short session it reads `GET /api/session` and, `SESSION_SHORT_TTL_SECONDS - SESSION_SHORT_NOTIFY_TTL_SECONDS` before expiry, shows a banner with "Stay signed in" / "Sign out"; clears the user once the session is gone), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
+| `widgets/` | composite blocks with logic: `loginWidget.tsx` (sign in / sign up buttons, or avatar, name, admin badge and sign out), `gameCard.tsx` (game card for grids: picture, name, lowest price, update time), `recentGames.tsx` (home page: the most recently updated games), `guestOnly.tsx` (renders children only for signed-out visitors), `authPanel.tsx` (sign-in / sign-up panel), `alreadySignedIn.tsx` (shown instead of the auth form to a signed-in user, redirects home), `requestErrorAlert.tsx` (BFF request error message), `tagPicker.tsx` (tag / genre filter row), `pagination.tsx`, `catalog/` (`catalogView.tsx`: loads the games page and the vendors, renders heading, filters, table and pagination and writes an applied filter to the URL; `catalogFilters.tsx`: source, currency, price range, sort, tags and genres, the backend price bounds are checked before applying; `catalogTable.tsx`: game table), `game/` (`gameView.tsx`: loads the game and renders it with its offers; offers table), `admin/` (scraping tasks), `sectionNav.tsx` (section menu with avatar and nickname), `sessionExpiryWatcher.tsx` (rendered in the layout; for a short session it reads `GET /api/session` and, `SESSION_SHORT_TTL_SECONDS - SESSION_SHORT_NOTIFY_TTL_SECONDS` before expiry, shows a banner with "Stay signed in" / "Sign out"; clears the user once the session is gone), `requireAccess.tsx` (closed pages: signed-in / administrator check), `placeholderSection.tsx` (area with undefined content) |
 
 Components from the mockups are added here during the redesign: buttons, inputs, panels, chips, tables, icons and so on.
 
@@ -72,7 +73,7 @@ Data models shared by the client and the server, declared as interfaces / types 
 
 | path | purpose |
 | --- | --- |
-| `entities/` | `Entity` (base of the backend entities: id, dates), `User` (the Identity account and its roles; the profile picture is stored in Identity and loaded by the user id), `UserData` / `WishlistItem` (backend user data), `Game` / `GameStoreMetadata`, `Offer`, `ScrapingTask`; `enums/ETheme` (`light` / `dark`), `enums/ECurrency`, `enums/EVendor` (offer vendors: Steam, InstantGaming, G2A), `enums/EWishlistSyncStatus` |
+| `entities/` | `Entity` (base of the backend entities: id, dates), `User` (the Identity account and its roles; the profile picture is stored in Identity and loaded by the user id), `UserData` / `WishlistItem` (backend user data), `Game` / `GameStoreMetadata`, `Offer`, `ScrapingTask`; `enums/ETheme` (`light` / `dark`), `enums/ECurrency`, `enums/EVendor` (offer vendors: Steam, InstantGaming, G2A), `enums/ESort` (catalog sort orders, the backend names), `enums/EWishlistSyncStatus` |
 
 ## `src/config` — app-wide constants
 
@@ -83,6 +84,7 @@ Data models shared by the client and the server, declared as interfaces / types 
 | `bffRoutes.ts` | BFF routes the browser calls (`BffRoutes.login`, `BffRoutes.game(id)`, `BffRoutes.profilePicture(userId)` …); client code takes `/api/*` paths only from here |
 | `externalLinksConfig.ts` | `ExternalLinks` (GitHub, contact email, portfolio) from `NEXT_PUBLIC_*` env variables, inlined at build time; defaults when unset |
 | `pagination.ts` | `PAGE_SIZE_OPTIONS` |
+| `catalog.ts` | `DEFAULT_CURRENCY`, `DEFAULT_SORT`, `RECENT_GAMES_COUNT` |
 
 ## `src/lib` — helpers and the server side of the BFF
 
@@ -98,14 +100,15 @@ Data models shared by the client and the server, declared as interfaces / types 
 | `server/auth/signOut.ts` | body of the sign-out routes |
 | `server/auth/authPayloads.ts` | parsing and validation of the sign-in / sign-up request bodies (the BFF repeats the page checks) |
 | `server/profilePicture/profilePictureClient.ts` | Identity profile pictures client: `getPicture` (anonymous GET with the ETag) |
-| `server/game/gameClient.ts` | backend games client: `getGamesPaged`, `getGame` (`Game/getGame?id=`) |
-| `server/backendClient.ts` | backend client; `authorizedRequest` sends the session access token |
+| `server/game/gameClient.ts` | backend games and offers client (`BackendClient`): `getGamesFiltered` (`Game/GetPagedWithLowestFiltered`), `getGame` (`Game/getGame?id=`), `getVendors` (`GameOffer/vendors`) |
+| `server/backendClient.ts` | `BackendClient`, the abstract base of the backend clients (one per backend area); `authorizedRequest` sends the session access token |
 | `server/session.ts` | Redis sessions (`Session`: tokens and `keepSignedIn` only, no user; the BFF's own storage format, not a contract) and the httpOnly session cookie with the same sliding TTL (`SESSION_SHORT_TTL_SECONDS`, default 30 min, without `keepSignedIn`; `SESSION_PERSISTENT_TTL_SECONDS`, default 30 days, with it; `SESSION_SHORT_NOTIFY_TTL_SECONDS`, default 5 min less than the short TTL: inactivity after which the client warns about expiry), `extendSession` (for `proxy.ts` and `POST /api/session`), `getSessionStatus` (remaining TTL without extending), `startSession` (after login / register), `fetchCurrentUser` (the layout restores the user from Identity `auth/session` by the access token only, so tokens are rotated under the refresh lock), `endSession` (sign-out), token refresh under a per-session lock, `withAccessToken` |
 | `server/errors.ts` | `BffError` and `toErrorResponse`: Identity and backend errors as a JSON string with the upstream status. In development every error is logged (method, full upstream URL, status, response body); in production only upstream 5xx, unreachable upstreams and unexpected errors |
 | `server/logger.ts`, `withLogging.ts` | BFF request logging |
 | `server/redisClient.ts` | Redis connection, `setIfAbsent` / `deleteIfEquals` for locks |
+| `shared/gamesFilterParams.ts` | `readGamesFilter` (the games filter from the catalog URL or the `GET /api/games` query; malformed values are dropped), `validatePriceRange` (the backend price bounds: min ≥ 0, max ≥ 1, min < max) |
 | `shared/authValidation.ts` | sign-in / sign-up field checks shared by the pages and the BFF: login, username, email (password rules belong to Identity) |
-| `shared/contracts/` | contracts with the same shape in the BFF API and in the external service; the route passes them through. `game/gamesPaged.ts` (`GamesPagedRequest`, `GamesPagedResponse`: `GET /api/games` and backend `Game/getPaged`) |
+| `shared/contracts/` | contracts with the same shape in the BFF API and in the external service; the route passes them through. `game/gamesFiltered.ts` (`GamesFilter`, `GamesFilteredRequest`, `GameWithLowestPrice`, `GamesFilteredResponse`: `GET /api/games` and backend `Game/GetPagedWithLowestFiltered`), `game/vendors.ts` (`VendorsResponse`: `GET /api/vendors` and backend `GameOffer/vendors`) |
 
 ### Contracts
 
@@ -113,7 +116,7 @@ Data models shared by the client and the server, declared as interfaces / types 
 | --- | --- | --- | --- |
 | `lib/client/contracts/` | browser ↔ BFF (`/api/*`) | pages, components, route handlers | `*Payload` for requests; responses are entities (e.g. `User`) |
 | `lib/server/contracts/` | BFF ↔ Identity / backend | `lib/server` and route handlers only | prefixed with the service: `Identity*`, `Backend*` |
-| `lib/shared/contracts/` | both, when the shapes are identical | everyone | plain names (`GamesPagedRequest`) |
+| `lib/shared/contracts/` | both, when the shapes are identical | everyone | plain names (`GamesFilteredRequest`) |
 
 A route handler takes a `client/contracts` type, builds the `server/contracts` request from it and maps the service response back to a `client/contracts` type. A contract with the same shape on both sides lives in `shared/contracts` and is passed through; once the shapes diverge, split it into `client/` and `server/`. Contract files hold types only, no side effects. Upstream errors are answered with `toErrorResponse`, never parsed in the route.
 
@@ -153,8 +156,7 @@ Browser (components with "use client")
                                               ├─ lib/server/session.ts       session, cookie, token refresh
                                               ├─ lib/server/auth/authClient ─► Identity service
                                               ├─ lib/server/profilePicture  ─► Identity (profile pictures)
-                                              ├─ lib/server/game/gameClient ─► backend
-                                              ├─ lib/server/backendClient   ─► backend (Bearer token)
+                                              ├─ lib/server/game/gameClient ─► backend (BackendClient: Bearer token where required)
                                               ├─ lib/server/redisClient     ─► Redis (sessions)
                                               └─ lib/server/errors.ts        upstream errors → JSON string
 Server Components (layout, pages) ──────────► lib/server/* directly, without HTTP
@@ -168,7 +170,7 @@ The backend (GamesFinderOrchester) and the Identity server are the source of tru
 | --- | --- |
 | Stage1 | BFF infrastructure: endpoints config, Redis sessions, token refresh, backend client, error normalization (done) |
 | Stage2 | auth: registration without roles and with a session, login errors, session restore in the layout, sign-out with token revocation, `ADMIN` / `USER` roles (done) |
-| Stage3 | catalog and home page from the backend (filters, sort, vendors, currency) |
+| Stage3 | catalog and home page from the backend (filters, sort, vendors, currency) (done; name search, the tags / genres lists and the vendors of every game wait for the backend) |
 | Stage4 | game page: game and offers |
 | Stage5 | account: UserData, preferences, profile picture |
 | Stage6 | administration: scraping tasks, roles, picture moderation |

@@ -2,23 +2,31 @@ import "server-only";
 
 import type { Game } from "@/domain/entities/game";
 import { config } from "@/lib/config";
-import ApiClient from "../apiClient";
-import type { GamesPagedRequest, GamesPagedResponse } from "@/lib/shared/contracts/game/gamesPaged";
+import BackendClient from "@/lib/server/backendClient";
+import type {
+  GamesFilteredRequest,
+  GamesFilteredResponse,
+} from "@/lib/shared/contracts/game/gamesFiltered";
+import type { VendorsResponse } from "@/lib/shared/contracts/game/vendors";
 
-// FIXME: [Stage3] Split the responsibilities of GameClient and BackendClient: both call the backend.
-/** Backend games API. GET endpoints do not require a JWT. */
-export class GameClient extends ApiClient {
+/** Backend games and offers API. GET endpoints do not require a JWT. */
+export class GameClient extends BackendClient {
   constructor(uri: string) {
     super(uri);
   }
 
-  async getGamesPaged(params: GamesPagedRequest): Promise<GamesPagedResponse> {
-    return this.get<GamesPagedResponse>(config.gamesPagedEndpoint, { params });
+  /** The backend answers 400 to invalid paging or price bounds. */
+  async getGamesFiltered(params: GamesFilteredRequest): Promise<GamesFilteredResponse> {
+    return this.get<GamesFilteredResponse>(config.gamesFilteredPagedEndpoint, { params });
   }
 
   /** The backend answers 400 to a malformed id and 404 to an unknown one. */
   async getGame(id: string): Promise<Game> {
     return this.get<Game>(config.gameEndpoint, { params: { id } });
+  }
+
+  async getVendors(): Promise<VendorsResponse> {
+    return this.get<VendorsResponse>(config.vendorsEndpoint);
   }
 }
 
