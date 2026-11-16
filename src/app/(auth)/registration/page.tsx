@@ -5,7 +5,7 @@ import { BffRoutes } from "@/config/bffRoutes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CONTACT_EMAIL_HREF } from "@/config/externalLinks";
+import { ExternalLinks } from "@/config/externalLinksConfig";
 import { hasErrors } from "@/components/helpers/authValidations";
 import { USERNAME_MAX_LENGTH, validateEmail, validateUsername } from "@/lib/shared/authValidation";
 import { useUser } from "@/components/providers/userProvider";
@@ -190,7 +190,7 @@ export default function RegistrationPage() {
         {mutation.isError && (
           <p className="text-center">
             Problem persists?{" "}
-            <a href={CONTACT_EMAIL_HREF} className="font-semibold">
+            <a href={ExternalLinks.contactEmailHref} className="font-semibold">
               Contact us
             </a>
           </p>
