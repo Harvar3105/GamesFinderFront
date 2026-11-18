@@ -50,11 +50,4 @@ export class ProfilePictureClient extends ApiClient {
   }
 }
 
-const globalForClient = globalThis as unknown as {
-  profilePictureClient?: ProfilePictureClient;
-};
-
-export const profilePictureClient =
-  globalForClient.profilePictureClient ?? new ProfilePictureClient(config.identityUri);
-
-globalForClient.profilePictureClient = profilePictureClient;
+export const profilePictureClient = new ProfilePictureClient(config.identityUri);

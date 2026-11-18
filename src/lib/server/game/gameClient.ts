@@ -54,10 +54,4 @@ export class GameClient extends BackendClient {
   }
 }
 
-const globalForClient = globalThis as unknown as {
-  gameClient?: GameClient;
-};
-
-export const gameClient = globalForClient.gameClient ?? new GameClient(config.backendUrl);
-
-globalForClient.gameClient = gameClient;
+export const gameClient = new GameClient(config.backendUrl);
