@@ -36,7 +36,6 @@ export function readGamesFilter(params: URLSearchParams): GamesFilterWithCurrenc
     vendor: readEnum(EVendor, params.get("vendor")),
     sort: readEnum(ESort, params.get("sort")),
     tags: readList(params, "tags"),
-    genres: readList(params, "genres"),
     currency: readEnum(ECurrency, params.get("currency")),
   };
 }

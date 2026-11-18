@@ -17,10 +17,9 @@ interface CatalogViewProps {
   /** The filter from the page URL. */
   filter: GamesFilterWithCurrency;
   tags: string[];
-  genres: string[];
 }
 
-export default function CatalogView({ page, pageSize, filter, tags, genres }: CatalogViewProps) {
+export default function CatalogView({ page, pageSize, filter, tags }: CatalogViewProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -50,7 +49,6 @@ export default function CatalogView({ page, pageSize, filter, tags, genres }: Ca
           filter={filter}
           vendors={vendorsQuery.data?.vendors ?? []}
           tags={tags}
-          genres={genres}
           onApply={applyFilter}
         />
       </Panel>

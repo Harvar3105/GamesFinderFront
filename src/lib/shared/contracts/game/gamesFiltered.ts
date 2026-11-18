@@ -12,8 +12,6 @@ export interface GamesFilter {
   sort?: ESort;
   /** A game must have every listed tag. */
   tags?: string[];
-  /** A game must have every listed genre. */
-  genres?: string[];
 }
 
 /** Query of GET /api/games and of the backend Game/GetPagedWithLowestFiltered endpoint. */

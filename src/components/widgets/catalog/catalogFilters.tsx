@@ -30,7 +30,6 @@ interface FilterDraft {
   priceTo: string;
   sort: ESort;
   tags: string[];
-  genres: string[];
 }
 
 function toDraft(filter: GamesFilterWithCurrency): FilterDraft {
@@ -41,7 +40,6 @@ function toDraft(filter: GamesFilterWithCurrency): FilterDraft {
     priceTo: filter.max === undefined ? "" : String(filter.max),
     sort: filter.sort ?? DEFAULT_SORT,
     tags: filter.tags ?? [],
-    genres: filter.genres ?? [],
   };
 }
 
@@ -58,17 +56,10 @@ interface CatalogFiltersProps {
   filter: GamesFilterWithCurrency;
   vendors: EVendor[];
   tags: string[];
-  genres: string[];
   onApply: (filter: GamesFilterWithCurrency) => void;
 }
 
-export default function CatalogFilters({
-  filter,
-  vendors,
-  tags,
-  genres,
-  onApply,
-}: CatalogFiltersProps) {
+export default function CatalogFilters({ filter, vendors, tags, onApply }: CatalogFiltersProps) {
   const [draft, setDraft] = useState<FilterDraft>(() => toDraft(filter));
   const [priceError, setPriceError] = useState<string | null>(null);
 
@@ -95,7 +86,6 @@ export default function CatalogFilters({
       currency: draft.currency,
       sort: draft.sort,
       tags: draft.tags,
-      genres: draft.genres,
     });
   };
 
@@ -204,13 +194,6 @@ export default function CatalogFilters({
           selected={draft.tags}
           onChange={(value) => set("tags", value)}
           searchPlaceholder="Find tag"
-        />
-        <TagPicker
-          label="Genres"
-          options={genres}
-          selected={draft.genres}
-          onChange={(value) => set("genres", value)}
-          searchPlaceholder="Find genre"
         />
       </div>
     </div>

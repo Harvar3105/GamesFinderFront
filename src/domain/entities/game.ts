@@ -4,7 +4,6 @@ import type { Offer } from "./offer";
 
 export interface GameStoreMetadata {
   tags: string[];
-  genres: string[];
   positiveReviews: number;
   negativeReviews: number;
   positiveReviewsPercent: number;

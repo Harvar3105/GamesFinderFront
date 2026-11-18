@@ -4,8 +4,8 @@ import { PAGE_SIZE_OPTIONS } from "@/config/pagination";
 import { readGamesFilter } from "@/lib/shared/gamesFilterParams";
 import { toQueryString } from "@/lib/toQueryString";
 
-// TODO: [Stage3] Load tags and genres from the BFF once the backend lists them; example values from the
-// mockup for now. The backend matches them exactly against the Steam store tags and genres.
+// TODO: [Stage3] Load tags from the BFF once the backend lists them; example values from the mockup for
+// now. The backend matches them exactly against the Steam store tags.
 const TAGS = [
   "Singleplayer",
   "Multiplayer",
@@ -32,28 +32,6 @@ const TAGS = [
   "Horror",
   "Anime",
 ];
-const GENRES = [
-  "Action",
-  "Adventure",
-  "RPG",
-  "Strategy",
-  "Simulation",
-  "Sports",
-  "Racing",
-  "Puzzle",
-  "Platformer",
-  "Shooter",
-  "Fighting",
-  "Stealth",
-  "Rhythm",
-  "Card Game",
-  "MMO",
-  "Visual Novel",
-  "Tower Defense",
-  "City Builder",
-  "Metroidvania",
-  "Battle Royale",
-];
 
 function readPositiveInt(value: string | string[] | undefined, fallback: number): number {
   const parsed = Number(Array.isArray(value) ? value[0] : value);
@@ -73,7 +51,7 @@ export default async function CatalogPage({
 
   return (
     <PageContainer>
-      <CatalogView page={page} pageSize={pageSize} filter={filter} tags={TAGS} genres={GENRES} />
+      <CatalogView page={page} pageSize={pageSize} filter={filter} tags={TAGS} />
     </PageContainer>
   );
 }
