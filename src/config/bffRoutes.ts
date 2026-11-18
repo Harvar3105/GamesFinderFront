@@ -7,6 +7,7 @@ export const BffRoutes = {
   session: "/api/session",
   games: "/api/games",
   vendors: "/api/vendors",
+  tags: "/api/tags",
   game: (id: string) => `/api/games/${encodeURIComponent(id)}`,
   profilePicture: (userId: string) => `/api/profilePicture/${encodeURIComponent(userId)}`,
 };

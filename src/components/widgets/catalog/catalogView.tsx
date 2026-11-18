@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useGamesFiltered, useVendors } from "@/components/hooks/useGames";
+import { useGamesFiltered, useTags, useVendors } from "@/components/hooks/useGames";
 import { Chip, PageHeading, Panel } from "@/components/ui";
 import CatalogFilters from "@/components/widgets/catalog/catalogFilters";
 import CatalogTable from "@/components/widgets/catalog/catalogTable";
@@ -16,16 +16,16 @@ interface CatalogViewProps {
   pageSize: number;
   /** The filter from the page URL. */
   filter: GamesFilterWithCurrency;
-  tags: string[];
 }
 
-export default function CatalogView({ page, pageSize, filter, tags }: CatalogViewProps) {
+export default function CatalogView({ page, pageSize, filter }: CatalogViewProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const currency = filter.currency ?? DEFAULT_CURRENCY;
   const query = useGamesFiltered({ page, pageSize, ...filter, currency });
   const vendorsQuery = useVendors();
+  const tagsQuery = useTags();
 
   const totalItems = query.data?.totalGamesCount ?? 0;
   const items = query.data?.games ?? [];
@@ -48,7 +48,7 @@ export default function CatalogView({ page, pageSize, filter, tags }: CatalogVie
           key={toQueryString(filter).toString()}
           filter={filter}
           vendors={vendorsQuery.data?.vendors ?? []}
-          tags={tags}
+          tags={tagsQuery.data?.tags ?? []}
           onApply={applyFilter}
         />
       </Panel>

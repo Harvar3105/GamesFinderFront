@@ -17,6 +17,7 @@ export class Config {
   public readonly gameEndpoint: string;
   public readonly gameOffersEndpoint: string;
   public readonly vendorsEndpoint: string;
+  public readonly tagsEndpoint: string;
 
   public readonly userDataEndpoint: string;
   public readonly userPreferencesEndpoint: string;
@@ -56,6 +57,7 @@ export class Config {
     this.gameEndpoint = process.env.BACKEND_GET_GAME!;
     this.gameOffersEndpoint = process.env.BACKEND_GET_GAME_OFFERS!;
     this.vendorsEndpoint = process.env.BACKEND_GET_VENDORS!;
+    this.tagsEndpoint = process.env.BACKEND_GET_TAGS!;
 
     this.userDataEndpoint = process.env.BACKEND_USER_DATA!;
     this.userPreferencesEndpoint = process.env.BACKEND_USER_PREFERENCES!;

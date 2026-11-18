@@ -8,6 +8,7 @@ import type {
   GamesFilteredRequest,
   GamesFilteredResponse,
 } from "@/lib/shared/contracts/game/gamesFiltered";
+import type { TagsResponse } from "@/lib/shared/contracts/game/tags";
 import type { VendorsResponse } from "@/lib/shared/contracts/game/vendors";
 
 /** A page of games with their lowest prices (`GET /api/games`). Keeps the previous page while the next loads. */
@@ -29,5 +30,14 @@ export function useVendors() {
     queryKey: ["vendors"],
     queryFn: () => BFFFetch<VendorsResponse>({ uri: BffRoutes.vendors, method: "GET" }),
     staleTime: Infinity,
+  });
+}
+
+/** Tags of the stored games (`GET /api/tags`). The backend caches the list for an hour. */
+export function useTags() {
+  return useQuery<TagsResponse, FetchError>({
+    queryKey: ["tags"],
+    queryFn: () => BFFFetch<TagsResponse>({ uri: BffRoutes.tags, method: "GET" }),
+    staleTime: 60 * 60 * 1000,
   });
 }

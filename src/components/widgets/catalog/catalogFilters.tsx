@@ -104,7 +104,8 @@ export default function CatalogFilters({ filter, vendors, tags, onApply }: Catal
         onReset={handleReset}
         className="flex flex-wrap items-start gap-related-md"
       >
-        {/* TODO: [Stage3] Name search: the backend GamesFilter has no name field yet. */}
+        {/* TODO: [Stage3] Name search: the backend Game/searchByName takes no GamesFilter and returns no lowest
+            price, so it waits for a name field in GamesFilter of GetPagedWithLowestFiltered. */}
         <Field label="Source" htmlFor="filter-vendor" className="flex-[1_1_180px]">
           <Select
             id="filter-vendor"
