@@ -14,8 +14,13 @@ export interface GamesFilter {
   tags?: string[];
 }
 
-/** Query of GET /api/games and of the backend Game/GetPagedWithLowestFiltered endpoint. */
+/**
+ * Query of GET /api/games. Without `name` it goes to the backend Game/GetPagedWithLowestFiltered, with it to
+ * Game/getCatalogPage, which takes the same filter.
+ */
 export interface GamesFilteredRequest extends GamesFilter {
+  /** Case-insensitive part of the game name. */
+  name?: string;
   page: number;
   pageSize: number;
   /** The backend defaults to USD. */
@@ -29,7 +34,7 @@ export interface GameWithLowestPrice {
   lowestPrice: number | null;
 }
 
-/** Response of GET /api/games and of the backend Game/GetPagedWithLowestFiltered endpoint. */
+/** Response of GET /api/games and of the backend Game/GetPagedWithLowestFiltered and Game/getCatalogPage. */
 export interface GamesFilteredResponse {
   games: GameWithLowestPrice[];
   totalGamesCount: number;

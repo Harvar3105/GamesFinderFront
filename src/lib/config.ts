@@ -14,6 +14,7 @@ export class Config {
 
   public readonly backendUrl: string;
   public readonly gamesFilteredPagedEndpoint: string;
+  public readonly catalogPageEndpoint: string;
   public readonly gameEndpoint: string;
   public readonly gameOffersEndpoint: string;
   public readonly vendorsEndpoint: string;
@@ -54,6 +55,7 @@ export class Config {
 
     this.backendUrl = process.env.BACKEND_URL!;
     this.gamesFilteredPagedEndpoint = process.env.BACKEND_GET_GAMES_FILTERED!;
+    this.catalogPageEndpoint = process.env.BACKEND_GET_CATALOG_PAGE!;
     this.gameEndpoint = process.env.BACKEND_GET_GAME!;
     this.gameOffersEndpoint = process.env.BACKEND_GET_GAME_OFFERS!;
     this.vendorsEndpoint = process.env.BACKEND_GET_VENDORS!;

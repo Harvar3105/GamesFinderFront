@@ -23,6 +23,7 @@ const SORT_OPTIONS: { value: ESort; label: string }[] = [
 
 /** Form state: prices stay as typed until the filter is applied. */
 interface FilterDraft {
+  name: string;
   /** Empty string means all vendors. */
   vendor: EVendor | "";
   currency: ECurrency;
@@ -34,6 +35,7 @@ interface FilterDraft {
 
 function toDraft(filter: GamesFilterWithCurrency): FilterDraft {
   return {
+    name: filter.name ?? "",
     vendor: filter.vendor ?? "",
     currency: filter.currency ?? DEFAULT_CURRENCY,
     priceFrom: filter.min === undefined ? "" : String(filter.min),
@@ -80,6 +82,7 @@ export default function CatalogFilters({ filter, vendors, tags, onApply }: Catal
     if (rangeError !== null) return;
 
     onApply({
+      name: draft.name.trim() || undefined,
       min,
       max,
       vendor: draft.vendor || undefined,
@@ -104,8 +107,15 @@ export default function CatalogFilters({ filter, vendors, tags, onApply }: Catal
         onReset={handleReset}
         className="flex flex-wrap items-start gap-related-md"
       >
-        {/* TODO: [Stage3] Name search: the backend Game/searchByName takes no GamesFilter and returns no lowest
-            price, so it waits for a name field in GamesFilter of GetPagedWithLowestFiltered. */}
+        <Field label="Name" htmlFor="filter-name" className="flex-[2_1_240px]">
+          <Input
+            id="filter-name"
+            type="search"
+            placeholder="Part of the game name"
+            value={draft.name}
+            onChange={(e) => set("name", e.target.value)}
+          />
+        </Field>
         <Field label="Source" htmlFor="filter-vendor" className="flex-[1_1_180px]">
           <Select
             id="filter-vendor"

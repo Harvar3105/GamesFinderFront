@@ -4,6 +4,7 @@ import { EVendor } from "@/domain/entities/enums/EVendor";
 import type { GamesFilter } from "@/lib/shared/contracts/game/gamesFiltered";
 
 export interface GamesFilterWithCurrency extends GamesFilter {
+  name?: string;
   currency?: ECurrency;
 }
 
@@ -20,6 +21,11 @@ function readNumber(value: string | null): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+function readText(value: string | null): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 function readList(params: URLSearchParams, key: string): string[] | undefined {
   const values = params.getAll(key).filter((value) => value.trim() !== "");
   return values.length > 0 ? values : undefined;
@@ -31,6 +37,7 @@ function readList(params: URLSearchParams, key: string): string[] | undefined {
  */
 export function readGamesFilter(params: URLSearchParams): GamesFilterWithCurrency {
   return {
+    name: readText(params.get("name")),
     min: readNumber(params.get("min")),
     max: readNumber(params.get("max")),
     vendor: readEnum(EVendor, params.get("vendor")),
