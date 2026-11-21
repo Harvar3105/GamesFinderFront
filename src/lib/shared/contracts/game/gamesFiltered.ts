@@ -32,6 +32,13 @@ export interface GameWithLowestPrice {
   game: Game;
   /** In the requested currency; null when the game has no priced offer in it. */
   lowestPrice: number | null;
+  /**
+   * Vendors with an available offer for the game, regardless of the currency and vendor filter. Null when the
+   * backend endpoint does not return them.
+   */
+  // FIXME: [Stage3] Backend Game/GetPagedWithLowestFiltered does not return availableVendors, only
+  // Game/getCatalogPage does, so they are null without a name.
+  availableVendors: EVendor[] | null;
 }
 
 /** Response of GET /api/games and of the backend Game/GetPagedWithLowestFiltered and Game/getCatalogPage. */

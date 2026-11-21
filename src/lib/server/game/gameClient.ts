@@ -23,7 +23,16 @@ export class GameClient extends BackendClient {
     ...params
   }: GamesFilteredRequest): Promise<GamesFilteredResponse> {
     if (!name) {
-      return this.get<GamesFilteredResponse>(config.gamesFilteredPagedEndpoint, { params });
+      const response = await this.get<GamesFilteredResponse>(config.gamesFilteredPagedEndpoint, {
+        params,
+      });
+      return {
+        ...response,
+        games: response.games.map((item) => ({
+          ...item,
+          availableVendors: item.availableVendors ?? null,
+        })),
+      };
     }
 
     try {
