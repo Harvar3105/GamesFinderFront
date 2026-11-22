@@ -41,7 +41,7 @@ App Router file-based routing. Each folder is a URL segment, `page.tsx` is a pag
 | `api/(auth)/logout/route.ts` | `POST /api/logout` | BFF: sign out: revoke the session tokens in Identity, delete the session cookie and the Redis session |
 | `api/(auth)/logout-all/route.ts` | `POST /api/logout-all` | BFF: sign out of all devices: revoke every session of the user in Identity, then as `/api/logout` |
 | `api/(auth)/session/route.ts` | `GET` / `POST /api/session` | BFF: `GET` returns the remaining lifetime of the session (`SessionStatus`) without extending it; `POST` extends it ("Stay signed in"). 401 when the session is gone. Skipped by `proxy.ts` |
-| `api/games/route.ts` | `GET /api/games?page=&pageSize=&name=&min=&max=&vendor=&sort=&currency=&tags=` | BFF: a filtered page of games with their lowest prices from the backend `Game/getCatalogPage`, `name` only when set (its 404 is logged and becomes an empty page) (`gameClient`); answers 400 to invalid paging, a `pageSize` above `MAX_PAGE_SIZE` or invalid price bounds |
+| `api/games/route.ts` | `GET /api/games?page=&pageSize=&name=&min=&max=&vendor=&sort=&currency=&tags=` | BFF: a filtered page of games with their lowest prices from the backend `Game/getCatalogPage`, `name` only when set (its 404 is logged and becomes an empty page) (`gameClient`); answers 400 to invalid paging, a `pageSize` above `MAX_PAGE_SIZE`, a missing `currency` (required: the backend compares prices only within one currency, without conversion) or invalid price bounds |
 | `api/vendors/route.ts` | `GET /api/vendors` | BFF: offer vendors from the backend `GameOffer/vendors` (`gameClient`) |
 | `api/tags/route.ts` | `GET /api/tags` | BFF: tags of the stored games from the backend `Game/tags` (`gameClient`) |
 | `api/profilePicture/[userId]/route.ts` | `GET /api/profilePicture/<userId>` | BFF: anonymous proxy to the Identity profile picture; passes `If-None-Match` / `ETag` through (304); when the user has no picture, redirects to `DEFAULT_AVATAR` (302, not stored). Skipped by `proxy.ts` |
@@ -171,7 +171,7 @@ The backend (GamesFinderOrchester) and the Identity server are the source of tru
 | --- | --- |
 | Stage1 | BFF infrastructure: endpoints config, Redis sessions, token refresh, backend client, error normalization (done) |
 | Stage2 | auth: registration without roles and with a session, login errors, session restore in the layout, sign-out with token revocation, `ADMIN` / `USER` roles (done) |
-| Stage3 | catalog and home page from the backend (filters, sort, vendors, currency) (done; adapting to the reworked backend endpoints: the catalog goes through `Game/getCatalogPage` only) |
+| Stage3 | catalog and home page from the backend (filters, sort, vendors, currency) (adapting to the reworked backend endpoints: the catalog goes through `Game/getCatalogPage` only, with a required currency; open: game page offers from `GameOffer/getGameOffers`, offers table, vendor chips on one line — see `FIXME: [Stage3]`) |
 | Stage4 | game page: game and offers |
 | Stage5 | account: UserData, preferences, profile picture |
 | Stage6 | administration: scraping tasks, roles, picture moderation |

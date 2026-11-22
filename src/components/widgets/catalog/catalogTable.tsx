@@ -9,6 +9,8 @@ import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
 const MAX_VISIBLE_VENDORS = 2;
 
+// FIXME: [Stage3] Keep the vendors on one line on every window size: no wrapping, the overflow is cut with an
+// ellipsis.
 function VendorChips({ vendors }: { vendors: EVendor[] }) {
   if (vendors.length === 0) return <>—</>;
 

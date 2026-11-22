@@ -28,14 +28,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(`pageSize must not exceed ${config.maxPageSize}`, { status: 400 });
   }
 
-  const filter = readGamesFilter(params);
+  const { currency, ...filter } = readGamesFilter(params);
+  if (currency === undefined) {
+    return NextResponse.json("currency is required", { status: 400 });
+  }
+
   const priceRangeError = validatePriceRange(filter.min, filter.max);
   if (priceRangeError !== null) {
     return NextResponse.json(priceRangeError, { status: 400 });
   }
 
   try {
-    const response = await gameClient.getCatalogPage({ page, pageSize, ...filter });
+    const response = await gameClient.getCatalogPage({ page, pageSize, ...filter, currency });
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     return toErrorResponse(error);

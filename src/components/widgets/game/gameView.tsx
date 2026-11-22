@@ -6,6 +6,7 @@ import { formatPrice } from "@/components/helpers/format";
 import { ButtonLink, Chip, Icon, Panel, SectionHeading, Thumb } from "@/components/ui";
 import OffersTable from "@/components/widgets/game/offersTable";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
+import { ECurrency } from "@/domain/entities/enums/ECurrency";
 import type { Game } from "@/domain/entities/game";
 import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
 
@@ -38,7 +39,12 @@ export default function GameView({ id }: { id: string }) {
   }
 
   const game = query.data;
+  // FIXME: [Stage3] Offers never arrive here: the backend Game/getGame does not load them (Game.Offers is
+  // BsonIgnore), so this list is always empty. Load them from the backend GameOffer/getGameOffers?gameId=
+  // (`{ offers }`, BACKEND_GET_GAME_OFFERS) through a new BFF route with its own query, and drop `offers` from Game.
   const offers = game.offers ?? [];
+  // FIXME: [Stage4] Add a currency picker widget; until then the offers are shown in USD.
+  const offersCurrency = ECurrency.USD;
   const offersCount = offers.length;
 
   return (
@@ -116,7 +122,7 @@ export default function GameView({ id }: { id: string }) {
           }
         />
         <Panel padding="none">
-          <OffersTable offers={offers} />
+          <OffersTable offers={offers} currency={offersCurrency} />
         </Panel>
       </section>
     </>

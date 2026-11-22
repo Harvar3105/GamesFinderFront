@@ -20,8 +20,8 @@ export interface CatalogPageRequest extends GamesFilter {
   name?: string;
   page: number;
   pageSize: number;
-  /** The backend defaults to USD. */
-  currency?: ECurrency;
+  /** Required: the backend compares and filters prices only among offers in this currency, without conversion. */
+  currency: ECurrency;
 }
 
 export interface CatalogGame {
