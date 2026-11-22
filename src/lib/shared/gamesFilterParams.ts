@@ -53,9 +53,9 @@ export function validatePriceRange(
   max: number | undefined,
 ): string | null {
   if (min !== undefined && min < 0) return "The lower price must not be negative.";
-  if (max !== undefined && max < 1) return "The upper price must be at least 1.";
-  if (min !== undefined && max !== undefined && min >= max) {
-    return "The lower price must be less than the upper price.";
+  if (max !== undefined && max < 0) return "The upper price must not be negative.";
+  if (min !== undefined && max !== undefined && min > max) {
+    return "The lower price must not be greater than the upper price.";
   }
   return null;
 }

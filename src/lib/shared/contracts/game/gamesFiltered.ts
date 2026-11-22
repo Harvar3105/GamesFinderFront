@@ -14,12 +14,9 @@ export interface GamesFilter {
   tags?: string[];
 }
 
-/**
- * Query of GET /api/games. Without `name` it goes to the backend Game/GetPagedWithLowestFiltered, with it to
- * Game/getCatalogPage, which takes the same filter.
- */
+/** Query of GET /api/games and of the backend Game/getCatalogPage. */
 export interface GamesFilteredRequest extends GamesFilter {
-  /** Case-insensitive part of the game name. */
+  /** Case-insensitive part of the game name; omitted for the catalog start page. */
   name?: string;
   page: number;
   pageSize: number;
@@ -32,16 +29,11 @@ export interface GameWithLowestPrice {
   game: Game;
   /** In the requested currency; null when the game has no priced offer in it. */
   lowestPrice: number | null;
-  /**
-   * Vendors with an available offer for the game, regardless of the currency and vendor filter. Null when the
-   * backend endpoint does not return them.
-   */
-  // FIXME: [Stage3] Backend Game/GetPagedWithLowestFiltered does not return availableVendors, only
-  // Game/getCatalogPage does, so they are null without a name.
-  availableVendors: EVendor[] | null;
+  /** Vendors with an available offer for the game, regardless of the currency and vendor filter. */
+  availableVendors: EVendor[];
 }
 
-/** Response of GET /api/games and of the backend Game/GetPagedWithLowestFiltered and Game/getCatalogPage. */
+/** Response of GET /api/games and of the backend Game/getCatalogPage. */
 export interface GamesFilteredResponse {
   games: GameWithLowestPrice[];
   totalGamesCount: number;

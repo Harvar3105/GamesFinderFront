@@ -13,7 +13,6 @@ export class Config {
   public readonly tokenValidateEndpoint: string;
 
   public readonly backendUrl: string;
-  public readonly gamesFilteredPagedEndpoint: string;
   public readonly catalogPageEndpoint: string;
   public readonly gameEndpoint: string;
   public readonly gameOffersEndpoint: string;
@@ -42,6 +41,9 @@ export class Config {
   /** Session lifetime with "Remember me", extended the same way. */
   public readonly sessionPersistentTtlSeconds: number;
 
+  /** Largest `pageSize` the BFF passes to the backend, which has no upper bound of its own. */
+  public readonly maxPageSize: number;
+
   constructor() {
     this.identityUri = process.env.IDENTITY_URI!;
     this.profilePictureEndpoint = process.env.PROFILE_PICTURE!;
@@ -54,7 +56,6 @@ export class Config {
     this.tokenValidateEndpoint = process.env.TOKEN_VALIDATE!;
 
     this.backendUrl = process.env.BACKEND_URL!;
-    this.gamesFilteredPagedEndpoint = process.env.BACKEND_GET_GAMES_FILTERED!;
     this.catalogPageEndpoint = process.env.BACKEND_GET_CATALOG_PAGE!;
     this.gameEndpoint = process.env.BACKEND_GET_GAME!;
     this.gameOffersEndpoint = process.env.BACKEND_GET_GAME_OFFERS!;
@@ -89,6 +90,8 @@ export class Config {
       "SESSION_PERSISTENT_TTL_SECONDS",
       60 * 60 * 24 * 30,
     );
+
+    this.maxPageSize = readPositiveInt("MAX_PAGE_SIZE", 100);
   }
 }
 

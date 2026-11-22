@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { config } from "@/lib/config";
 import { toErrorResponse } from "@/lib/server/errors";
 import { gameClient } from "@/lib/server/game/gameClient";
 import { logger } from "@/lib/server/logger";
@@ -19,6 +20,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json("page and pageSize must be positive integers", { status: 400 });
   }
 
+  if (pageSize > config.maxPageSize) {
+    logger.warn({
+      msg: "Page size above the limit",
+      ctx: { url: request.url, maxPageSize: config.maxPageSize },
+    });
+    return NextResponse.json(`pageSize must not exceed ${config.maxPageSize}`, { status: 400 });
+  }
+
   const filter = readGamesFilter(params);
   const priceRangeError = validatePriceRange(filter.min, filter.max);
   if (priceRangeError !== null) {
@@ -26,7 +35,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await gameClient.getGamesFiltered({ page, pageSize, ...filter });
+    const response = await gameClient.getCatalogPage({ page, pageSize, ...filter });
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     return toErrorResponse(error);

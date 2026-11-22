@@ -9,8 +9,8 @@ import type { GameWithLowestPrice } from "@/lib/shared/contracts/game/gamesFilte
 
 const MAX_VISIBLE_VENDORS = 2;
 
-function VendorChips({ vendors }: { vendors: EVendor[] | null }) {
-  if (vendors === null || vendors.length === 0) return <>—</>;
+function VendorChips({ vendors }: { vendors: EVendor[] }) {
+  if (vendors.length === 0) return <>—</>;
 
   const visible = vendors.slice(0, MAX_VISIBLE_VENDORS);
   const hidden = vendors.slice(MAX_VISIBLE_VENDORS);

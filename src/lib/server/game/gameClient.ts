@@ -4,6 +4,7 @@ import { isAxiosError } from "axios";
 import type { Game } from "@/domain/entities/game";
 import { config } from "@/lib/config";
 import BackendClient from "@/lib/server/backendClient";
+import { logger } from "@/lib/server/logger";
 import type {
   GamesFilteredRequest,
   GamesFilteredResponse,
@@ -18,30 +19,17 @@ export class GameClient extends BackendClient {
   }
 
   /** The backend answers 400 to invalid paging or price bounds. */
-  async getGamesFiltered({
-    name,
-    ...params
-  }: GamesFilteredRequest): Promise<GamesFilteredResponse> {
-    if (!name) {
-      const response = await this.get<GamesFilteredResponse>(config.gamesFilteredPagedEndpoint, {
-        params,
-      });
-      return {
-        ...response,
-        games: response.games.map((item) => ({
-          ...item,
-          availableVendors: item.availableVendors ?? null,
-        })),
-      };
-    }
-
+  async getCatalogPage(params: GamesFilteredRequest): Promise<GamesFilteredResponse> {
     try {
-      return await this.get<GamesFilteredResponse>(config.catalogPageEndpoint, {
-        params: { ...params, name },
-      });
+      return await this.get<GamesFilteredResponse>(config.catalogPageEndpoint, { params });
     } catch (error) {
-      // getCatalogPage answers 404 when no game matches, GetPagedWithLowestFiltered an empty page.
+      // getCatalogPage answers 404 when no game matches. The log keeps a wrong endpoint path visible, since
+      // it also ends up as an empty page.
       if (isAxiosError(error) && error.response?.status === 404) {
+        logger.info({
+          msg: "Backend catalog page answered 404, returning an empty page",
+          ctx: { url: error.config?.url, params },
+        });
         return { games: [], totalGamesCount: 0 };
       }
       throw error;
@@ -49,6 +37,7 @@ export class GameClient extends BackendClient {
   }
 
   /** The backend answers 400 to a malformed id and 404 to an unknown one. */
+  // FIXME: [Stage3] The backend Game/getGame takes `gameId`, not `id`, and wraps the response as `{ game }`.
   async getGame(id: string): Promise<Game> {
     return this.get<Game>(config.gameEndpoint, { params: { id } });
   }
