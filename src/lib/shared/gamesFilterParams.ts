@@ -1,7 +1,7 @@
 import { ECurrency } from "@/domain/entities/enums/ECurrency";
 import { ESort } from "@/domain/entities/enums/ESort";
 import { EVendor } from "@/domain/entities/enums/EVendor";
-import type { GamesFilter } from "@/lib/shared/contracts/game/gamesFiltered";
+import type { GamesFilter } from "@/lib/shared/contracts/game/catalogPage";
 
 export interface GamesFilterWithCurrency extends GamesFilter {
   name?: string;

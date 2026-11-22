@@ -3,12 +3,12 @@ import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
 import { Thumb, panelClass } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
 import type { ECurrency } from "@/domain/entities/enums/ECurrency";
-import type { GameWithLowestPrice } from "@/lib/shared/contracts/game/gamesFiltered";
+import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
 // TODO: [Stage3] Bring back the "N sources" chip once the backend returns the vendors of every game with the
 // paged list.
 interface GameCardProps {
-  item: GameWithLowestPrice;
+  item: CatalogGame;
   /** Currency of the lowest price. */
   currency: ECurrency;
 }

@@ -15,7 +15,7 @@ export interface GamesFilter {
 }
 
 /** Query of GET /api/games and of the backend Game/getCatalogPage. */
-export interface GamesFilteredRequest extends GamesFilter {
+export interface CatalogPageRequest extends GamesFilter {
   /** Case-insensitive part of the game name; omitted for the catalog start page. */
   name?: string;
   page: number;
@@ -24,7 +24,7 @@ export interface GamesFilteredRequest extends GamesFilter {
   currency?: ECurrency;
 }
 
-export interface GameWithLowestPrice {
+export interface CatalogGame {
   /** Comes without offers. */
   game: Game;
   /** In the requested currency; null when the game has no priced offer in it. */
@@ -34,7 +34,7 @@ export interface GameWithLowestPrice {
 }
 
 /** Response of GET /api/games and of the backend Game/getCatalogPage. */
-export interface GamesFilteredResponse {
-  games: GameWithLowestPrice[];
+export interface CatalogPageResponse {
+  games: CatalogGame[];
   totalGamesCount: number;
 }

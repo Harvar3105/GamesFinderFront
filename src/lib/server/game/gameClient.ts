@@ -6,9 +6,9 @@ import { config } from "@/lib/config";
 import BackendClient from "@/lib/server/backendClient";
 import { logger } from "@/lib/server/logger";
 import type {
-  GamesFilteredRequest,
-  GamesFilteredResponse,
-} from "@/lib/shared/contracts/game/gamesFiltered";
+  CatalogPageRequest,
+  CatalogPageResponse,
+} from "@/lib/shared/contracts/game/catalogPage";
 import type { TagsResponse } from "@/lib/shared/contracts/game/tags";
 import type { VendorsResponse } from "@/lib/shared/contracts/game/vendors";
 
@@ -19,9 +19,9 @@ export class GameClient extends BackendClient {
   }
 
   /** The backend answers 400 to invalid paging or price bounds. */
-  async getCatalogPage(params: GamesFilteredRequest): Promise<GamesFilteredResponse> {
+  async getCatalogPage(params: CatalogPageRequest): Promise<CatalogPageResponse> {
     try {
-      return await this.get<GamesFilteredResponse>(config.catalogPageEndpoint, { params });
+      return await this.get<CatalogPageResponse>(config.catalogPageEndpoint, { params });
     } catch (error) {
       // getCatalogPage answers 404 when no game matches. The log keeps a wrong endpoint path visible, since
       // it also ends up as an empty page.

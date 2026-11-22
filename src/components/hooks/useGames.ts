@@ -5,18 +5,18 @@ import { BffRoutes } from "@/config/bffRoutes";
 import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
 import { toQueryString } from "@/lib/toQueryString";
 import type {
-  GamesFilteredRequest,
-  GamesFilteredResponse,
-} from "@/lib/shared/contracts/game/gamesFiltered";
+  CatalogPageRequest,
+  CatalogPageResponse,
+} from "@/lib/shared/contracts/game/catalogPage";
 import type { TagsResponse } from "@/lib/shared/contracts/game/tags";
 import type { VendorsResponse } from "@/lib/shared/contracts/game/vendors";
 
 /** A page of games with their lowest prices (`GET /api/games`). Keeps the previous page while the next loads. */
-export function useGamesFiltered(request: GamesFilteredRequest) {
-  return useQuery<GamesFilteredResponse, FetchError>({
+export function useCatalogPage(request: CatalogPageRequest) {
+  return useQuery<CatalogPageResponse, FetchError>({
     queryKey: ["games", request],
     queryFn: () =>
-      BFFFetch<GamesFilteredResponse>({
+      BFFFetch<CatalogPageResponse>({
         uri: `${BffRoutes.games}?${toQueryString(request)}`,
         method: "GET",
       }),

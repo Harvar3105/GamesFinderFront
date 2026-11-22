@@ -1,13 +1,13 @@
 "use client";
 
-import { useGamesFiltered } from "@/components/hooks/useGames";
+import { useCatalogPage } from "@/components/hooks/useGames";
 import GameCard from "@/components/widgets/gameCard";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
 import { DEFAULT_CURRENCY, RECENT_GAMES_COUNT } from "@/config/catalog";
 import { ESort } from "@/domain/entities/enums/ESort";
 
 export default function RecentGames() {
-  const query = useGamesFiltered({
+  const query = useCatalogPage({
     page: 1,
     pageSize: RECENT_GAMES_COUNT,
     sort: ESort.NEWEST_UPDATED,

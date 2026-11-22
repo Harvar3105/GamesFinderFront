@@ -5,7 +5,7 @@ import { Chip, Table, TableCell, TableHeader, ZoomThumb } from "@/components/ui"
 import { NavPages } from "@/config/navPages";
 import type { ECurrency } from "@/domain/entities/enums/ECurrency";
 import type { EVendor } from "@/domain/entities/enums/EVendor";
-import type { GameWithLowestPrice } from "@/lib/shared/contracts/game/gamesFiltered";
+import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
 const MAX_VISIBLE_VENDORS = 2;
 
@@ -28,7 +28,7 @@ function VendorChips({ vendors }: { vendors: EVendor[] }) {
 }
 
 interface CatalogTableProps {
-  items: GameWithLowestPrice[];
+  items: CatalogGame[];
   /** Currency of the lowest prices. */
   currency: ECurrency;
 }

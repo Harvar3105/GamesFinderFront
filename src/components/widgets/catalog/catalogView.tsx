@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useGamesFiltered, useTags, useVendors } from "@/components/hooks/useGames";
+import { useCatalogPage, useTags, useVendors } from "@/components/hooks/useGames";
 import { Chip, PageHeading, Panel } from "@/components/ui";
 import CatalogFilters from "@/components/widgets/catalog/catalogFilters";
 import CatalogTable from "@/components/widgets/catalog/catalogTable";
@@ -23,7 +23,7 @@ export default function CatalogView({ page, pageSize, filter }: CatalogViewProps
   const pathname = usePathname();
 
   const currency = filter.currency ?? DEFAULT_CURRENCY;
-  const query = useGamesFiltered({ page, pageSize, ...filter, currency });
+  const query = useCatalogPage({ page, pageSize, ...filter, currency });
   const vendorsQuery = useVendors();
   const tagsQuery = useTags();
 
