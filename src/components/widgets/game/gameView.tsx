@@ -54,6 +54,7 @@ export default function GameView({ id }: { id: string }) {
           alt={game.name}
           placeholder="Product image"
           sizes="(min-width: 840px) 640px, 100vw"
+          fit="contain"
           className="aspect-video max-w-[640px] flex-[1_1_420px]"
         />
 
