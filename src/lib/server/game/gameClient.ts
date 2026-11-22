@@ -4,6 +4,7 @@ import { isAxiosError } from "axios";
 import type { Game } from "@/domain/entities/game";
 import { config } from "@/lib/config";
 import BackendClient from "@/lib/server/backendClient";
+import type { BackendGameRequest, BackendGameResponse } from "@/lib/server/contracts/game/game";
 import { logger } from "@/lib/server/logger";
 import type {
   CatalogPageRequest,
@@ -37,9 +38,10 @@ export class GameClient extends BackendClient {
   }
 
   /** The backend answers 400 to a malformed id and 404 to an unknown one. */
-  // FIXME: [Stage3] The backend Game/getGame takes `gameId`, not `id`, and wraps the response as `{ game }`.
   async getGame(id: string): Promise<Game> {
-    return this.get<Game>(config.gameEndpoint, { params: { id } });
+    const params: BackendGameRequest = { gameId: id };
+    const response = await this.get<BackendGameResponse>(config.gameEndpoint, { params });
+    return response.game;
   }
 
   async getVendors(): Promise<VendorsResponse> {
