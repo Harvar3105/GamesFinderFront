@@ -1,6 +1,5 @@
 import type { Entity } from "./entity";
 import type { ECurrency } from "./enums/ECurrency";
-import type { Offer } from "./offer";
 
 export interface GameStoreMetadata {
   tags: string[];
@@ -17,8 +16,6 @@ export interface Game extends Entity {
   isDLC: boolean;
   description: string | null;
   headerImage: string | null;
-  /** Empty or missing when the endpoint returns games without offers (e.g. the paged list). */
-  offers?: Offer[] | null;
   isReleased: boolean;
   initialPrice: number | null;
   initialCurrency: ECurrency | null;

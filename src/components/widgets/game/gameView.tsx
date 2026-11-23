@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BffRoutes } from "@/config/bffRoutes";
 import { formatPrice } from "@/components/helpers/format";
+import { useGameOffers } from "@/components/hooks/useGames";
 import { ButtonLink, Chip, Icon, Panel, SectionHeading, Thumb } from "@/components/ui";
 import OffersTable from "@/components/widgets/game/offersTable";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
@@ -39,13 +40,6 @@ export default function GameView({ id }: { id: string }) {
   }
 
   const game = query.data;
-  // FIXME: [Stage3] Offers never arrive here: the backend Game/getGame does not load them (Game.Offers is
-  // BsonIgnore), so this list is always empty. Load them from the backend GameOffer/getGameOffers?gameId=
-  // (`{ offers }`, BACKEND_GET_GAME_OFFERS) through a new BFF route with its own query, and drop `offers` from Game.
-  const offers = game.offers ?? [];
-  // FIXME: [Stage4] Add a currency picker widget; until then the offers are shown in USD.
-  const offersCurrency = ECurrency.USD;
-  const offersCount = offers.length;
 
   return (
     <>
@@ -111,20 +105,43 @@ export default function GameView({ id }: { id: string }) {
         </div>
       </Panel>
 
-      <section aria-labelledby="offers-title" className="flex flex-col gap-related-lg">
-        <SectionHeading
-          id="offers-title"
-          title="Offers"
-          aside={
+      <GameOffers gameId={game.id} />
+    </>
+  );
+}
+
+function GameOffers({ gameId }: { gameId: string }) {
+  // FIXME: [Stage4] Add a currency picker widget; until then only the USD offers are loaded and shown.
+  const offersCurrency = ECurrency.USD;
+  const query = useGameOffers({ gameId, currency: offersCurrency, isAvailable: true });
+  const offersCount = query.data?.offers.length;
+
+  return (
+    <section aria-labelledby="offers-title" className="flex flex-col gap-related-lg">
+      <SectionHeading
+        id="offers-title"
+        title="Offers"
+        aside={
+          offersCount !== undefined && (
             <Chip>
               {offersCount} {offersCount === 1 ? "offer" : "offers"} · lowest price first
             </Chip>
-          }
+          )
+        }
+      />
+      {query.isPending ? (
+        <p aria-busy>Loading…</p>
+      ) : query.isError ? (
+        <RequestErrorAlert
+          error={query.error}
+          failureTitle="Failed to load the offers"
+          serverErrorText="Offers are currently unavailable. Please try again later."
         />
+      ) : (
         <Panel padding="none">
-          <OffersTable offers={offers} currency={offersCurrency} />
+          <OffersTable offers={query.data.offers} />
         </Panel>
-      </section>
-    </>
+      )}
+    </section>
   );
 }

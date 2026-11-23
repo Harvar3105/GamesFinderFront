@@ -10,6 +10,7 @@ import type {
   CatalogPageRequest,
   CatalogPageResponse,
 } from "@/lib/shared/contracts/game/catalogPage";
+import type { GameOffersRequest, GameOffersResponse } from "@/lib/shared/contracts/game/gameOffers";
 import type { TagsResponse } from "@/lib/shared/contracts/game/tags";
 import type { VendorsResponse } from "@/lib/shared/contracts/game/vendors";
 
@@ -42,6 +43,10 @@ export class GameClient extends BackendClient {
     const params: BackendGameRequest = { gameId: id };
     const response = await this.get<BackendGameResponse>(config.gameEndpoint, { params });
     return response.game;
+  }
+
+  async getGameOffers(params: GameOffersRequest): Promise<GameOffersResponse> {
+    return this.get<GameOffersResponse>(config.gameOffersEndpoint, { params });
   }
 
   async getVendors(): Promise<VendorsResponse> {

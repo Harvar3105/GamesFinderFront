@@ -8,6 +8,7 @@ import type {
   CatalogPageRequest,
   CatalogPageResponse,
 } from "@/lib/shared/contracts/game/catalogPage";
+import type { GameOffersRequest, GameOffersResponse } from "@/lib/shared/contracts/game/gameOffers";
 import type { TagsResponse } from "@/lib/shared/contracts/game/tags";
 import type { VendorsResponse } from "@/lib/shared/contracts/game/vendors";
 
@@ -21,6 +22,18 @@ export function useCatalogPage(request: CatalogPageRequest) {
         method: "GET",
       }),
     placeholderData: keepPreviousData,
+  });
+}
+
+/** Offers of one game (`GET /api/games/<id>/offers`); unset filter fields do not filter. */
+export function useGameOffers({ gameId, ...filter }: GameOffersRequest) {
+  return useQuery<GameOffersResponse, FetchError>({
+    queryKey: ["gameOffers", gameId, filter],
+    queryFn: () =>
+      BFFFetch<GameOffersResponse>({
+        uri: `${BffRoutes.gameOffers(gameId)}?${toQueryString(filter)}`,
+        method: "GET",
+      }),
   });
 }
 

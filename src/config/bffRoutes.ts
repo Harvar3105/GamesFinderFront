@@ -9,5 +9,6 @@ export const BffRoutes = {
   vendors: "/api/vendors",
   tags: "/api/tags",
   game: (id: string) => `/api/games/${encodeURIComponent(id)}`,
+  gameOffers: (id: string) => `/api/games/${encodeURIComponent(id)}/offers`,
   profilePicture: (userId: string) => `/api/profilePicture/${encodeURIComponent(userId)}`,
 };
