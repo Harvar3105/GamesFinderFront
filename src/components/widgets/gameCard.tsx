@@ -1,19 +1,21 @@
 import Link from "next/link";
 import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
-import { Thumb, panelClass } from "@/components/ui";
+import { vendorLabel } from "@/components/helpers/vendors";
+import { Chip, Thumb, panelClass } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
 import type { ECurrency } from "@/domain/entities/enums/ECurrency";
 import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
-// TODO: [Stage3] Bring back the "N sources" chip once the backend returns the vendors of every game with the
-// paged list.
 interface GameCardProps {
   item: CatalogGame;
   /** Currency of the lowest price. */
   currency: ECurrency;
 }
 
-export default function GameCard({ item: { game, lowestPrice }, currency }: GameCardProps) {
+export default function GameCard({
+  item: { game, lowestPrice, availableVendors },
+  currency,
+}: GameCardProps) {
   return (
     <Link
       href={NavPages.game(game.id)}
@@ -31,7 +33,14 @@ export default function GameCard({ item: { game, lowestPrice }, currency }: Game
           {lowestPrice === null ? "—" : `from ${formatPrice(lowestPrice, currency)}`}
         </span>
       </div>
-      <span className="typo-small">{formatTimeAgo(game.updatedAt)}</span>
+      <div className="mt-auto flex items-center justify-between gap-related-sm">
+        <span className="typo-small">{formatTimeAgo(game.updatedAt)}</span>
+        {availableVendors.length > 0 && (
+          <Chip title={availableVendors.map(vendorLabel).join(", ")}>
+            {availableVendors.length} {availableVendors.length === 1 ? "source" : "sources"}
+          </Chip>
+        )}
+      </div>
     </Link>
   );
 }
