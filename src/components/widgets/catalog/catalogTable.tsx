@@ -9,8 +9,10 @@ import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
 const MAX_VISIBLE_VENDORS = 2;
 
-// FIXME: [Stage3] Keep the vendors on one line on every window size: no wrapping, the overflow is cut with an
-// ellipsis.
+/**
+ * One line on every window size. The chips are inline boxes, not flex items, so that `text-overflow` cuts the
+ * overflow with an ellipsis; the full list is in the title.
+ */
 function VendorChips({ vendors }: { vendors: EVendor[] }) {
   if (vendors.length === 0) return <>—</>;
 
@@ -18,13 +20,16 @@ function VendorChips({ vendors }: { vendors: EVendor[] }) {
   const hidden = vendors.slice(MAX_VISIBLE_VENDORS);
 
   return (
-    <div className="flex flex-wrap gap-related-xs">
+    <div
+      title={vendors.map(vendorLabel).join(", ")}
+      className="max-w-60 space-x-related-xs overflow-hidden text-ellipsis whitespace-nowrap"
+    >
       {visible.map((vendor) => (
-        <Chip key={vendor}>{vendorLabel(vendor)}</Chip>
+        <Chip key={vendor} className="align-middle">
+          {vendorLabel(vendor)}
+        </Chip>
       ))}
-      {hidden.length > 0 && (
-        <Chip title={hidden.map(vendorLabel).join(", ")}>+{hidden.length}</Chip>
-      )}
+      {hidden.length > 0 && <Chip className="align-middle">+{hidden.length}</Chip>}
     </div>
   );
 }
