@@ -3,9 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { BffRoutes } from "@/config/bffRoutes";
 import { formatPrice } from "@/components/helpers/format";
+import { useGameOffers } from "@/components/hooks/useGames";
 import { ButtonLink, Chip, Icon, Panel, SectionHeading, Thumb } from "@/components/ui";
 import OffersTable from "@/components/widgets/game/offersTable";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
+import { ECurrency } from "@/domain/entities/enums/ECurrency";
 import type { Game } from "@/domain/entities/game";
 import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
 
@@ -38,8 +40,6 @@ export default function GameView({ id }: { id: string }) {
   }
 
   const game = query.data;
-  const offers = game.offers ?? [];
-  const offersCount = offers.length;
 
   return (
     <>
@@ -54,6 +54,7 @@ export default function GameView({ id }: { id: string }) {
           alt={game.name}
           placeholder="Product image"
           sizes="(min-width: 840px) 640px, 100vw"
+          fit="contain"
           className="aspect-video max-w-[640px] flex-[1_1_420px]"
         />
 
@@ -104,20 +105,43 @@ export default function GameView({ id }: { id: string }) {
         </div>
       </Panel>
 
-      <section aria-labelledby="offers-title" className="flex flex-col gap-related-lg">
-        <SectionHeading
-          id="offers-title"
-          title="Offers"
-          aside={
+      <GameOffers gameId={game.id} />
+    </>
+  );
+}
+
+function GameOffers({ gameId }: { gameId: string }) {
+  // FIXME: [Stage4] Add a currency picker widget; until then only the USD offers are loaded and shown.
+  const offersCurrency = ECurrency.USD;
+  const query = useGameOffers({ gameId, currency: offersCurrency, isAvailable: true });
+  const offersCount = query.data?.offers.length;
+
+  return (
+    <section aria-labelledby="offers-title" className="flex flex-col gap-related-lg">
+      <SectionHeading
+        id="offers-title"
+        title="Offers"
+        aside={
+          offersCount !== undefined && (
             <Chip>
               {offersCount} {offersCount === 1 ? "offer" : "offers"} · lowest price first
             </Chip>
-          }
+          )
+        }
+      />
+      {query.isPending ? (
+        <p aria-busy>Loading…</p>
+      ) : query.isError ? (
+        <RequestErrorAlert
+          error={query.error}
+          failureTitle="Failed to load the offers"
+          serverErrorText="Offers are currently unavailable. Please try again later."
         />
+      ) : (
         <Panel padding="none">
-          <OffersTable offers={offers} />
+          <OffersTable offers={query.data.offers} />
         </Panel>
-      </section>
-    </>
+      )}
+    </section>
   );
 }

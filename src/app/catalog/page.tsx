@@ -1,57 +1,8 @@
 import PageContainer from "@/components/layouts/pageContainer";
 import CatalogView from "@/components/widgets/catalog/catalogView";
 import { PAGE_SIZE_OPTIONS } from "@/config/pagination";
-
-// FIXME: Example values from the mockup. Replace with tags and genres from the BFF.
-const SOURCES: string[] = [];
-const TAGS = [
-  "Singleplayer",
-  "Multiplayer",
-  "Co-op",
-  "Online Co-op",
-  "PvP",
-  "Open World",
-  "Story Rich",
-  "Indie",
-  "Early Access",
-  "Free to Play",
-  "Controller Support",
-  "VR",
-  "Pixel Graphics",
-  "Atmospheric",
-  "Sandbox",
-  "Survival",
-  "Roguelike",
-  "Difficult",
-  "Casual",
-  "Family Friendly",
-  "Fantasy",
-  "Sci-fi",
-  "Horror",
-  "Anime",
-];
-const GENRES = [
-  "Action",
-  "Adventure",
-  "RPG",
-  "Strategy",
-  "Simulation",
-  "Sports",
-  "Racing",
-  "Puzzle",
-  "Platformer",
-  "Shooter",
-  "Fighting",
-  "Stealth",
-  "Rhythm",
-  "Card Game",
-  "MMO",
-  "Visual Novel",
-  "Tower Defense",
-  "City Builder",
-  "Metroidvania",
-  "Battle Royale",
-];
+import { readGamesFilter } from "@/lib/shared/gamesFilterParams";
+import { toQueryString } from "@/lib/toQueryString";
 
 function readPositiveInt(value: string | string[] | undefined, fallback: number): number {
   const parsed = Number(Array.isArray(value) ? value[0] : value);
@@ -67,10 +18,11 @@ export default async function CatalogPage({
   const perPage = readPositiveInt(params.perPage, PAGE_SIZE_OPTIONS[0]);
   const pageSize = PAGE_SIZE_OPTIONS.includes(perPage) ? perPage : PAGE_SIZE_OPTIONS[0];
   const page = readPositiveInt(params.page, 1);
+  const filter = readGamesFilter(toQueryString(params));
 
   return (
     <PageContainer>
-      <CatalogView page={page} pageSize={pageSize} tags={TAGS} genres={GENRES} />
+      <CatalogView page={page} pageSize={pageSize} filter={filter} />
     </PageContainer>
   );
 }

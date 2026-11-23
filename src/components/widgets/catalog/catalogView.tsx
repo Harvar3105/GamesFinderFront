@@ -1,38 +1,39 @@
 "use client";
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { BffRoutes } from "@/config/bffRoutes";
+import { usePathname, useRouter } from "next/navigation";
+import { useCatalogPage, useTags, useVendors } from "@/components/hooks/useGames";
 import { Chip, PageHeading, Panel } from "@/components/ui";
 import CatalogFilters from "@/components/widgets/catalog/catalogFilters";
 import CatalogTable from "@/components/widgets/catalog/catalogTable";
 import Pagination from "@/components/widgets/pagination";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { EVendor } from "@/domain/entities/enums/EVendor";
-import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
+import { DEFAULT_CURRENCY } from "@/config/catalog";
+import type { GamesFilterWithCurrency } from "@/lib/shared/gamesFilterParams";
 import { toQueryString } from "@/lib/toQueryString";
-import type { GamesPagedRequest, GamesPagedResponse } from "@/lib/shared/contracts/game/gamesPaged";
 
 interface CatalogViewProps {
   page: number;
   pageSize: number;
-  tags: string[];
-  genres: string[];
+  /** The filter from the page URL. */
+  filter: GamesFilterWithCurrency;
 }
 
-export default function CatalogView({ page, pageSize, tags, genres }: CatalogViewProps) {
-  const pageQuery: GamesPagedRequest = { page, pageSize };
-  const query = useQuery<GamesPagedResponse, FetchError>({
-    queryKey: ["games", page, pageSize],
-    queryFn: () =>
-      BFFFetch<GamesPagedResponse>({
-        uri: `${BffRoutes.games}?${toQueryString(pageQuery)}`,
-        method: "GET",
-      }),
-    placeholderData: keepPreviousData,
-  });
+export default function CatalogView({ page, pageSize, filter }: CatalogViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const currency = filter.currency ?? DEFAULT_CURRENCY;
+  const query = useCatalogPage({ page, pageSize, ...filter, currency });
+  const vendorsQuery = useVendors();
+  const tagsQuery = useTags();
 
   const totalItems = query.data?.totalGamesCount ?? 0;
-  const games = query.data?.games ?? [];
+  const items = query.data?.games ?? [];
+
+  // The filter lives in the URL, so pagination links and the browser history keep it. A new filter starts
+  // from the first page.
+  const applyFilter = (next: GamesFilterWithCurrency) =>
+    router.push(`${pathname}?${toQueryString({ ...next, perPage: pageSize })}`);
 
   return (
     <>
@@ -43,7 +44,13 @@ export default function CatalogView({ page, pageSize, tags, genres }: CatalogVie
       />
 
       <Panel as="section" aria-label="Filters and sorting">
-        <CatalogFilters sources={Object.values(EVendor)} tags={tags} genres={genres} />
+        <CatalogFilters
+          key={toQueryString(filter).toString()}
+          filter={filter}
+          vendors={vendorsQuery.data?.vendors ?? []}
+          tags={tagsQuery.data?.tags ?? []}
+          onApply={applyFilter}
+        />
       </Panel>
 
       {query.isError && (
@@ -63,10 +70,10 @@ export default function CatalogView({ page, pageSize, tags, genres }: CatalogVie
       >
         {query.isPending ? (
           <p className="p-related-lg">Loading…</p>
-        ) : games.length === 0 ? (
+        ) : items.length === 0 ? (
           <p className="p-related-lg">No products found.</p>
         ) : (
-          <CatalogTable games={games} />
+          <CatalogTable items={items} currency={currency} />
         )}
       </Panel>
 

@@ -1,9 +1,8 @@
 import PageContainer from "@/components/layouts/pageContainer";
 import { ButtonLink, Icon, Panel, SectionHeading } from "@/components/ui";
 import GuestOnly from "@/components/widgets/guestOnly";
-import GameCard from "@/components/widgets/gameCard";
+import RecentGames from "@/components/widgets/recentGames";
 import { NavPages } from "@/config/navPages";
-import type { Game } from "@/domain/entities/game";
 
 const STEPS = [
   {
@@ -19,26 +18,6 @@ const STEPS = [
     text: "The purchase happens on the chosen seller’s page.",
   },
 ];
-
-// FIXME: Placeholder games. Replace with recently updated games from the BFF once the endpoint exists.
-const PLACEHOLDER_DATE = new Date().toISOString();
-const RECENT_GAMES: Game[] = [1, 2, 3, 4].map((n) => ({
-  id: `placeholder-${n}`,
-  createdAt: PLACEHOLDER_DATE,
-  updatedAt: PLACEHOLDER_DATE,
-  name: `[Product name ${n}]`,
-  steamURL: null,
-  steamID: n,
-  inPackages: [],
-  isDLC: false,
-  description: null,
-  headerImage: null,
-  offers: [],
-  isReleased: false,
-  initialPrice: null,
-  initialCurrency: null,
-  storeMetadata: null,
-}));
 
 export default function HomePage() {
   return (
@@ -96,11 +75,7 @@ export default function HomePage() {
             </ButtonLink>
           }
         />
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-related-lg">
-          {RECENT_GAMES.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </div>
+        <RecentGames />
       </section>
     </PageContainer>
   );

@@ -1,99 +1,165 @@
 "use client";
 
 import { useState } from "react";
+import { vendorLabel } from "@/components/helpers/vendors";
 import { Button, Field, Input, Select } from "@/components/ui";
 import TagPicker from "@/components/widgets/tagPicker";
+import { DEFAULT_CURRENCY, DEFAULT_SORT } from "@/config/catalog";
+import { ECurrency } from "@/domain/entities/enums/ECurrency";
+import { ESort } from "@/domain/entities/enums/ESort";
+import type { EVendor } from "@/domain/entities/enums/EVendor";
+import { type GamesFilterWithCurrency, validatePriceRange } from "@/lib/shared/gamesFilterParams";
 
-export type CatalogSort = "updated" | "price-asc" | "price-desc" | "name-asc";
-
-// FIXME: [Stage3] Match the backend GamesFilter: min, max, vendor (Steam | InstantGaming | G2A), sort (ESort),
-// tags[], genres[]. Sort keys: updated -> newestUpdated, price-asc -> priceAsc, price-desc -> priceDesc,
-// name-asc -> name.
-export interface CatalogFilterValues {
-  // TODO: [Stage3] The backend has no name search yet.
-  search: string;
-  /** Empty string means all sources. */
-  source: string;
-  priceFrom: string;
-  priceTo: string;
-  sort: CatalogSort;
-  tags: string[];
-  genres: string[];
-}
-
-const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
-  { value: "updated", label: "Recently updated first" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
-  { value: "name-asc", label: "Name: A–Z" },
+const SORT_OPTIONS: { value: ESort; label: string }[] = [
+  { value: ESort.NEWEST_UPDATED, label: "Recently updated first" },
+  { value: ESort.OLDEST_UPDATED, label: "Least recently updated first" },
+  { value: ESort.NEWEST, label: "Recently added first" },
+  { value: ESort.OLDEST, label: "Earliest added first" },
+  { value: ESort.PRICE_ASC, label: "Price: low to high" },
+  { value: ESort.PRICE_DESC, label: "Price: high to low" },
+  { value: ESort.NAME, label: "Name: A–Z" },
+  { value: ESort.NAME_REVERSED, label: "Name: Z–A" },
 ];
 
-const EMPTY_FILTERS: CatalogFilterValues = {
-  search: "",
-  source: "",
-  priceFrom: "",
-  priceTo: "",
-  sort: "updated",
-  tags: [],
-  genres: [],
-};
-
-interface CatalogFiltersProps {
-  sources: string[];
+/** Form state: prices stay as typed until the filter is applied. */
+interface FilterDraft {
+  name: string;
+  /** Empty string means all vendors. */
+  vendor: EVendor | "";
+  currency: ECurrency;
+  priceFrom: string;
+  priceTo: string;
+  sort: ESort;
   tags: string[];
-  genres: string[];
 }
 
-export default function CatalogFilters({ sources, tags, genres }: CatalogFiltersProps) {
-  const [filters, setFilters] = useState<CatalogFilterValues>(EMPTY_FILTERS);
+function toDraft(filter: GamesFilterWithCurrency): FilterDraft {
+  return {
+    name: filter.name ?? "",
+    vendor: filter.vendor ?? "",
+    currency: filter.currency ?? DEFAULT_CURRENCY,
+    priceFrom: filter.min === undefined ? "" : String(filter.min),
+    priceTo: filter.max === undefined ? "" : String(filter.max),
+    sort: filter.sort ?? DEFAULT_SORT,
+    tags: filter.tags ?? [],
+  };
+}
 
-  const set = <K extends keyof CatalogFilterValues>(key: K, value: CatalogFilterValues[K]) =>
-    setFilters((current) => ({ ...current, [key]: value }));
+/** Empty input -> undefined, not a number -> null. A decimal comma is accepted. */
+function parsePrice(value: string): number | undefined | null {
+  const trimmed = value.trim().replace(",", ".");
+  if (trimmed === "") return undefined;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+interface CatalogFiltersProps {
+  /** The applied filter. Remount the component (`key`) when it changes to reset the form. */
+  filter: GamesFilterWithCurrency;
+  vendors: EVendor[];
+  tags: string[];
+  onApply: (filter: GamesFilterWithCurrency) => void;
+}
+
+export default function CatalogFilters({ filter, vendors, tags, onApply }: CatalogFiltersProps) {
+  const [draft, setDraft] = useState<FilterDraft>(() => toDraft(filter));
+  const [priceError, setPriceError] = useState<string | null>(null);
+
+  const set = <K extends keyof FilterDraft>(key: K, value: FilterDraft[K]) =>
+    setDraft((current) => ({ ...current, [key]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // FIX: Filters are not applied yet. Send them to the BFF catalog query once the endpoint exists.
+
+    const min = parsePrice(draft.priceFrom);
+    const max = parsePrice(draft.priceTo);
+    if (min === null || max === null) {
+      setPriceError("Enter prices as numbers.");
+      return;
+    }
+    const rangeError = validatePriceRange(min, max);
+    setPriceError(rangeError);
+    if (rangeError !== null) return;
+
+    onApply({
+      name: draft.name.trim() || undefined,
+      min,
+      max,
+      vendor: draft.vendor || undefined,
+      currency: draft.currency,
+      sort: draft.sort,
+      tags: draft.tags,
+    });
+  };
+
+  const handleReset = (e: React.FormEvent) => {
+    e.preventDefault();
+    // The URL may already hold no filter, and then the component is not remounted.
+    setDraft(toDraft({}));
+    setPriceError(null);
+    onApply({});
   };
 
   return (
     <div className="flex flex-col gap-related-lg">
       <form
         onSubmit={handleSubmit}
-        onReset={() => setFilters(EMPTY_FILTERS)}
-        className="flex flex-wrap items-end gap-related-md"
+        onReset={handleReset}
+        className="flex flex-wrap items-start gap-related-md"
       >
-        <Field label="Search" htmlFor="filter-search" className="flex-[3_1_260px]">
+        <Field label="Name" htmlFor="filter-name" className="flex-[2_1_240px]">
           <Input
-            id="filter-search"
+            id="filter-name"
             type="search"
-            placeholder="Product name"
-            value={filters.search}
-            onChange={(e) => set("search", e.target.value)}
+            placeholder="Part of the game name"
+            value={draft.name}
+            onChange={(e) => set("name", e.target.value)}
           />
         </Field>
-        <Field label="Source" htmlFor="filter-source" className="flex-[1_1_180px]">
+        <Field label="Source" htmlFor="filter-vendor" className="flex-[1_1_180px]">
           <Select
-            id="filter-source"
-            value={filters.source}
-            onChange={(e) => set("source", e.target.value)}
+            id="filter-vendor"
+            value={draft.vendor}
+            onChange={(e) => set("vendor", e.target.value as EVendor | "")}
           >
             <option value="">All sources</option>
-            {sources.map((source) => (
-              <option key={source} value={source}>
-                {source}
+            {vendors.map((vendor) => (
+              <option key={vendor} value={vendor}>
+                {vendorLabel(vendor)}
               </option>
             ))}
           </Select>
         </Field>
-        <Field label="Lowest price" labelId="filter-price-label" className="flex-[1_1_200px]">
+        <Field label="Currency" htmlFor="filter-currency" className="flex-[1_1_120px]">
+          <Select
+            id="filter-currency"
+            value={draft.currency}
+            onChange={(e) => set("currency", e.target.value as ECurrency)}
+          >
+            {Object.values(ECurrency).map((currency) => (
+              <option key={currency} value={currency}>
+                {currency}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field
+          label="Lowest price"
+          labelId="filter-price-label"
+          error={priceError}
+          errorId="filter-price-error"
+          className="flex-[1_1_200px]"
+        >
           <div role="group" aria-labelledby="filter-price-label" className="flex gap-related-sm">
             <Input
               type="text"
               inputMode="decimal"
               placeholder="from"
               aria-label="Price from"
+              aria-describedby={priceError ? "filter-price-error" : undefined}
+              invalid={priceError !== null}
               mono
-              value={filters.priceFrom}
+              value={draft.priceFrom}
               onChange={(e) => set("priceFrom", e.target.value)}
             />
             <Input
@@ -101,8 +167,10 @@ export default function CatalogFilters({ sources, tags, genres }: CatalogFilters
               inputMode="decimal"
               placeholder="to"
               aria-label="Price to"
+              aria-describedby={priceError ? "filter-price-error" : undefined}
+              invalid={priceError !== null}
               mono
-              value={filters.priceTo}
+              value={draft.priceTo}
               onChange={(e) => set("priceTo", e.target.value)}
             />
           </div>
@@ -110,8 +178,8 @@ export default function CatalogFilters({ sources, tags, genres }: CatalogFilters
         <Field label="Sort by" htmlFor="filter-sort" className="flex-[1_1_200px]">
           <Select
             id="filter-sort"
-            value={filters.sort}
-            onChange={(e) => set("sort", e.target.value as CatalogSort)}
+            value={draft.sort}
+            onChange={(e) => set("sort", e.target.value as ESort)}
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -120,7 +188,7 @@ export default function CatalogFilters({ sources, tags, genres }: CatalogFilters
             ))}
           </Select>
         </Field>
-        <div className="flex gap-related-sm">
+        <div className="flex gap-related-sm self-end">
           <Button type="submit" variant="primary">
             Apply
           </Button>
@@ -134,16 +202,9 @@ export default function CatalogFilters({ sources, tags, genres }: CatalogFilters
         <TagPicker
           label="Tags"
           options={tags}
-          selected={filters.tags}
+          selected={draft.tags}
           onChange={(value) => set("tags", value)}
           searchPlaceholder="Find tag"
-        />
-        <TagPicker
-          label="Genres"
-          options={genres}
-          selected={filters.genres}
-          onChange={(value) => set("genres", value)}
-          searchPlaceholder="Find genre"
         />
       </div>
     </div>

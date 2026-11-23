@@ -1,10 +1,32 @@
 import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
+import { vendorLabel } from "@/components/helpers/vendors";
 import { ButtonLink, Icon, Table, TableCell, TableHeader } from "@/components/ui";
 import type { Offer } from "@/domain/entities/offer";
 
-export default function OffersTable({ offers }: { offers: Offer[] }) {
-  // FIXME: [Stage4] amount is nullable: put offers without a price or unavailable ones last.
-  const sorted = [...offers].sort((a, b) => a.price - b.price);
+interface OffersTableProps {
+  /** Available offers in one currency: the backend filters them by availability and currency. */
+  offers: Offer[];
+}
+
+/** Cheapest first; offers without a price last. */
+function sortOffers(offers: Offer[]): Offer[] {
+  return [...offers].sort((a, b) => {
+    if (a.amount === null || b.amount === null) {
+      return Number(a.amount === null) - Number(b.amount === null);
+    }
+    return a.amount - b.amount;
+  });
+}
+
+function offerPrice(offer: Offer): string {
+  return offer.amount === null || offer.currency === null
+    ? "—"
+    : formatPrice(offer.amount, offer.currency);
+}
+
+export default function OffersTable({ offers }: OffersTableProps) {
+  const sorted = sortOffers(offers);
+  const lowest = sorted.length > 0 && sorted[0].amount !== null ? sorted[0] : null;
 
   return (
     <Table minWidth={640}>
@@ -19,11 +41,12 @@ export default function OffersTable({ offers }: { offers: Offer[] }) {
         </tr>
       </thead>
       <tbody>
-        {sorted.map((offer, index) => {
-          const isLowest = index === 0;
+        {sorted.map((offer) => {
+          const isLowest = offer === lowest;
+          const vendor = vendorLabel(offer.vendor);
           return (
             <tr key={offer.id}>
-              <TableCell className="font-semibold">{offer.vendor}</TableCell>
+              <TableCell className="font-semibold">{vendor}</TableCell>
               <TableCell
                 className={
                   isLowest
@@ -31,14 +54,14 @@ export default function OffersTable({ offers }: { offers: Offer[] }) {
                     : "text-right font-code whitespace-nowrap"
                 }
               >
-                {formatPrice(offer.price, offer.currency)}
+                {offerPrice(offer)}
               </TableCell>
               <TableCell className="whitespace-nowrap">{formatTimeAgo(offer.updatedAt)}</TableCell>
               <TableCell className="text-right">
                 <ButtonLink
-                  href={offer.url}
+                  href={offer.vendorsUrl}
                   variant={isLowest ? "primary" : "secondary"}
-                  aria-label={`Go to ${offer.vendor}`}
+                  aria-label={`Go to ${vendor}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

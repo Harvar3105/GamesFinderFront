@@ -102,10 +102,4 @@ export class AuthClient extends ApiClient {
   }
 }
 
-const globalForClient = globalThis as unknown as {
-  authClient?: AuthClient;
-};
-
-export const authClient = globalForClient.authClient ?? new AuthClient(config.identityUri);
-
-globalForClient.authClient = authClient;
+export const authClient = new AuthClient(config.identityUri);

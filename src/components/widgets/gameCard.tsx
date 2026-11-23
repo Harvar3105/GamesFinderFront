@@ -1,14 +1,21 @@
 import Link from "next/link";
 import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
-import { findLowestOffer } from "@/components/helpers/gameOffers";
+import { vendorLabel } from "@/components/helpers/vendors";
 import { Chip, Thumb, panelClass } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
-import type { Game } from "@/domain/entities/game";
+import type { ECurrency } from "@/domain/entities/enums/ECurrency";
+import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
-export default function GameCard({ game }: { game: Game }) {
-  const lowestOffer = findLowestOffer(game.offers);
-  const vendorsCount = game.offers?.length ?? 0;
+interface GameCardProps {
+  item: CatalogGame;
+  /** Currency of the lowest price. */
+  currency: ECurrency;
+}
 
+export default function GameCard({
+  item: { game, lowestPrice, availableVendors },
+  currency,
+}: GameCardProps) {
   return (
     <Link
       href={NavPages.game(game.id)}
@@ -23,16 +30,16 @@ export default function GameCard({ game }: { game: Game }) {
       <div className="flex flex-col gap-related-xs">
         <span className="font-semibold">{game.name}</span>
         <span className="font-code">
-          {lowestOffer === null || lowestOffer.amount === null
-            ? "—"
-            : `from ${formatPrice(lowestOffer.amount, lowestOffer.currency!)}`}
+          {lowestPrice === null ? "—" : `from ${formatPrice(lowestPrice, currency)}`}
         </span>
       </div>
-      <div className="flex flex-wrap justify-between gap-related-sm">
-        <Chip>
-          {vendorsCount} {vendorsCount === 1 ? "source" : "sources"}
-        </Chip>
+      <div className="mt-auto flex items-center justify-between gap-related-sm">
         <span className="typo-small">{formatTimeAgo(game.updatedAt)}</span>
+        {availableVendors.length > 0 && (
+          <Chip title={availableVendors.map(vendorLabel).join(", ")}>
+            {availableVendors.length} {availableVendors.length === 1 ? "source" : "sources"}
+          </Chip>
+        )}
       </div>
     </Link>
   );

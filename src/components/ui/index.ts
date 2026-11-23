@@ -19,5 +19,5 @@ export { default as PageHeading } from "./pageHeading";
 export { default as Panel, panelClass, type PanelPadding } from "./panel";
 export { default as SectionHeading } from "./sectionHeading";
 export { default as Table, TableHeader, TableCell } from "./table";
-export { default as Thumb } from "./thumb";
+export { default as Thumb, type ThumbFit } from "./thumb";
 export { default as ZoomThumb } from "./zoomThumb";

@@ -1,27 +1,46 @@
 import Link from "next/link";
 import { formatPrice, formatTimeAgo } from "@/components/helpers/format";
-import { findLowestOffer } from "@/components/helpers/gameOffers";
+import { vendorLabel } from "@/components/helpers/vendors";
 import { Chip, Table, TableCell, TableHeader, ZoomThumb } from "@/components/ui";
 import { NavPages } from "@/config/navPages";
-import type { Game } from "@/domain/entities/game";
+import type { ECurrency } from "@/domain/entities/enums/ECurrency";
+import type { EVendor } from "@/domain/entities/enums/EVendor";
+import type { CatalogGame } from "@/lib/shared/contracts/game/catalogPage";
 
-const VISIBLE_SOURCES = 2;
+const MAX_VISIBLE_VENDORS = 2;
 
-// TODO: [Stage3] See Product.sources: the catalog endpoint does not return vendors.
-function SourceChips({ sources }: { sources: string[] }) {
-  const hidden = sources.length - VISIBLE_SOURCES;
+/**
+ * One line on every window size. The chips are inline boxes, not flex items, so that `text-overflow` cuts the
+ * overflow with an ellipsis; the full list is in the title.
+ */
+function VendorChips({ vendors }: { vendors: EVendor[] }) {
+  if (vendors.length === 0) return <>—</>;
+
+  const visible = vendors.slice(0, MAX_VISIBLE_VENDORS);
+  const hidden = vendors.slice(MAX_VISIBLE_VENDORS);
 
   return (
-    <div className="flex flex-wrap gap-related-xs">
-      {sources.slice(0, VISIBLE_SOURCES).map((source) => (
-        <Chip key={source}>{source}</Chip>
+    <div
+      title={vendors.map(vendorLabel).join(", ")}
+      className="max-w-60 space-x-related-xs overflow-hidden text-ellipsis whitespace-nowrap"
+    >
+      {visible.map((vendor) => (
+        <Chip key={vendor} className="align-middle">
+          {vendorLabel(vendor)}
+        </Chip>
       ))}
-      {hidden > 0 && <Chip>+{hidden}</Chip>}
+      {hidden.length > 0 && <Chip className="align-middle">+{hidden.length}</Chip>}
     </div>
   );
 }
 
-export default function CatalogTable({ games }: { games: Game[] }) {
+interface CatalogTableProps {
+  items: CatalogGame[];
+  /** Currency of the lowest prices. */
+  currency: ECurrency;
+}
+
+export default function CatalogTable({ items, currency }: CatalogTableProps) {
   return (
     <Table highlightHover>
       <thead>
@@ -29,49 +48,44 @@ export default function CatalogTable({ games }: { games: Game[] }) {
           <TableHeader className="w-30">Photo</TableHeader>
           <TableHeader>Name</TableHeader>
           <TableHeader>Description</TableHeader>
+          <TableHeader>Sources</TableHeader>
           <TableHeader align="right">Original price</TableHeader>
           <TableHeader align="right">Lowest price</TableHeader>
-          <TableHeader>Sources</TableHeader>
           <TableHeader>Updated</TableHeader>
         </tr>
       </thead>
       <tbody>
-        {games.map((game) => {
-          const lowestOffer = findLowestOffer(game.offers);
-          return (
-            <tr key={game.id}>
-              <TableCell>
-                <ZoomThumb
-                  src={game.headerImage}
-                  alt=""
-                  placeholder="Photo"
-                  sizes="96px"
-                  className="aspect-video w-24"
-                />
-              </TableCell>
-              <TableCell>
-                <Link href={NavPages.game(game.id)} className="font-semibold">
-                  {game.name}
-                </Link>
-              </TableCell>
-              <TableCell className="max-w-[360px]">{game.description}</TableCell>
-              <TableCell className="text-right font-code whitespace-nowrap">
-                {game.initialPrice === null || game.initialCurrency === null
-                  ? "—"
-                  : formatPrice(game.initialPrice, game.initialCurrency)}
-              </TableCell>
-              <TableCell className="text-right font-code font-semibold whitespace-nowrap">
-                {lowestOffer === null || lowestOffer.amount === null
-                  ? "—"
-                  : formatPrice(lowestOffer.amount, lowestOffer.currency!)}
-              </TableCell>
-              <TableCell>
-                <SourceChips sources={(game.offers ?? []).map((offer) => offer.vendor)} />
-              </TableCell>
-              <TableCell className="whitespace-nowrap">{formatTimeAgo(game.updatedAt)}</TableCell>
-            </tr>
-          );
-        })}
+        {items.map(({ game, lowestPrice, availableVendors }) => (
+          <tr key={game.id}>
+            <TableCell>
+              <ZoomThumb
+                src={game.headerImage}
+                alt=""
+                placeholder="Photo"
+                sizes="96px"
+                className="aspect-video w-24"
+              />
+            </TableCell>
+            <TableCell>
+              <Link href={NavPages.game(game.id)} className="font-semibold">
+                {game.name}
+              </Link>
+            </TableCell>
+            <TableCell className="max-w-[360px]">{game.description}</TableCell>
+            <TableCell>
+              <VendorChips vendors={availableVendors} />
+            </TableCell>
+            <TableCell className="text-right font-code whitespace-nowrap">
+              {game.initialPrice === null || game.initialCurrency === null
+                ? "—"
+                : formatPrice(game.initialPrice, game.initialCurrency)}
+            </TableCell>
+            <TableCell className="text-right font-code font-semibold whitespace-nowrap">
+              {lowestPrice === null ? "—" : formatPrice(lowestPrice, currency)}
+            </TableCell>
+            <TableCell className="whitespace-nowrap">{formatTimeAgo(game.updatedAt)}</TableCell>
+          </tr>
+        ))}
       </tbody>
     </Table>
   );
