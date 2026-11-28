@@ -3,15 +3,16 @@
 import { useCatalogPage } from "@/components/hooks/useGames";
 import GameCard from "@/components/widgets/gameCard";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { DEFAULT_CURRENCY, RECENT_GAMES_COUNT } from "@/config/catalog";
+import { RECENT_GAMES_COUNT } from "@/config/catalog";
+import type { ECurrency } from "@/domain/entities/enums/ECurrency";
 import { ESort } from "@/domain/entities/enums/ESort";
 
-export default function RecentGames() {
+export default function RecentGames({ currency }: { currency: ECurrency }) {
   const query = useCatalogPage({
     page: 1,
     pageSize: RECENT_GAMES_COUNT,
     sort: ESort.NEWEST_UPDATED,
-    currency: DEFAULT_CURRENCY,
+    currency,
   });
 
   if (query.isPending) return <p aria-busy>Loading…</p>;
@@ -31,7 +32,7 @@ export default function RecentGames() {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-related-lg">
       {query.data.games.map((item) => (
-        <GameCard key={item.game.id} item={item} currency={DEFAULT_CURRENCY} />
+        <GameCard key={item.game.id} item={item} currency={currency} />
       ))}
     </div>
   );

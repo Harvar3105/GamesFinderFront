@@ -9,6 +9,7 @@ import NotificationProvider from "@/components/providers/notificationProvider";
 import QueryProvider from "@/components/providers/queryProvider";
 import UserProvider from "@/components/providers/userProvider";
 import SessionExpiryWatcher from "@/components/widgets/sessionExpiryWatcher";
+import { PreferenceCookies } from "@/config/cookies";
 import { ETheme } from "@/domain/entities/enums/ETheme";
 import { fetchCurrentUser } from "@/lib/server/session";
 
@@ -23,7 +24,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const initialTheme = cookieStore.get("theme")?.value === ETheme.DARK ? ETheme.DARK : ETheme.LIGHT;
+  const initialTheme =
+    cookieStore.get(PreferenceCookies.theme)?.value === ETheme.DARK ? ETheme.DARK : ETheme.LIGHT;
   const sessionUser = await fetchCurrentUser();
 
   return (

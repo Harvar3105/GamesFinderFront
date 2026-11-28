@@ -1,5 +1,7 @@
 "use client";
 
+import { writePreferenceCookie } from "@/components/helpers/preferenceCookies";
+import { PreferenceCookies } from "@/config/cookies";
 import { ETheme } from "@/domain/entities/enums/ETheme";
 import { createContext, useContext, useState, ReactNode } from "react";
 
@@ -23,7 +25,7 @@ export default function ThemeProvider({
     const next = theme === "light" ? ETheme.DARK : ETheme.LIGHT;
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
-    document.cookie = `theme=${next}; path=/; max-age=31536000`;
+    writePreferenceCookie(PreferenceCookies.theme, next);
   };
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;

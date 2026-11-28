@@ -3,6 +3,7 @@ import { ButtonLink, Icon, Panel, SectionHeading } from "@/components/ui";
 import GuestOnly from "@/components/widgets/guestOnly";
 import RecentGames from "@/components/widgets/recentGames";
 import { NavPages } from "@/config/navPages";
+import { readPageCurrency } from "@/lib/server/currency";
 
 const STEPS = [
   {
@@ -19,7 +20,9 @@ const STEPS = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const currency = await readPageCurrency();
+
   return (
     <PageContainer spacing="wide">
       <Panel as="section" padding="none" aria-labelledby="hero-title" className="flex flex-wrap">
@@ -75,7 +78,7 @@ export default function HomePage() {
             </ButtonLink>
           }
         />
-        <RecentGames />
+        <RecentGames currency={currency} />
       </section>
     </PageContainer>
   );

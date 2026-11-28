@@ -7,11 +7,17 @@ import { useGameOffers } from "@/components/hooks/useGames";
 import { ButtonLink, Chip, Icon, Panel, SectionHeading, Thumb } from "@/components/ui";
 import OffersTable from "@/components/widgets/game/offersTable";
 import RequestErrorAlert from "@/components/widgets/requestErrorAlert";
-import { ECurrency } from "@/domain/entities/enums/ECurrency";
+import type { ECurrency } from "@/domain/entities/enums/ECurrency";
 import type { Game } from "@/domain/entities/game";
 import BFFFetch, { type FetchError } from "@/lib/client/fetch/bffFetch";
 
-export default function GameView({ id }: { id: string }) {
+interface GameViewProps {
+  id: string;
+  /** Currency of the shown offers, resolved by the page. */
+  currency: ECurrency;
+}
+
+export default function GameView({ id, currency }: GameViewProps) {
   const query = useQuery<Game, FetchError>({
     queryKey: ["game", id],
     queryFn: () =>
@@ -105,15 +111,13 @@ export default function GameView({ id }: { id: string }) {
         </div>
       </Panel>
 
-      <GameOffers gameId={game.id} />
+      <GameOffers gameId={game.id} currency={currency} />
     </>
   );
 }
 
-function GameOffers({ gameId }: { gameId: string }) {
-  // FIXME: [Stage4] Add a currency picker widget; until then only the USD offers are loaded and shown.
-  const offersCurrency = ECurrency.USD;
-  const query = useGameOffers({ gameId, currency: offersCurrency, isAvailable: true });
+function GameOffers({ gameId, currency }: { gameId: string; currency: ECurrency }) {
+  const query = useGameOffers({ gameId, currency, isAvailable: true });
   const offersCount = query.data?.offers.length;
 
   return (

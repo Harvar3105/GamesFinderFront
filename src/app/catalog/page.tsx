@@ -1,6 +1,7 @@
 import PageContainer from "@/components/layouts/pageContainer";
 import CatalogView from "@/components/widgets/catalog/catalogView";
 import { PAGE_SIZE_OPTIONS } from "@/config/pagination";
+import { readPageCurrency } from "@/lib/server/currency";
 import { readGamesFilter } from "@/lib/shared/gamesFilterParams";
 import { toQueryString } from "@/lib/toQueryString";
 
@@ -18,7 +19,10 @@ export default async function CatalogPage({
   const perPage = readPositiveInt(params.perPage, PAGE_SIZE_OPTIONS[0]);
   const pageSize = PAGE_SIZE_OPTIONS.includes(perPage) ? perPage : PAGE_SIZE_OPTIONS[0];
   const page = readPositiveInt(params.page, 1);
-  const filter = readGamesFilter(toQueryString(params));
+  const filter = {
+    ...readGamesFilter(toQueryString(params)),
+    currency: await readPageCurrency(params.currency),
+  };
 
   return (
     <PageContainer>
