@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ECurrency } from "@/domain/entities/enums/ECurrency";
+import { readCurrency } from "@/domain/entities/enums/ECurrency";
 import { toErrorResponse } from "@/lib/server/errors";
 import { gameClient } from "@/lib/server/game/gameClient";
-
-function isCurrency(value: string): value is ECurrency {
-  return (Object.values(ECurrency) as string[]).includes(value);
-}
 
 function readBoolean(value: string | null): boolean | undefined | null {
   if (value === null) return undefined;
@@ -17,10 +13,11 @@ function readBoolean(value: string | null): boolean | undefined | null {
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const searchParams = request.nextUrl.searchParams;
-  const currency = searchParams.get("currency");
+  const rawCurrency = searchParams.get("currency");
+  const currency = readCurrency(rawCurrency);
   const isAvailable = readBoolean(searchParams.get("isAvailable"));
 
-  if (currency !== null && !isCurrency(currency)) {
+  if (rawCurrency !== null && currency === undefined) {
     return NextResponse.json("Unknown currency", { status: 400 });
   }
 
@@ -31,7 +28,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const response = await gameClient.getGameOffers({
       gameId: id,
-      currency: currency ?? undefined,
+      currency,
       isAvailable,
     });
     return NextResponse.json(response, { status: 200 });

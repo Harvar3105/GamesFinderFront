@@ -2,9 +2,17 @@ import PageContainer from "@/components/layouts/pageContainer";
 import { ButtonLink, Icon } from "@/components/ui";
 import GameView from "@/components/widgets/game/gameView";
 import { NavPages } from "@/config/navPages";
+import { readPageCurrency } from "@/lib/server/currency";
 
-export default async function GamePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function GamePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const currency = await readPageCurrency((await searchParams).currency);
 
   return (
     <PageContainer>
@@ -18,7 +26,7 @@ export default async function GamePage({ params }: { params: Promise<{ id: strin
         Back to catalog
       </ButtonLink>
 
-      <GameView id={id} />
+      <GameView id={id} currency={currency} />
     </PageContainer>
   );
 }
